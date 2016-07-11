@@ -57,9 +57,7 @@ int gonm_parent_send_client_socket(int child_socket, int client_socket)
     control_message_header->cmsg_len = CMSG_LEN(sizeof(int));
     *((int *) CMSG_DATA(control_message_header)) = client_socket;
 
-    if(sendmsg(child_socket, &message_header, 0) == -1)
-        return -1;
-    return 0;
+    return sendmsg(child_socket, &message_header, 0);
 }
 
 void gonm_parent_start(struct gonm_socket_array* child_socket_array)
