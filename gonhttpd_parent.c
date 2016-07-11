@@ -1,5 +1,4 @@
 #include <arpa/inet.h>
-#include <libgonc/gonc_list.h>
 #include <signal.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -29,7 +28,7 @@ void gonhttpd_parent_sigchld_handler(int signal_name)
     }
 }
 
-void gonhttpd_parent_start(struct gonhttpd_socket_list* child_socket_list)
+void gonhttpd_parent_start(struct gonhttpd_socket_array* child_socket_array)
 {
     int server_socket, client_socket;
     struct sockaddr_in server_address, client_address;
@@ -56,9 +55,10 @@ void gonhttpd_parent_start(struct gonhttpd_socket_list* child_socket_list)
         exit(1);
     }
 
-    while(true)
+    for(size_t i = 0;; i = (i + 1) % child_socket_array->size)
     {
         client_socket = accept(server_socket, (struct sockaddr*)&client_address, &client_address_length);
+        printf("i:%u\n", i);
         printf("client_address_length: %u\n", client_address_length);
         if(client_socket == -1)
             fprintf(stderr, "accept error\n");
