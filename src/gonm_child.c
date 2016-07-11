@@ -42,10 +42,14 @@ int gonm_child_receive_client_socket(int parent_socket)
 
 void gonm_child_start(int parent_socket)
 {
-    int client_socket;
-    while((client_socket = gonm_child_receive_client_socket(parent_socket)) != 0)
+    for(int client_socket = gonm_child_receive_client_socket(parent_socket); ; client_socket = gonm_child_receive_client_socket(parent_socket))
     {
-        if(client_socket == -1)
+        if(client_socket == 0)
+        {
+            fprintf(stderr, "%s:%d:%s\n", __FILE__, __LINE__, strerror(errno));
+            continue;
+        }
+        else if(client_socket == -1)
         {
             fprintf(stderr, "%s:%d:%s\n", __FILE__, __LINE__, strerror(errno));
             continue;
