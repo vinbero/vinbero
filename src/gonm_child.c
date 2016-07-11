@@ -33,7 +33,7 @@ int gonm_child_receive_client_socket(int parent_socket)
 
     for(control_message_header = CMSG_FIRSTHDR(&message_header); control_message_header != NULL; control_message_header = CMSG_NXTHDR(&message_header, control_message_header))
     {
-        if(control_message_header->cmsg_level == SOL_SOCKET && control_message_header->cmsg_type == SCM_RIGHTS)
+        if(control_message_header->cmsg_level == SOL_SOCKET && control_message_header->cmsg_type == SCM_RIGHTS && control_message_header->cmsg_len == CMSG_LEN(sizeof(int)))
             return *((int*)CMSG_DATA(control_message_header));
     }
 

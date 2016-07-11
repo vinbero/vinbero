@@ -29,7 +29,7 @@ void gonm_parent_sigchld_handler(int signal_name)
     }
 }
 
-int gonm_parent_send_client_socket(int child_socket, int client_socket)
+ssize_t gonm_parent_send_client_socket(int child_socket, int client_socket)
 {
     struct iovec io_vector[1];
     char io_vector_base[1];
