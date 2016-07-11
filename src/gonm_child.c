@@ -58,5 +58,4 @@ void gonm_child_start(int parent_socket)
         write(client_socket, "HTTP/1.1 200 OK\r\nServer: gonm\r\nContent-Length: 5\r\nContent-Type: text/plain\r\n\r\nHELLO\r\n", sizeof("HTTP/1.1 200 OK\r\nServer: gonm\r\nContent-Length: 5\r\nContent-Type: text/plain\r\n\r\nHELLO\r\n"));
         close(client_socket);
     }
-    fputs("parent socket closed", stderr);
 }
