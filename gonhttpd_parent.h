@@ -6,6 +6,7 @@
 GONC_ARRAY(gonhttpd_socket_array, int);
 
 void gonhttpd_parent_sigchld_handler(int signal_name);
+void gonhttpd_parent_send_client_socket(int child_socket, int client_socket);
 void gonhttpd_parent_start(struct gonhttpd_socket_array* child_socket_array);
 
 #endif
