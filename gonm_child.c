@@ -5,7 +5,7 @@
 #include <sys/socket.h>
 #include <unistd.h>
 
-int gonhttpd_child_receive_client_socket(int parent_socket)
+int gonm_child_receive_client_socket(int parent_socket)
 {
     int client_socket;
     struct msghdr message_header;
@@ -40,10 +40,10 @@ int gonhttpd_child_receive_client_socket(int parent_socket)
     return -1;
 }
 
-void gonhttpd_child_start(int parent_socket)
+void gonm_child_start(int parent_socket)
 {
     int client_socket;
-    while((client_socket = gonhttpd_child_receive_client_socket(parent_socket)) != 0)
+    while((client_socket = gonm_child_receive_client_socket(parent_socket)) != 0)
     {
         if(client_socket == -1)
         {
@@ -51,7 +51,7 @@ void gonhttpd_child_start(int parent_socket)
             continue;
         }
         
-        write(client_socket, "HTTP/1.1 200 OK\r\nServer: gonhttpd\r\nContent-Length: 5\r\nContent-Type: text/plain\r\n\r\nHELLO\r\n", sizeof("HTTP/1.1 200 OK\r\nServer: gonhttpd\r\nContent-Length: 5\r\nContent-Type: text/plain\r\n\r\nHELLO\r\n"));
+        write(client_socket, "HTTP/1.1 200 OK\r\nServer: gonm\r\nContent-Length: 5\r\nContent-Type: text/plain\r\n\r\nHELLO\r\n", sizeof("HTTP/1.1 200 OK\r\nServer: gonm\r\nContent-Length: 5\r\nContent-Type: text/plain\r\n\r\nHELLO\r\n"));
         close(client_socket);
     }
     fputs("parent socket closed", stderr);

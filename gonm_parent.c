@@ -8,9 +8,9 @@
 #include <sys/socket.h>
 #include <sys/wait.h>
 #include <unistd.h>
-#include "gonhttpd_parent.h"
+#include "gonm_parent.h"
 
-void gonhttpd_parent_sigchld_handler(int signal_name)
+void gonm_parent_sigchld_handler(int signal_name)
 {
     if(signal_name == SIGCHLD)
     {
@@ -29,7 +29,7 @@ void gonhttpd_parent_sigchld_handler(int signal_name)
     }
 }
 
-void gonhttpd_parent_send_client_socket(int child_socket, int client_socket)
+void gonm_parent_send_client_socket(int child_socket, int client_socket)
 {
     struct iovec io_vector[1];
     char io_vector_base[1];
@@ -60,7 +60,7 @@ void gonhttpd_parent_send_client_socket(int child_socket, int client_socket)
     sendmsg(child_socket, &message_header, 0);
 }
 
-void gonhttpd_parent_start(struct gonhttpd_socket_array* child_socket_array)
+void gonm_parent_start(struct gonm_socket_array* child_socket_array)
 {
     int server_socket;
     struct sockaddr_in server_address;
@@ -98,7 +98,7 @@ void gonhttpd_parent_start(struct gonhttpd_socket_array* child_socket_array)
             continue;
         }
 
-        gonhttpd_parent_send_client_socket(child_socket_array->elements[i], client_socket);
+        gonm_parent_send_client_socket(child_socket_array->elements[i], client_socket);
     }
 }
 
