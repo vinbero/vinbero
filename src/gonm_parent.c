@@ -29,7 +29,7 @@ void gonm_parent_sigchld_handler(int signal_name)
     }
 }
 
-void gonm_parent_send_client_socket(int child_socket, int client_socket)
+int gonm_parent_send_client_socket(int child_socket, int client_socket)
 {
     struct iovec io_vector[1];
     char io_vector_base[1];
@@ -57,7 +57,9 @@ void gonm_parent_send_client_socket(int child_socket, int client_socket)
     control_message_header->cmsg_len = CMSG_LEN(sizeof(int));
     *((int *) CMSG_DATA(control_message_header)) = client_socket;
 
-    sendmsg(child_socket, &message_header, 0);
+    if(sendmsg(child_socket, &message_header, 0) == -1)
+        return -1;
+    return 0;
 }
 
 void gonm_parent_start(struct gonm_socket_array* child_socket_array)
@@ -82,7 +84,7 @@ void gonm_parent_start(struct gonm_socket_array* child_socket_array)
         exit(EXIT_FAILURE);
     }
 
-    if(listen(server_socket, 10) == -1)
+    if(listen(server_socket, 1024) == -1)
     {
         fprintf(stderr, "%s:%d:%s\n", __FILE__, __LINE__, strerror(errno));
         exit(EXIT_FAILURE);
@@ -97,8 +99,10 @@ void gonm_parent_start(struct gonm_socket_array* child_socket_array)
             fprintf(stderr, "%s:%d:%s\n", __FILE__, __LINE__, strerror(errno));
             continue;
         }
-
-        gonm_parent_send_client_socket(child_socket_array->elements[i], client_socket);
+        if(gonm_parent_send_client_socket(child_socket_array->elements[i], client_socket) == -1)
+        {
+            fprintf(stderr, "%s:%d:%s\n", __FILE__, __LINE__, strerror(errno));
+        }
     }
 }
 
