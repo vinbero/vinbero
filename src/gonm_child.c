@@ -1,6 +1,7 @@
 #include <errno.h>
 #include <stdbool.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <sys/socket.h>
 #include <unistd.h>
@@ -44,8 +45,8 @@ void gonm_child_start(int parent_socket)
     {
         if(client_socket == 0)
         {
-            fprintf(stderr, "%s:%d:%s\n", __FILE__, __LINE__, strerror(errno));
-            continue;
+            fprintf(stderr, "%s:%d:%s\n", __FILE__, __LINE__, "Parent abnormally exited");
+            exit(EXIT_FAILURE);
         }
         else if(client_socket == -1)
         {
