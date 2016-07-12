@@ -60,14 +60,15 @@ ssize_t gonm_parent_send_client_socket(int child_socket, int client_socket)
     return sendmsg(child_socket, &message_header, 0);
 }
 
-void gonm_parent_start(struct gonm_socket_array* child_socket_array, const char* address, const int port, const int backlog)
+void gonm_parent_start(struct gonm_parent_args* parent_args)
 {
     int server_socket;
     struct sockaddr_in server_address;
+
     memset(server_address.sin_zero, 0, sizeof(server_address.sin_zero));
     server_address.sin_family = AF_INET;
-    inet_aton(address, &server_address.sin_addr);
-    server_address.sin_port = htons(port);
+    inet_aton(parent_args->address, &server_address.sin_addr);
+    server_address.sin_port = htons(parent_args->port);
 
     if((server_socket = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) == -1)
     {
@@ -87,20 +88,20 @@ void gonm_parent_start(struct gonm_socket_array* child_socket_array, const char*
         exit(EXIT_FAILURE);
     }
 
-    if(bind(server_socket, (struct sockaddr*)&server_address, sizeof(server_address)) == -1)
+    if(bind(server_socket, (struct sockaddr*)&server_address, sizeof(struct sockaddr)) == -1)
     {
         fprintf(stderr, "%s:%d:%s\n", __FILE__, __LINE__, strerror(errno));
         exit(EXIT_FAILURE);
     }
 
-    if(listen(server_socket, backlog) == -1)
+    if(listen(server_socket, parent_args->backlog) == -1)
     {
         fprintf(stderr, "%s:%d:%s\n", __FILE__, __LINE__, strerror(errno));
         exit(EXIT_FAILURE);
     }
 
     int client_socket;
-    for(size_t i = 0; ; i = (i + 1) % child_socket_array->size)
+    for(size_t i = 0; ; i = (i + 1) % parent_args->child_socket_array->size)
     {
         if((client_socket = accept(server_socket, NULL, NULL)) == -1)
         {
@@ -108,7 +109,7 @@ void gonm_parent_start(struct gonm_socket_array* child_socket_array, const char*
             continue;
         }
 
-        if(gonm_parent_send_client_socket(child_socket_array->elements[i], client_socket) == -1)
+        if(gonm_parent_send_client_socket(parent_args->child_socket_array->elements[i], client_socket) == -1)
         {
             fprintf(stderr, "%s:%d:%s\n", __FILE__, __LINE__, strerror(errno));
         }
