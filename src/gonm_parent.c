@@ -97,12 +97,11 @@ void gonm_parent_start(struct gonm_socket_array* child_socket_array)
         fprintf(stderr, "%s:%d:%s\n", __FILE__, __LINE__, strerror(errno));
         exit(EXIT_FAILURE);
     }
+
     int client_socket;
-    struct sockaddr_in client_address;
-    socklen_t client_address_length;
     for(size_t i = 0; ; i = (i + 1) % child_socket_array->size)
     {
-        if((client_socket = accept(server_socket, (struct sockaddr*)&client_address, &client_address_length)) == -1)
+        if((client_socket = accept(server_socket, NULL, NULL)) == -1)
         {
             fprintf(stderr, "%s:%d:%s\n", __FILE__, __LINE__, strerror(errno));
             continue;
