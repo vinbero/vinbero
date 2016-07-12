@@ -38,8 +38,8 @@ void gonm_start(size_t child_count, struct gonm_socket_array* child_socket_array
 
 int main(int argc, char* argv[])
 {
-    struct gonm_socket_array* child_socket_array = malloc(sizeof(struct gonm_socket_array));
-    GONC_ARRAY_INIT(child_socket_array, int, 2);
-    gonm_start(2, child_socket_array);
+    struct gonm_socket_array child_socket_array;
+    GONC_ARRAY_INIT(&child_socket_array, int, 3);
+    gonm_start(child_socket_array.capacity, &child_socket_array);
     return 0;
 }
