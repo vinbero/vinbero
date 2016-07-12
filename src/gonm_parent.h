@@ -1,9 +1,7 @@
 #ifndef _GONM_PARENT_H
 #define _GONM_PARENT_H
 
-#include <libgonc/gonc_array.h>
-
-GONC_ARRAY(gonm_socket_array, int);
+#include "gonm_socket_array.h"
 
 struct gonm_parent_args
 {

@@ -9,6 +9,7 @@
 #include <sys/wait.h>
 #include <unistd.h>
 #include "gonm_parent.h"
+#include "gonm_socket_array.h"
 
 void gonm_parent_sigchld_handler(int signal_name)
 {

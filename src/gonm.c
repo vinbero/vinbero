@@ -7,8 +7,10 @@
 #include "gonm.h"
 #include "gonm_parent.h"
 #include "gonm_child.h"
+#include "gonm_socket_array.h"
+#include "gonm_string_list.h"
 
-void gonm_start(size_t child_count, struct gonm_parent_args* parent_args, struct gonm_string_array* module_path_array)
+void gonm_start(size_t child_count, struct gonm_parent_args* parent_args, struct gonm_string_list* module_path_list)
 {
     if(child_count == 0)
     {
@@ -27,12 +29,12 @@ void gonm_start(size_t child_count, struct gonm_parent_args* parent_args, struct
     {
         close(socket_pair[1]);
         GONC_ARRAY_SET(parent_args->child_socket_array, parent_args->child_socket_array->size, socket_pair[0]);
-        gonm_start(child_count - 1, parent_args, module_path_array);
+        gonm_start(child_count - 1, parent_args, module_path_list);
     }
     else
     {
         close(socket_pair[0]);
-        gonm_child_start(socket_pair[1], module_path_array);
+        gonm_child_start(socket_pair[1], module_path_list);
     }
 }
 
@@ -41,14 +43,21 @@ int main(int argc, char* argv[])
     struct gonm_socket_array child_socket_array;
     GONC_ARRAY_INIT(&child_socket_array, int, 3);
 
-    struct gonm_string_array module_path_array;
-    GONC_ARRAY_INIT(&module_path_array, char*, 1);
-    GONC_ARRAY_SET(&module_path_array, 0, "/usr/local/lib/test.so");
+    struct gonm_string_list* module_path_list = malloc(sizeof(struct gonm_string_list));
+    GONC_LIST_INIT(module_path_list);
+    struct gonm_string_list_element* module_path = malloc(sizeof(struct gonm_string_list_element));
+    GONC_LIST_ELEMENT_INIT(module_path);
 
-    gonm_start(child_socket_array.capacity, &(struct gonm_parent_args){&child_socket_array, "0.0.0.0", 8080, 1024}, &module_path_array);
+    module_path->string = "/home/arch/git/gonm/src/libtest.so";
+
+    GONC_LIST_INSERT_AFTER(module_path_list, module_path_list->last, module_path);
+
+    gonm_start(child_socket_array.capacity, &(struct gonm_parent_args){&child_socket_array, "0.0.0.0", 8080, 1024}, module_path_list);
+
+    free(module_path);
+    free(module_path_list);
 
     free(child_socket_array.elements);
-    free(module_path_array.elements);
 
     return 0;
 }
