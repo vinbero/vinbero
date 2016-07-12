@@ -86,14 +86,6 @@ void gonm_parent_start(struct gonm_socket_array* child_socket_array)
         exit(EXIT_FAILURE);
     }
 
-/*
-    if(setsockopt(server_socket, SOL_SOCKET, SO_KEEPALIVE, &(const int){0}, sizeof(const int)) == -1)
-    {
-        fprintf(stderr, "%s:%d:%s\n", __FILE__, __LINE__, strerror(errno));
-        exit(EXIT_FAILURE);
-    }
-*/
-
     if(bind(server_socket, (struct sockaddr*)&server_address, sizeof(server_address)) == -1)
     {
         fprintf(stderr, "%s:%d:%s\n", __FILE__, __LINE__, strerror(errno));
@@ -115,7 +107,13 @@ void gonm_parent_start(struct gonm_socket_array* child_socket_array)
             fprintf(stderr, "%s:%d:%s\n", __FILE__, __LINE__, strerror(errno));
             continue;
         }
+
         if(gonm_parent_send_client_socket(child_socket_array->elements[i], client_socket) == -1)
+        {
+            fprintf(stderr, "%s:%d:%s\n", __FILE__, __LINE__, strerror(errno));
+        }
+
+        if(close(client_socket) == -1)
         {
             fprintf(stderr, "%s:%d:%s\n", __FILE__, __LINE__, strerror(errno));
         }
