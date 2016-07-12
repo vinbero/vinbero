@@ -5,6 +5,7 @@
 #include <string.h>
 #include <sys/socket.h>
 #include <unistd.h>
+#include "gonm_child.h"
 
 int gonm_child_receive_client_socket(int parent_socket)
 {
@@ -39,7 +40,7 @@ int gonm_child_receive_client_socket(int parent_socket)
     return -1;
 }
 
-void gonm_child_start(int parent_socket)
+void gonm_child_start(int parent_socket, struct gonm_string_array* module_path_array)
 {
     for(int client_socket = gonm_child_receive_client_socket(parent_socket); ; client_socket = gonm_child_receive_client_socket(parent_socket))
     {
@@ -53,8 +54,11 @@ void gonm_child_start(int parent_socket)
             fprintf(stderr, "%s:%d:%s\n", __FILE__, __LINE__, strerror(errno));
             continue;
         }
+
+        fprintf(stderr, "%s\n", module_path_array->elements[0]);
         
         write(client_socket, "HTTP/1.1 200 OK\r\nServer: gonm\r\nContent-Length: 5\r\nContent-Type: text/plain\r\n\r\nHELLO\r\n", sizeof("HTTP/1.1 200 OK\r\nServer: gonm\r\nContent-Length: 5\r\nContent-Type: text/plain\r\n\r\nHELLO\r\n"));
+        
         if(close(client_socket) == -1)
         {
             fprintf(stderr, "%s:%d:%s\n", __FILE__, __LINE__, strerror(errno));

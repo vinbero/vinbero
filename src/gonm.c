@@ -8,7 +8,7 @@
 #include "gonm_parent.h"
 #include "gonm_child.h"
 
-void gonm_start(size_t child_count, struct gonm_parent_args* parent_args)
+void gonm_start(size_t child_count, struct gonm_parent_args* parent_args, struct gonm_string_array* module_path_array)
 {
     if(child_count == 0)
     {
@@ -27,12 +27,12 @@ void gonm_start(size_t child_count, struct gonm_parent_args* parent_args)
     {
         close(socket_pair[1]);
         GONC_ARRAY_SET(parent_args->child_socket_array, parent_args->child_socket_array->size, socket_pair[0]);
-        gonm_start(child_count - 1, parent_args);
+        gonm_start(child_count - 1, parent_args, module_path_array);
     }
     else
     {
         close(socket_pair[0]);
-        gonm_child_start(socket_pair[1]);
+        gonm_child_start(socket_pair[1], module_path_array);
     }
 }
 
@@ -40,6 +40,15 @@ int main(int argc, char* argv[])
 {
     struct gonm_socket_array child_socket_array;
     GONC_ARRAY_INIT(&child_socket_array, int, 3);
-    gonm_start(child_socket_array.capacity, &(struct gonm_parent_args){&child_socket_array, "0.0.0.0", 8080, 1024});
+
+    struct gonm_string_array module_path_array;
+    GONC_ARRAY_INIT(&module_path_array, char*, 1);
+    GONC_ARRAY_SET(&module_path_array, 0, "/usr/local/lib/test.so");
+
+    gonm_start(child_socket_array.capacity, &(struct gonm_parent_args){&child_socket_array, "0.0.0.0", 8080, 1024}, &module_path_array);
+
+    free(child_socket_array.elements);
+    free(module_path_array.elements);
+
     return 0;
 }
