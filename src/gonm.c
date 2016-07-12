@@ -10,7 +10,6 @@
 
 void gonm_start(size_t child_count, struct gonm_socket_array* child_socket_array)
 {
-    int socket_pair[2];
     if(child_count == 0)
     {
         struct sigaction sigchld_action;
@@ -22,6 +21,7 @@ void gonm_start(size_t child_count, struct gonm_socket_array* child_socket_array
         //gonm_parent_stop();
         return;
     }
+    int socket_pair[2];
     socketpair(AF_UNIX, SOCK_STREAM, 0, socket_pair);
     if(fork() != 0)
     {
