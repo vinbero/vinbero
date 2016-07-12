@@ -8,7 +8,7 @@
 #include "gonm_parent.h"
 #include "gonm_child.h"
 
-void gonm_start(size_t child_count, struct gonm_socket_array* child_socket_array)
+void gonm_start(size_t child_count, struct gonm_socket_array* child_socket_array, const char* address, const int port, const int backlog)
 {
     if(child_count == 0)
     {
@@ -17,7 +17,7 @@ void gonm_start(size_t child_count, struct gonm_socket_array* child_socket_array
         sigemptyset(&sigchld_action.sa_mask);
         sigchld_action.sa_flags = 0;
         sigaction(SIGCHLD, &sigchld_action, NULL);
-        gonm_parent_start(child_socket_array);
+        gonm_parent_start(child_socket_array, address, port, backlog);
         //gonm_parent_stop();
         return;
     }
@@ -25,9 +25,9 @@ void gonm_start(size_t child_count, struct gonm_socket_array* child_socket_array
     socketpair(AF_UNIX, SOCK_STREAM, 0, socket_pair);
     if(fork() != 0)
     {
-       close(socket_pair[1]);
-       GONC_ARRAY_SET(child_socket_array, child_socket_array->size, socket_pair[0]);
-       gonm_start(child_count - 1, child_socket_array);
+        close(socket_pair[1]);
+        GONC_ARRAY_SET(child_socket_array, child_socket_array->size, socket_pair[0]);
+        gonm_start(child_count - 1, child_socket_array, address, port, backlog);
     }
     else
     {
@@ -40,6 +40,6 @@ int main(int argc, char* argv[])
 {
     struct gonm_socket_array child_socket_array;
     GONC_ARRAY_INIT(&child_socket_array, int, 3);
-    gonm_start(child_socket_array.capacity, &child_socket_array);
+    gonm_start(child_socket_array.capacity, &child_socket_array, "0.0.0.0", 8080, 1024);
     return 0;
 }

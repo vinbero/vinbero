@@ -55,19 +55,20 @@ ssize_t gonm_parent_send_client_socket(int child_socket, int client_socket)
     control_message_header->cmsg_level = SOL_SOCKET;
     control_message_header->cmsg_type = SCM_RIGHTS;
     control_message_header->cmsg_len = CMSG_LEN(sizeof(int));
-    *((int *) CMSG_DATA(control_message_header)) = client_socket;
+    *((int*)CMSG_DATA(control_message_header)) = client_socket;
 
     return sendmsg(child_socket, &message_header, 0);
 }
 
-void gonm_parent_start(struct gonm_socket_array* child_socket_array)
+void gonm_parent_start(struct gonm_socket_array* child_socket_array, const char* address, const int port, const int backlog)
 {
     int server_socket;
     struct sockaddr_in server_address;
     memset(server_address.sin_zero, 0, sizeof(server_address.sin_zero));
     server_address.sin_family = AF_INET;
-    inet_aton("0.0.0.0", &server_address.sin_addr);
-    server_address.sin_port = htons(8080);
+    inet_aton(address, &server_address.sin_addr);
+    server_address.sin_port = htons(port);
+
     if((server_socket = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) == -1)
     {
         fprintf(stderr, "%s:%d:%s\n", __FILE__, __LINE__, strerror(errno));
@@ -92,7 +93,7 @@ void gonm_parent_start(struct gonm_socket_array* child_socket_array)
         exit(EXIT_FAILURE);
     }
 
-    if(listen(server_socket, 1024) == -1)
+    if(listen(server_socket, backlog) == -1)
     {
         fprintf(stderr, "%s:%d:%s\n", __FILE__, __LINE__, strerror(errno));
         exit(EXIT_FAILURE);
