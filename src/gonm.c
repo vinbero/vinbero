@@ -45,16 +45,20 @@ int main(int argc, char* argv[])
 
     struct gonm_string_list* module_path_list = malloc(sizeof(struct gonm_string_list));
     GONC_LIST_INIT(module_path_list);
+
     struct gonm_string_list_element* module_path = malloc(sizeof(struct gonm_string_list_element));
     GONC_LIST_ELEMENT_INIT(module_path);
-
     module_path->string = "/home/arch/git/gonm/src/libtest.so";
-
     GONC_LIST_INSERT_AFTER(module_path_list, module_path_list->tail, module_path);
 
     gonm_start(child_socket_array.capacity, &(struct gonm_parent_args){&child_socket_array, "0.0.0.0", 8080, 1024}, module_path_list);
 
-    free(module_path);
+    for(struct gonc_string_list_element* target_element; module_path_list->size > 0; )
+    {
+        target_element = module_path_list->head;
+        GONC_LIST_REMOVE(module_path_list, module_path_list->head);
+        free(target_element);
+    }
     free(module_path_list);
 
     free(child_socket_array.elements);
