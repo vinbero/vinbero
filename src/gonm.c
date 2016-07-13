@@ -50,7 +50,7 @@ int main(int argc, char* argv[])
 
     module_path->string = "/home/arch/git/gonm/src/libtest.so";
 
-    GONC_LIST_INSERT_AFTER(module_path_list, module_path_list->last, module_path);
+    GONC_LIST_INSERT_AFTER(module_path_list, module_path_list->tail, module_path);
 
     gonm_start(child_socket_array.capacity, &(struct gonm_parent_args){&child_socket_array, "0.0.0.0", 8080, 1024}, module_path_list);
 

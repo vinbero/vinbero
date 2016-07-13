@@ -47,7 +47,7 @@ void gonm_child_start(int parent_socket, struct gonm_string_list* module_path_li
     int (*gonm_module_run)(int, struct gonm_string_list*);
     void* dl_handle;
 
-    if((dl_handle = dlopen(module_path_list->first->string, RTLD_LAZY)) == NULL)
+    if((dl_handle = dlopen(module_path_list->head->string, RTLD_LAZY)) == NULL)
     {
         fprintf(stderr, "%s:%d:%s\n", __FILE__, __LINE__, strerror(errno));
         exit(EXIT_FAILURE);
