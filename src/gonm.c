@@ -12,7 +12,7 @@
 #include "gonm_child.h"
 #include "gonm_cond_array.h"
 #include "gonm_mutex_array.h"
-#include "gonm_int_array.h"
+#include "gonm_socket_list_array.h"
 
 void gonm_start(struct gonm_parent_args* parent_args, struct gonm_child_args_array* child_args_array)
 {
@@ -25,7 +25,7 @@ void gonm_start(struct gonm_parent_args* parent_args, struct gonm_child_args_arr
     {
         GONC_ARRAY_GET(child_args_array, index).client_socket_cond = GONC_ARRAY_GET(parent_args->client_socket_cond_array, index);
         GONC_ARRAY_GET(child_args_array, index).client_socket_mutex = GONC_ARRAY_GET(parent_args->client_socket_mutex_array, index);
-        GONC_ARRAY_GET(child_args_array, index).client_socket = &(GONC_ARRAY_GET(parent_args->client_socket_array, index));
+        GONC_ARRAY_GET(child_args_array, index).client_socket_list = GONC_ARRAY_GET(parent_args->client_socket_list_array, index);
         if(pthread_create(threads + index, &thread_attr, gonm_child_start, &(GONC_ARRAY_GET(child_args_array, index))) != 0)
         {
             fprintf(stderr, "%s:%d:%s\n", __FILE__, __LINE__, strerror(errno));
@@ -35,12 +35,12 @@ void gonm_start(struct gonm_parent_args* parent_args, struct gonm_child_args_arr
 
     gonm_parent_start(parent_args);
 }
-
+#define CHILD_COUNT 3
 int main(int argc, char* argv[])
 {
 
     struct gonm_cond_array* client_socket_cond_array = malloc(sizeof(struct gonm_cond_array));
-    GONC_ARRAY_INIT(client_socket_cond_array, 3);
+    GONC_ARRAY_INIT(client_socket_cond_array, CHILD_COUNT);
     for(size_t index = 0; index != GONC_ARRAY_SIZE(client_socket_cond_array); ++index)
     {
         GONC_ARRAY_SET(client_socket_cond_array, index, malloc(sizeof(pthread_cond_t)));
@@ -48,25 +48,28 @@ int main(int argc, char* argv[])
     }
 
     struct gonm_mutex_array* client_socket_mutex_array = malloc(sizeof(struct gonm_mutex_array));
-    GONC_ARRAY_INIT(client_socket_mutex_array, 3);
+    GONC_ARRAY_INIT(client_socket_mutex_array, CHILD_COUNT);
     for(size_t index = 0; index != GONC_ARRAY_SIZE(client_socket_mutex_array); ++index)
     {
         GONC_ARRAY_SET(client_socket_mutex_array, index, malloc(sizeof(pthread_mutex_t)));
         pthread_mutex_init(GONC_ARRAY_GET(client_socket_mutex_array, index), NULL);
     }
 
-    struct gonm_int_array* client_socket_array = malloc(sizeof(struct gonm_int_array));
-    GONC_ARRAY_INIT(client_socket_array, 3);
+    struct gonm_socket_list_array* client_socket_list_array = malloc(sizeof(struct gonm_socket_list_array));
+    GONC_ARRAY_INIT(client_socket_list_array, CHILD_COUNT);
     for(size_t index = 0; index != GONC_ARRAY_SIZE(client_socket_cond_array); ++index)
-        GONC_ARRAY_SET(client_socket_array, index, -1);
+    {
+        GONC_ARRAY_SET(client_socket_list_array, index, malloc(sizeof(struct gonm_socket_list)));
+        GONC_LIST_INIT(GONC_ARRAY_GET(client_socket_list_array, index));
+    }
 
     struct gonm_child_args_array* child_args_array = malloc(sizeof(struct gonm_child_args_array));
-    GONC_ARRAY_INIT(child_args_array, 3);
+    GONC_ARRAY_INIT(child_args_array, CHILD_COUNT);
 
     struct gonm_parent_args* parent_args = malloc(sizeof(struct gonm_parent_args));
     parent_args->client_socket_cond_array = client_socket_cond_array;
     parent_args->client_socket_mutex_array = client_socket_mutex_array;
-    parent_args->client_socket_array = client_socket_array;
+    parent_args->client_socket_list_array = client_socket_list_array;
     parent_args->address = "0.0.0.0";
     parent_args->port = 8080;
     parent_args->backlog = 1024;

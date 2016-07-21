@@ -2,12 +2,13 @@
 #define _GONM_CHILD_H
 
 #include <libgonc/gonc_array.h>
+#include "gonm_socket_list.h"
 
 struct gonm_child_args
 {
     pthread_cond_t* client_socket_cond;
     pthread_mutex_t* client_socket_mutex;
-    int* client_socket;
+    struct gonm_socket_list* client_socket_list;
 };
 
 struct gonm_child_args_array
