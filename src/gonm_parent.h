@@ -5,6 +5,9 @@
 
 struct gonm_parent_args
 {
+    char* address;
+    int port;
+    int backlog;
     size_t child_count;
     struct gonm_child_args* child_args;
 };
