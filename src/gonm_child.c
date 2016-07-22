@@ -1,3 +1,4 @@
+#include <arpa/inet.h>
 #include <dlfcn.h>
 #include <errno.h>
 #include <pthread.h>
@@ -8,29 +9,61 @@
 #include <sys/socket.h>
 #include <unistd.h>
 #include "gonm_child.h"
-#include "gonm_socket_list.h"
 
-void* gonm_child_start(void* child_args)
+void* gonm_child_start(void* _child_args)
 {
-    struct gonm_socket_list_element* client_socket_list_element;
-    while(true)
-    {
-        pthread_mutex_lock(((struct gonm_child_args*)child_args)->client_socket_mutex);
-        while(GONC_LIST_SIZE(((struct gonm_child_args*)child_args)->client_socket_list) < 1)
-            pthread_cond_wait(((struct gonm_child_args*)child_args)->client_socket_cond, ((struct gonm_child_args*)child_args)->client_socket_mutex);
-        client_socket_list_element = GONC_LIST_HEAD(((struct gonm_child_args*)child_args)->client_socket_list);
-        GONC_LIST_REMOVE(((struct gonm_child_args*)child_args)->client_socket_list, client_socket_list_element);
-        pthread_mutex_unlock(((struct gonm_child_args*)child_args)->client_socket_mutex);
-        
+    struct gonm_child_args* child_args = _child_args;
+    int server_socket;
+    struct sockaddr_in server_address;
+    memset(server_address.sin_zero, 0, sizeof(server_address.sin_zero));
+    server_address.sin_family = AF_INET;
+    inet_aton(child_args->address, &server_address.sin_addr);
+    server_address.sin_port = htons(child_args->port);
 
-        write(client_socket_list_element->socket, "HTTP/1.1 200 OK\r\nServer: gonm\r\nContent-Length: 5\r\nContent-Type: text/plain\r\n\r\nHELLO\r\n", sizeof("HTTP/1.1 200 OK\r\nServer: gonm\r\nContent-Length: 5\r\nContent-Type: text/plain\r\n\r\nHELLO\r\n"));
+    if((server_socket = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) == -1)
+    {
+        fprintf(stderr, "%s:%d:%s\n", __FILE__, __LINE__, strerror(errno));
+        exit(EXIT_FAILURE);
+    }
+
+    if(setsockopt(server_socket, SOL_SOCKET, SO_REUSEADDR, &(const int){1}, sizeof(const int)) == -1)
+    {
+        fprintf(stderr, "%s:%d:%s\n", __FILE__, __LINE__, strerror(errno));
+        exit(EXIT_FAILURE);
+    }
+
+    if(setsockopt(server_socket, SOL_SOCKET, SO_REUSEPORT, &(const int){1}, sizeof(const int)) == -1)
+    {
+        fprintf(stderr, "%s:%d:%s\n", __FILE__, __LINE__, strerror(errno));
+        exit(EXIT_FAILURE);
+    }
+
+    if(bind(server_socket, (struct sockaddr*)&server_address, sizeof(struct sockaddr)) == -1)
+    {
+        fprintf(stderr, "%s:%d:%s\n", __FILE__, __LINE__, strerror(errno));
+        exit(EXIT_FAILURE);
+    }
+
+    if(listen(server_socket, child_args->backlog) == -1)
+    {
+        fprintf(stderr, "%s:%d:%s\n", __FILE__, __LINE__, strerror(errno));
+        exit(EXIT_FAILURE);
+    }
+
+    for(int client_socket;;)
+    {
+        if((client_socket = accept(server_socket, NULL, NULL)) == -1)
+        {
+            fprintf(stderr, "%s:%d:%s\n", __FILE__, __LINE__, strerror(errno));
+            continue;
+        }
+
+        write(client_socket, "HTTP/1.1 200 OK\r\nServer: gonm\r\nContent-Length: 5\r\nContent-Type: text/plain\r\n\r\nHELLO\r\n", sizeof("HTTP/1.1 200 OK\r\nServer: gonm\r\nContent-Length: 5\r\nContent-Type: text/plain\r\n\r\nHELLO\r\n"));
         
-        if(close(client_socket_list_element->socket) == -1)
+        if(close(client_socket) == -1)
         {
             fprintf(stderr, "%s:%d:%s\n", __FILE__, __LINE__, strerror(errno));
         }
-
-        free(client_socket_list_element);
     }
     return NULL;
 }
