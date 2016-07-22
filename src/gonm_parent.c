@@ -10,7 +10,6 @@
 
 void gonm_parent_start(struct gonm_parent_args* parent_args)
 {
-    int server_socket;
     struct sockaddr_in server_address;
 
     memset(server_address.sin_zero, 0, sizeof(server_address.sin_zero));
@@ -18,31 +17,31 @@ void gonm_parent_start(struct gonm_parent_args* parent_args)
     inet_aton(parent_args->address, &server_address.sin_addr);
     server_address.sin_port = htons(parent_args->port);
 
-    if((server_socket = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) == -1)
+    if((parent_args->child_args->server_socket = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) == -1)
     {
         fprintf(stderr, "%s:%d:%s\n", __FILE__, __LINE__, strerror(errno));
         exit(EXIT_FAILURE);
     }
 
-    if(setsockopt(server_socket, SOL_SOCKET, SO_REUSEADDR, &(const int){1}, sizeof(const int)) == -1)
+    if(setsockopt(parent_args->child_args->server_socket, SOL_SOCKET, SO_REUSEADDR, &(const int){1}, sizeof(const int)) == -1)
     {
         fprintf(stderr, "%s:%d:%s\n", __FILE__, __LINE__, strerror(errno));
         exit(EXIT_FAILURE);
     }
 
-    if(setsockopt(server_socket, SOL_SOCKET, SO_REUSEPORT, &(const int){1}, sizeof(const int)) == -1)
+    if(setsockopt(parent_args->child_args->server_socket, SOL_SOCKET, SO_REUSEPORT, &(const int){1}, sizeof(const int)) == -1)
     {
         fprintf(stderr, "%s:%d:%s\n", __FILE__, __LINE__, strerror(errno));
         exit(EXIT_FAILURE);
     }
 
-    if(bind(server_socket, (struct sockaddr*)&server_address, sizeof(struct sockaddr)) == -1)
+    if(bind(parent_args->child_args->server_socket, (struct sockaddr*)&server_address, sizeof(struct sockaddr)) == -1)
     {
         fprintf(stderr, "%s:%d:%s\n", __FILE__, __LINE__, strerror(errno));
         exit(EXIT_FAILURE);
     }
 
-    if(listen(server_socket, parent_args->backlog) == -1)
+    if(listen(parent_args->child_args->server_socket, parent_args->backlog) == -1)
     {
         fprintf(stderr, "%s:%d:%s\n", __FILE__, __LINE__, strerror(errno));
         exit(EXIT_FAILURE);
@@ -52,7 +51,6 @@ void gonm_parent_start(struct gonm_parent_args* parent_args)
     pthread_attr_t thread_attr;
     pthread_attr_init(&thread_attr);
     pthread_attr_setdetachstate(&thread_attr, PTHREAD_CREATE_JOINABLE);
-    parent_args->child_args->server_socket = server_socket;
     parent_args->child_args->server_socket_mutex = malloc(sizeof(pthread_mutex_t));
     pthread_mutex_init(parent_args->child_args->server_socket_mutex, NULL);    
     for(size_t index = 0; index != parent_args->child_count; ++index)
