@@ -33,9 +33,7 @@ void* gonm_child_start(void* child_args)
     {
         pthread_mutex_lock(((struct gonm_child_args*)child_args)->client_socket_mutex);
         while(GONC_LIST_SIZE(((struct gonm_child_args*)child_args)->client_socket_list) < 1)
-        {
             pthread_cond_wait(((struct gonm_child_args*)child_args)->client_socket_cond, ((struct gonm_child_args*)child_args)->client_socket_mutex);
-        }
         client_socket_list_element = GONC_LIST_HEAD(((struct gonm_child_args*)child_args)->client_socket_list);
         GONC_LIST_REMOVE(((struct gonm_child_args*)child_args)->client_socket_list, client_socket_list_element);
         pthread_mutex_unlock(((struct gonm_child_args*)child_args)->client_socket_mutex);
