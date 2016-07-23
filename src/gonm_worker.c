@@ -2,7 +2,9 @@
 #include <pthread.h>
 #include <sys/socket.h>
 #include <unistd.h>
+#include <libgonc/gonc_hmap.h>
 #include "gonm_worker.h"
+#include "gonm_context.h"
 
 void* gonm_worker_start(void* worker_args)
 {
