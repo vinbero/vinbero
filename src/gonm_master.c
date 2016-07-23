@@ -1,6 +1,7 @@
 #include <arpa/inet.h>
 #include <err.h>
 #include <pthread.h>
+#include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
 #include "gonm_master.h"
@@ -54,10 +55,15 @@ void gonm_master_start(struct gonm_master_args* master_args)
     }
 
     free(worker_args_array);
+    struct gonm_context_element* context_element;
     for(size_t index = 0; index != GONC_HMAP_CAPACITY(master_args->worker_args->context); ++index)
     {
-        if(master_args->worker_args->context->gonc_hmap.elements[index] != NULL)
-            free(GONC_HMAP_INDEX(master_args->worker_args->context, index));
+        while(true)
+        {
+            GONC_HMAP_INDEX_REMOVE(master_args->worker_args->context, index, context_element);
+            if(context_element == NULL) break;
+            context_element->destroy(context_element);
+        }
     }
     GONC_HMAP_FREE_ELEMENTS(master_args->worker_args->context);
     free(master_args->worker_args->context);

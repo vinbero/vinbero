@@ -7,6 +7,7 @@ struct gonm_context_element
 {
     void* data;
     size_t data_size;
+    int (*destroy)(struct gonm_context_element*);
     GONC_HMAP_ELEMENT(struct gonm_context_element);
 };
 
