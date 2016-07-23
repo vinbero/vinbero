@@ -16,5 +16,7 @@ int main(int argc, char* argv[])
     master_args->worker_count = 3;
     master_args->worker_args = malloc(sizeof(struct gonm_worker_args));
     gonm_master_start(master_args);
+    free(master_args->worker_args);
+    free(master_args);
     return 0;
 }

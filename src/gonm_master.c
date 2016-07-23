@@ -61,6 +61,10 @@ void gonm_master_start(struct gonm_master_args* master_args)
             exit(EXIT_FAILURE);
         }
     }
-    while(true){sleep(1);}
+    for(size_t index = 0; index != master_args->worker_count; ++index)
+        pthread_join(threads[index], NULL);
+    pthread_mutex_destroy(master_args->worker_args->server_socket_mutex);
+    free(master_args->worker_args->server_socket_mutex);
+    free(threads);
 }
 
