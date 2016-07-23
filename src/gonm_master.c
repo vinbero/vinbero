@@ -5,7 +5,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include "gonm_master.h"
-#include "gonm_context.h"
 
 void gonm_master_start(struct gonm_master_args* master_args)
 {
@@ -36,8 +35,6 @@ void gonm_master_start(struct gonm_master_args* master_args)
     pthread_attr_setdetachstate(&thread_attr, PTHREAD_CREATE_JOINABLE);
     master_args->worker_args->server_socket_mutex = malloc(sizeof(pthread_mutex_t));
     pthread_mutex_init(master_args->worker_args->server_socket_mutex, NULL);
-    master_args->worker_args->context = malloc(sizeof(struct gonm_context));
-    GONC_HMAP_INIT(master_args->worker_args->context, 101);
     struct gonm_worker_args** worker_args_array = malloc(master_args->worker_count * sizeof(struct gonm_worker_args*));
 
     for(size_t index = 0; index != master_args->worker_count; ++index)
@@ -55,18 +52,6 @@ void gonm_master_start(struct gonm_master_args* master_args)
     }
 
     free(worker_args_array);
-    struct gonm_context_attribute* context_attribute;
-    for(size_t index = 0; index != GONC_HMAP_CAPACITY(master_args->worker_args->context); ++index)
-    {
-        while(true)
-        {
-            GONC_HMAP_INDEX_REMOVE(master_args->worker_args->context, index, context_attribute);
-            if(context_attribute == NULL) break;
-            context_attribute->destroy(context_attribute);
-        }
-    }
-    GONC_HMAP_FREE_ELEMENTS(master_args->worker_args->context);
-    free(master_args->worker_args->context);
     pthread_mutex_destroy(master_args->worker_args->server_socket_mutex);
     free(master_args->worker_args->server_socket_mutex);
     free(threads);
