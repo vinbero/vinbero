@@ -55,14 +55,14 @@ void gonm_master_start(struct gonm_master_args* master_args)
     }
 
     free(worker_args_array);
-    struct gonm_context_element* context_element;
+    struct gonm_context_attribute* context_attribute;
     for(size_t index = 0; index != GONC_HMAP_CAPACITY(master_args->worker_args->context); ++index)
     {
         while(true)
         {
-            GONC_HMAP_INDEX_REMOVE(master_args->worker_args->context, index, context_element);
-            if(context_element == NULL) break;
-            context_element->destroy(context_element);
+            GONC_HMAP_INDEX_REMOVE(master_args->worker_args->context, index, context_attribute);
+            if(context_attribute == NULL) break;
+            context_attribute->destroy(context_attribute);
         }
     }
     GONC_HMAP_FREE_ELEMENTS(master_args->worker_args->context);
