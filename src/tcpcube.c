@@ -2,13 +2,13 @@
 #include <unistd.h>
 #include <libgonc/gonc_list.h>
 #include <libgonc/gonc_string.h>
-#include "gonm_master.h"
-#include "gonm_options.h"
+#include "tcpcube_master.h"
+#include "tcpcube_options.h"
 
 int main(int argc, char* argv[])
 {    
-    struct gonm_master_args* master_args = malloc(sizeof(struct gonm_master_args));
-    master_args->module_args_list = malloc(sizeof(struct gonm_module_args_list));
+    struct tcpcube_master_args* master_args = malloc(sizeof(struct tcpcube_master_args));
+    master_args->module_args_list = malloc(sizeof(struct tcpcube_module_args_list));
     GONC_LIST_INIT(master_args->module_args_list);
 
     master_args->set_uid = geteuid();
@@ -18,9 +18,9 @@ int main(int argc, char* argv[])
     master_args->backlog = 1024;
     master_args->worker_count = 4;
 
-    gonm_options_process(argc, argv, master_args);
+    tcpcube_options_process(argc, argv, master_args);
 
-    gonm_master_start(master_args);
+    tcpcube_master_start(master_args);
 
     free(master_args);
 

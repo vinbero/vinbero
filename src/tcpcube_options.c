@@ -2,11 +2,11 @@
 #include <getopt.h>
 #include <stdlib.h>
 #include <string.h>
-#include "gonm_options.h"
-#include "gonm_master.h"
-#include "gonm_help.h"
+#include "tcpcube_options.h"
+#include "tcpcube_master.h"
+#include "tcpcube_help.h"
 
-void gonm_options_process(int argc, char* argv[], struct gonm_master_args* master_args)
+void tcpcube_options_process(int argc, char* argv[], struct tcpcube_master_args* master_args)
 {
     struct option options[] = {
         {"help", no_argument, NULL, 'h'},
@@ -21,8 +21,8 @@ void gonm_options_process(int argc, char* argv[], struct gonm_master_args* maste
         {NULL, 0, NULL, 0}
     };
 
-    struct gonm_module_args* module_args;
-    struct gonm_module_arg* module_arg;
+    struct tcpcube_module_args* module_args;
+    struct tcpcube_module_arg* module_arg;
     char* module_args_string;
     char* module_path_string;
     char* module_arg_string;
@@ -32,7 +32,7 @@ void gonm_options_process(int argc, char* argv[], struct gonm_master_args* maste
         switch(option_char)
         {
         case 'h':
-            gonm_help_print();
+            tcpcube_help_print();
             exit(EXIT_SUCCESS);
             break;
         case 'u':
@@ -57,7 +57,7 @@ void gonm_options_process(int argc, char* argv[], struct gonm_master_args* maste
             master_args->worker_count = strtol(optarg, NULL, 10);
             break;
         case 'm':
-            module_args = malloc(sizeof(struct gonm_module_args));
+            module_args = malloc(sizeof(struct tcpcube_module_args));
             GONC_LIST_INIT(module_args);
             module_args_string = strdup(optarg);
             for(size_t i = 0; (module_arg_string = strsep(&module_args_string, ",")) != NULL; ++i)
@@ -69,7 +69,7 @@ void gonm_options_process(int argc, char* argv[], struct gonm_master_args* maste
                     GONC_STRING_SET(&module_args->module_path, module_path_string);
                     continue;
                 }
-                module_arg = malloc(sizeof(struct gonm_module_arg));
+                module_arg = malloc(sizeof(struct tcpcube_module_arg));
                 GONC_LIST_APPEND(module_args, module_arg);
                 module_arg_string = strdup(module_arg_string);
                 for(size_t j = 0; j != 2 && (module_arg_name_or_value = strsep(&module_arg_string, ":")) != NULL; ++j)

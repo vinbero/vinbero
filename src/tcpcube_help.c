@@ -1,9 +1,9 @@
-#include "gonm_help.h"
+#include "tcpcube_help.h"
 #include <stdio.h>
 
-void gonm_help_print()
+void tcpcube_help_print()
 {
-    printf("Usage: gonm [OPTION]...\n");
+    printf("Usage: tcpcube [OPTION]...\n");
     printf("A Modular TCP Server.\n");
     printf("Options:\n");
     printf("  -h --help                Print this help message.\n");
