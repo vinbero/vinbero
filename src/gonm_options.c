@@ -74,4 +74,6 @@ void gonm_options_process(int argc, char* argv[], struct gonm_master_args* maste
             break;
         }
     }
+    if(GONC_LIST_SIZE(master_args->module_args_list) < 1)
+        err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
 }
