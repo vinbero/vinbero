@@ -5,6 +5,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 #include <libgonc/gonc_list.h>
 #include "gonm_master.h"
 #include "gonm_worker.h"
@@ -74,6 +75,8 @@ void gonm_master_start(struct gonm_master_args* master_args)
     }
     free(master_args->module_args_list);
     worker_args->module = GONC_LIST_HEAD(module_list);
+    if(setuid(master_args->set_uid) == -1)
+        err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
 
     for(size_t index = 0; index != master_args->worker_count; ++index)
     {

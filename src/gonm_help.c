@@ -7,6 +7,7 @@ void gonm_help_print()
     printf("Modular TCP Server.\n");
     printf("Options:\n");
     printf("  -h --help                Print this help message.\n");
+    printf("  -u --set-uid             Set User ID(string/number). default: current euid\n");
     printf("  -a --address             Set IP address. default: 0.0.0.0\n");
     printf("  -p --port                Set port number. default: 80\n");
     printf("  -b --backlog             Set backlog size. default: 1024\n");

@@ -1,10 +1,13 @@
 #ifndef _GONM_MASTER_H
 #define _GONM_MASTER_H
+
+#include <unistd.h>
 #include "gonm_module.h"
 #include "gonm_worker.h"
 
 struct gonm_master_args
 {
+    uid_t set_uid;
     char* address;
     int port;
     int backlog;

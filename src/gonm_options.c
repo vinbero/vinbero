@@ -10,6 +10,7 @@ void gonm_options_process(int argc, char* argv[], struct gonm_master_args* maste
 {
     struct option options[] = {
         {"help", no_argument, NULL, 'h'},
+        {"set-uid", required_argument, NULL, 'u'},
         {"address", required_argument, NULL, 'a'},
         {"port", required_argument, NULL, 'p'},
         {"backlog", required_argument, NULL, 'b'},
@@ -25,13 +26,16 @@ void gonm_options_process(int argc, char* argv[], struct gonm_master_args* maste
     char* module_path_string;
     char* module_arg_string;
     char* module_arg_name_or_value;
-    for(char option_char; option_char != -1; option_char = getopt_long(argc, argv, "ha:p:b:rw:m:", options, NULL))
+    for(char option_char; option_char != -1; option_char = getopt_long(argc, argv, "hu:a:p:b:rw:m:", options, NULL))
     {
         switch(option_char)
         {
         case 'h':
             gonm_help_print();
             exit(EXIT_SUCCESS);
+            break;
+        case 'u':
+            master_args->set_uid = strtol(optarg, NULL, 10);
             break;
         case 'a':
             master_args->address = optarg;

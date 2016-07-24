@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <unistd.h>
 #include <libgonc/gonc_list.h>
 #include <libgonc/gonc_string.h>
 #include "gonm_master.h"
@@ -10,8 +11,9 @@ int main(int argc, char* argv[])
     master_args->module_args_list = malloc(sizeof(struct gonm_module_args_list));
     GONC_LIST_INIT(master_args->module_args_list);
 
+    master_args->set_uid = geteuid();
     master_args->address = "0.0.0.0";
-    master_args->port = 80;
+    master_args->port = 8080;
     master_args->backlog = 1024;
     master_args->worker_count = 4;
 
