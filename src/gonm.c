@@ -1,15 +1,12 @@
 #include <stdlib.h>
 #include <libgonc/gonc_list.h>
 #include <libgonc/gonc_string.h>
-#include "gonm_help.h"
 #include "gonm_master.h"
-#include "gonm_worker.h"
 #include "gonm_options.h"
 
 int main(int argc, char* argv[])
 {    
     struct gonm_master_args* master_args = malloc(sizeof(struct gonm_master_args));
-    master_args->worker_args = malloc(sizeof(struct gonm_worker_args));
     master_args->module_args_list = malloc(sizeof(struct gonm_module_args_list));
     GONC_LIST_INIT(master_args->module_args_list);
 
@@ -22,7 +19,7 @@ int main(int argc, char* argv[])
 
     gonm_master_start(master_args);
 
-    free(master_args->worker_args);
     free(master_args);
+
     return 0;
 }

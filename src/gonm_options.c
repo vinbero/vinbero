@@ -13,6 +13,7 @@ void gonm_options_process(int argc, char* argv[], struct gonm_master_args* maste
         {"address", required_argument, NULL, 'a'},
         {"port", required_argument, NULL, 'p'},
         {"backlog", required_argument, NULL, 'b'},
+        {"reuse-port", required_argument, NULL, 'r'},
         {"worker-count", required_argument, NULL, 'w'},
         {"module-args", required_argument, NULL, 'm'},
         {NULL, 0, NULL, 0}
@@ -24,7 +25,7 @@ void gonm_options_process(int argc, char* argv[], struct gonm_master_args* maste
     char* module_path_string;
     char* module_arg_string;
     char* module_arg_name_or_value;
-    for(char option_char; option_char != -1; option_char = getopt_long(argc, argv, "ha:p:b:w:m:", options, NULL))
+    for(char option_char; option_char != -1; option_char = getopt_long(argc, argv, "ha:p:b:rw:m:", options, NULL))
     {
         switch(option_char)
         {
@@ -40,6 +41,9 @@ void gonm_options_process(int argc, char* argv[], struct gonm_master_args* maste
             break;
         case 'b':
             master_args->backlog = strtol(optarg, NULL, 10);
+            break;
+        case 'r':
+            master_args->reuse_port = strtol(optarg, NULL, 10);
             break;
         case 'w':
             master_args->worker_count = strtol(optarg, NULL, 10);
