@@ -14,5 +14,5 @@ void gonm_help_print()
     printf("  -b --backlog             Set backlog size. Default: 1024\n");
     printf("  -r --reuse-port          Set reuse_port(0/1). Default: 0\n");
     printf("  -w --worker-count        Set worker count. Default: 4\n");
-    printf("  -m --module-args         Set module arguments. You can use this option multiple times.\n                             Order of multiple --module-args is preserved. First argument must be the path of a module.\n                             Arguments are separated by comma, name and value of argument are separated by colon.\n                             First argument doesn't need name, it only needs value(the path of module).\n");
+    printf("  -m --module-args         Set module arguments. You can use this option multiple times.\n                             Order of multiple --module-args is preserved. First argument must be the path of a module.\n                             Arguments are separated by comma(without spaces), name and value of argument are separated by colon(without spaces).\n                             First argument doesn't need name, it only needs value(the path of module).\n");
 }
