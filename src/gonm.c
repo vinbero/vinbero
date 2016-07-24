@@ -12,6 +12,7 @@ int main(int argc, char* argv[])
     GONC_LIST_INIT(master_args->module_args_list);
 
     master_args->set_uid = geteuid();
+    master_args->set_gid = getegid();
     master_args->address = "0.0.0.0";
     master_args->port = 8080;
     master_args->backlog = 1024;

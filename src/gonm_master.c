@@ -75,6 +75,9 @@ void gonm_master_start(struct gonm_master_args* master_args)
     }
     free(master_args->module_args_list);
     worker_args->module = GONC_LIST_HEAD(module_list);
+
+    if(setgid(master_args->set_gid) == -1)
+        err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
     if(setuid(master_args->set_uid) == -1)
         err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
 

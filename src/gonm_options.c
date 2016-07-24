@@ -11,6 +11,7 @@ void gonm_options_process(int argc, char* argv[], struct gonm_master_args* maste
     struct option options[] = {
         {"help", no_argument, NULL, 'h'},
         {"set-uid", required_argument, NULL, 'u'},
+        {"set-gid", required_argument, NULL, 'g'},
         {"address", required_argument, NULL, 'a'},
         {"port", required_argument, NULL, 'p'},
         {"backlog", required_argument, NULL, 'b'},
@@ -26,7 +27,7 @@ void gonm_options_process(int argc, char* argv[], struct gonm_master_args* maste
     char* module_path_string;
     char* module_arg_string;
     char* module_arg_name_or_value;
-    for(char option_char; option_char != -1; option_char = getopt_long(argc, argv, "hu:a:p:b:rw:m:", options, NULL))
+    for(char option_char; option_char != -1; option_char = getopt_long(argc, argv, "hu:g:a:p:b:rw:m:", options, NULL))
     {
         switch(option_char)
         {
@@ -36,6 +37,9 @@ void gonm_options_process(int argc, char* argv[], struct gonm_master_args* maste
             break;
         case 'u':
             master_args->set_uid = strtol(optarg, NULL, 10);
+            break;
+        case 'g':
+            master_args->set_gid = strtol(optarg, NULL, 10);
             break;
         case 'a':
             master_args->address = optarg;
@@ -83,5 +87,5 @@ void gonm_options_process(int argc, char* argv[], struct gonm_master_args* maste
         }
     }
     if(GONC_LIST_SIZE(master_args->module_args_list) < 1)
-        err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
+        errx(EXIT_FAILURE, "%s: %u: You need at least one --module-args option.", __FILE__, __LINE__);
 }

@@ -7,6 +7,7 @@
 
 struct gonm_master_args
 {
+    gid_t set_gid;
     uid_t set_uid;
     char* address;
     int port;
