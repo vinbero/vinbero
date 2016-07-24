@@ -50,7 +50,7 @@ void tcpcube_master_start(struct tcpcube_master_args* master_args)
     if((tcpcube_module_init = dlsym(dl_handle, "tcpcube_module_init")) == NULL)
         err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
 
-    if((worker_args->tcpcube_module_service = dlsym(dl_handle, "tcpcube_module_service")) == NULL)
+    if((worker_args->tcpcube_module_start = dlsym(dl_handle, "tcpcube_module_start")) == NULL)
         err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
 
     int (*tcpcube_module_destroy)(struct tcpcube_module*);
@@ -61,7 +61,7 @@ void tcpcube_master_start(struct tcpcube_master_args* master_args)
     GONC_LIST_INIT(module_list);
 
     if(tcpcube_module_init(GONC_LIST_HEAD(master_args->module_args_list), module_list) == -1)
-        err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
+        errx(EXIT_FAILURE, "%s: %u: tcpcube_module_init() failed.", __FILE__, __LINE__);
 
     GONC_LIST_FOR_EACH(master_args->module_args_list, struct tcpcube_module_args, module_args)
     {
@@ -96,5 +96,6 @@ void tcpcube_master_start(struct tcpcube_master_args* master_args)
     dlclose(dl_handle);
     pthread_mutex_destroy(worker_args->server_socket_mutex);
     free(worker_args->server_socket_mutex);
+    close(worker_args->server_socket);
     free(threads);
 }

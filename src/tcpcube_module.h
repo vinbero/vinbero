@@ -11,6 +11,9 @@ struct tcpcube_module
     GONC_LIST_ELEMENT(struct tcpcube_module);
 };
 
+#define TCPCUBE_MODULE_CAST(module, type) \
+((type)module)
+
 struct tcpcube_module_list
 {
     GONC_LIST(struct tcpcube_module);
