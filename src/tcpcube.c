@@ -7,7 +7,7 @@
 #include "tcpcube_options.h"
 
 int main(int argc, char* argv[])
-{    
+{
     struct tcpcube_master_args* master_args = malloc(sizeof(struct tcpcube_master_args));
     master_args->module_args_list = malloc(sizeof(struct tcpcube_module_args_list));
     GONC_LIST_INIT(master_args->module_args_list);

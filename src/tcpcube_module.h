@@ -1,6 +1,7 @@
 #ifndef _TCPCUBE_MODULE_H
 #define _TCPCUBE_MODULE_H
 
+#include <pthread.h>
 #include <libgonc/gonc_list.h>
 #include <libgonc/gonc_string.h>
 
@@ -8,6 +9,7 @@ struct tcpcube_module
 {
     void* object;
     size_t object_size;
+    pthread_mutex_t* object_mutex;
     GONC_LIST_ELEMENT(struct tcpcube_module);
 };
 
