@@ -88,5 +88,5 @@ void tcpcube_options_process(int argc, char* argv[], struct tcpcube_master_args*
         }
     }
     if(GONC_LIST_SIZE(master_args->module_args_list) < 1)
-        errx(EXIT_FAILURE, "%s: %u: You need at least one --module-args option.", __FILE__, __LINE__);
+        errx(EXIT_FAILURE, "%s: %u: You need at least one --module-args option", __FILE__, __LINE__);
 }

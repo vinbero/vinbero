@@ -48,20 +48,20 @@ void tcpcube_master_start(struct tcpcube_master_args* master_args)
 
     int (*tcpcube_module_init)(struct tcpcube_module_args*, struct tcpcube_module_list*);
     if((tcpcube_module_init = dlsym(dl_handle, "tcpcube_module_init")) == NULL)
-        err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
+        errx(EXIT_FAILURE, "%s: %u: Unable to find tcpcube_module_init", __FILE__, __LINE__);
 
     if((worker_args->tcpcube_module_start = dlsym(dl_handle, "tcpcube_module_start")) == NULL)
-        err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
+        errx(EXIT_FAILURE, "%s: %u: Unable to find tcpcube_module_start", __FILE__, __LINE__);
 
     int (*tcpcube_module_destroy)(struct tcpcube_module*);
     if((tcpcube_module_destroy = dlsym(dl_handle, "tcpcube_module_destroy")) == NULL)
-        err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
+        errx(EXIT_FAILURE, "%s: %u: Unable to find tcpcube_module_destroy", __FILE__, __LINE__);
 
     struct tcpcube_module_list* module_list = malloc(sizeof(struct tcpcube_module_list));
     GONC_LIST_INIT(module_list);
 
     if(tcpcube_module_init(GONC_LIST_HEAD(master_args->module_args_list), module_list) == -1)
-        errx(EXIT_FAILURE, "%s: %u: tcpcube_module_init() failed.", __FILE__, __LINE__);
+        errx(EXIT_FAILURE, "%s: %u: tcpcube_module_init() failed", __FILE__, __LINE__);
 
     GONC_LIST_FOR_EACH(master_args->module_args_list, struct tcpcube_module_args, module_args)
     {
