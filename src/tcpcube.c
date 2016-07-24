@@ -6,16 +6,17 @@
 #include "config.h"
 #include "tcpcube_master.h"
 #include "tcpcube_options.h"
+#include "tcpcube_signals.h"
 
-void exit_wrapper(int signal_number)
+/*void tcpcube_exit_handler()
 {
-    exit(EXIT_FAILURE);
-}
+    longjmp()
+}*/
 
 int main(int argc, char* argv[])
 {
     struct sigaction* signal_action = malloc(sizeof(struct sigaction));
-    signal_action->sa_handler = exit_wrapper;
+    signal_action->sa_handler = tcpcube_sigint_handler;
     signal_action->sa_flags = SA_RESTART;
     sigfillset(&signal_action->sa_mask);
     sigaction(SIGINT, signal_action, NULL);
