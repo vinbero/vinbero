@@ -62,7 +62,11 @@ void gonm_master_start(struct gonm_master_args* master_args)
     GONC_LIST_FOR_EACH(master_args->module_args_list, struct gonm_module_args, module_args)
     {
         GONC_LIST_FOR_EACH(module_args, struct gonm_module_arg, module_arg)
+        {
+            free(module_arg->name.chars);
+            free(module_arg->value.chars);
             free(module_arg);
+        }
         free(module_args->module_path.chars);
         free(module_args);
     }
