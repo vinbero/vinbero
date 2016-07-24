@@ -17,7 +17,7 @@ void* tcpcube_worker_start(void* worker_args)
         }
         pthread_mutex_unlock(((struct tcpcube_worker_args*)worker_args)->server_socket_mutex);
 
-        if(((struct tcpcube_worker_args*)worker_args)->tcpcube_module_service(((struct tcpcube_worker_args*)worker_args)->module, client_socket) == -1)
+        if(((struct tcpcube_worker_args*)worker_args)->tcpcube_module_service(((struct tcpcube_worker_args*)worker_args)->module, &client_socket) == -1)
             warn("%s: %u", __FILE__, __LINE__);
         
         if(close(client_socket) == -1)
