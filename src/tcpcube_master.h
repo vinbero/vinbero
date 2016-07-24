@@ -2,6 +2,7 @@
 #define _TCPCUBE_MASTER_H
 
 #include <unistd.h>
+#include "config.h"
 #include "tcpcube_module.h"
 #include "tcpcube_worker.h"
 

@@ -1,5 +1,5 @@
-#include "tcpcube_help.h"
 #include <stdio.h>
+#include "tcpcube_help.h"
 
 void tcpcube_help_print()
 {

@@ -2,6 +2,7 @@
 #include <getopt.h>
 #include <stdlib.h>
 #include <string.h>
+#include "config.h"
 #include "tcpcube_options.h"
 #include "tcpcube_master.h"
 #include "tcpcube_help.h"

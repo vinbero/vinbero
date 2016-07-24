@@ -7,6 +7,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <libgonc/gonc_list.h>
+#include "config.h"
 #include "tcpcube_master.h"
 #include "tcpcube_worker.h"
 
