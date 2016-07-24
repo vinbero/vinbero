@@ -1,3 +1,4 @@
+#include <signal.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <libgonc/gonc_list.h>
@@ -6,8 +7,19 @@
 #include "tcpcube_master.h"
 #include "tcpcube_options.h"
 
+void exit_wrapper(int signal_number)
+{
+    exit(EXIT_FAILURE);
+}
+
 int main(int argc, char* argv[])
 {
+    struct sigaction* signal_action = malloc(sizeof(struct sigaction));
+    signal_action->sa_handler = exit_wrapper;
+    signal_action->sa_flags = SA_RESTART;
+    sigfillset(&signal_action->sa_mask);
+    sigaction(SIGINT, signal_action, NULL);
+
     struct tcpcube_master_args* master_args = malloc(sizeof(struct tcpcube_master_args));
     master_args->module_args_list = malloc(sizeof(struct tcpcube_module_args_list));
     GONC_LIST_INIT(master_args->module_args_list);
@@ -24,6 +36,7 @@ int main(int argc, char* argv[])
     tcpcube_master_start(master_args);
 
     free(master_args);
+    free(signal_action);
 
     return 0;
 }
