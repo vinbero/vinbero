@@ -25,8 +25,10 @@ void tcpcube_options_process(int argc, char* argv[], struct tcpcube_master_args*
     struct tcpcube_module_args* module_args;
     struct tcpcube_module_arg* module_arg;
     char* module_args_string;
+    char* module_args_string_temp;
     char* module_path_string;
     char* module_arg_string;
+    char* module_arg_string_temp;
     char* module_arg_name_or_value;
     for(char option_char; option_char != -1; option_char = getopt_long(argc, argv, "hu:g:a:p:b:rw:m:", options, NULL))
     {
@@ -61,7 +63,8 @@ void tcpcube_options_process(int argc, char* argv[], struct tcpcube_master_args*
             module_args = malloc(sizeof(struct tcpcube_module_args));
             GONC_LIST_INIT(module_args);
             module_args_string = strdup(optarg);
-            for(size_t i = 0; (module_arg_string = strsep(&module_args_string, ",")) != NULL; ++i)
+            module_args_string_temp = module_args_string;
+            for(size_t i = 0; (module_arg_string = strsep(&module_args_string_temp, ",")) != NULL; ++i)
             {
                 if(i == 0)
                 {
@@ -73,7 +76,8 @@ void tcpcube_options_process(int argc, char* argv[], struct tcpcube_master_args*
                 module_arg = malloc(sizeof(struct tcpcube_module_arg));
                 GONC_LIST_APPEND(module_args, module_arg);
                 module_arg_string = strdup(module_arg_string);
-                for(size_t j = 0; j != 2 && (module_arg_name_or_value = strsep(&module_arg_string, ":")) != NULL; ++j)
+                module_arg_string_temp = module_arg_string;
+                for(size_t j = 0; j != 2 && (module_arg_name_or_value = strsep(&module_arg_string_temp, ":")) != NULL; ++j)
                 {
                     if(j == 0)
                         GONC_STRING_SET(&module_arg->name, strdup(module_arg_name_or_value));

@@ -110,16 +110,16 @@ void tcpcube_master_start(struct tcpcube_master_args* master_args)
         for(size_t index = 0; index != master_args->worker_count; ++index)
             pthread_join(worker_threads[index], NULL);
     }
+    free(tcpcube_master_jmp_buf);
 
-    if(pthread_mutex_lock(master_args->worker_args->server_socket_mutex) == 0)
-    {
-        close(master_args->worker_args->server_socket);
-        pthread_mutex_unlock(master_args->worker_args->server_socket_mutex);
-    }
-    else
-        warn("%s: %u", __FILE__, __LINE__);
+    close(master_args->worker_args->server_socket);
+
     pthread_mutex_destroy(master_args->worker_args->server_socket_mutex);
     free(master_args->worker_args->server_socket_mutex);
+    free(master_args->worker_args);
+
+    for(size_t index = 0; index != master_args->worker_count; ++index)
+        pthread_detach(worker_threads[index]);
 
     pthread_attr_destroy(&worker_thread_attr);
     free(worker_threads);
