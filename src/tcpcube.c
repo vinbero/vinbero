@@ -1,3 +1,4 @@
+#include <err.h>
 #include <signal.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -7,11 +8,6 @@
 #include "tcpcube_master.h"
 #include "tcpcube_options.h"
 #include "tcpcube_signals.h"
-
-/*void tcpcube_exit_handler()
-{
-    longjmp()
-}*/
 
 int main(int argc, char* argv[])
 {
@@ -33,6 +29,16 @@ int main(int argc, char* argv[])
     master_args->worker_count = 4;
 
     tcpcube_options_process(argc, argv, master_args);
+
+    tcpcube_master_init_core(master_args);
+
+    if(setgid(master_args->set_gid) == -1)
+        err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
+
+    if(setuid(master_args->set_uid) == -1)
+        err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
+
+    tcpcube_master_init_modules(master_args);
 
     tcpcube_master_start(master_args);
 
