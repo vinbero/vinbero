@@ -69,14 +69,16 @@ void tcpcube_master_init_modules(struct tcpcube_master_args* master_args)
 
     master_args->worker_args->module = GONC_LIST_HEAD(master_args->module_list);
 
-    GONC_LIST_FOR_EACH(master_args->module_args_list, struct tcpcube_module_args, module_args)
+    GONC_LIST_REMOVE_FOR_EACH(master_args->module_args_list, struct tcpcube_module_args, module_args)
     {
-        GONC_LIST_FOR_EACH(module_args, struct tcpcube_module_arg, module_arg)
+        GONC_LIST_REMOVE_FOR_EACH(module_args, struct tcpcube_module_arg, module_arg)
         {
+            GONC_LIST_REMOVE(module_args, module_arg);
             free(module_arg->name.chars);
             free(module_arg->value.chars);
             free(module_arg);
         }
+        GONC_LIST_REMOVE(master_args->module_args_list, module_args);
         free(module_args->module_path.chars);
         free(module_args);
     }

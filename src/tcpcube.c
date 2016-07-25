@@ -26,6 +26,7 @@ int main(int argc, char* argv[])
     master_args->address = "0.0.0.0";
     master_args->port = 8080;
     master_args->backlog = 1024;
+    master_args->reuse_port = 0;
     master_args->worker_count = 4;
 
     tcpcube_options_process(argc, argv, master_args);

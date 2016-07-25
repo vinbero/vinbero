@@ -83,6 +83,7 @@ void tcpcube_options_process(int argc, char* argv[], struct tcpcube_master_args*
                 free(module_arg_string);
             }
             free(module_args_string);
+            GONC_LIST_ELEMENT_INIT(module_args);
             GONC_LIST_APPEND(master_args->module_args_list, module_args);
             break;
         }
