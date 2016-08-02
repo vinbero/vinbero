@@ -111,6 +111,7 @@ void tcpcube_master_start(struct tcpcube_master_args* master_args)
             pthread_join(worker_threads[index], NULL);
     }
     free(tcpcube_master_jmp_buf);
+    pthread_key_delete(tcpcube_master_pthread_key);
 
     close(master_args->worker_args->server_socket);
 
