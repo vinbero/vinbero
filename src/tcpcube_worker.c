@@ -7,9 +7,14 @@
 #include "config.h"
 #include "tcpcube_worker.h"
 
+static void tcpcube_worker_pthread_cleanup_handler(void* worker_args)
+{
+    ((struct tcpcube_worker_args*)worker_args)->tcpcube_module_tldestroy(((struct tcpcube_worker_args*)worker_args)->module);
+}
+
 void* tcpcube_worker_start(void* worker_args)
 {
-    pthread_cleanup_push(((struct tcpcube_worker_args*)worker_args)->tcpcube_module_tldestroy, ((struct tcpcube_worker_args*)worker_args)->module);
+    pthread_cleanup_push(tcpcube_worker_pthread_cleanup_handler, worker_args);
     pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
 
     sigset_t signal_set;
