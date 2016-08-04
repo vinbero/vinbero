@@ -62,13 +62,16 @@ void tcpcube_master_init_modules(struct tcpcube_master_args* master_args)
         err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
 
     if((master_args->tcpcube_module_init = dlsym(master_args->dl_handle, "tcpcube_module_init")) == NULL)
-        errx(EXIT_FAILURE, "%s: %u: Unable to find tcpcube_module_init", __FILE__, __LINE__);
+        errx(EXIT_FAILURE, "%s: %u: Unable to find tcpcube_module_init()", __FILE__, __LINE__);
 
     if((master_args->worker_args->tcpcube_module_start = dlsym(master_args->dl_handle, "tcpcube_module_start")) == NULL)
-        errx(EXIT_FAILURE, "%s: %u: Unable to find tcpcube_module_start", __FILE__, __LINE__);
+        errx(EXIT_FAILURE, "%s: %u: Unable to find tcpcube_module_start()", __FILE__, __LINE__);
+
+    if((master_args->worker_args->tcpcube_module_tldestroy = dlsym(master_args->dl_handle, "tcpcube_module_tldestroy")) == NULL)
+        errx(EXIT_FAILURE, "%s: %u: Unable to find tcpcube_module_tldestroy()", __FILE__, __LINE__);
 
     if((master_args->tcpcube_module_destroy = dlsym(master_args->dl_handle, "tcpcube_module_destroy")) == NULL)
-        errx(EXIT_FAILURE, "%s: %u: Unable to find tcpcube_module_destroy", __FILE__, __LINE__);
+        errx(EXIT_FAILURE, "%s: %u: Unable to find tcpcube_module_destroy()", __FILE__, __LINE__);
 
     master_args->module_list = malloc(sizeof(struct tcpcube_module_list));
     GONC_LIST_INIT(master_args->module_list);
