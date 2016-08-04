@@ -9,6 +9,7 @@
 #include <libgonc/gonc_list.h>
 #include "config.h"
 #include "tcpcube_master.h"
+#include "tcpcube_global.h"
 #include "tcpcube_worker.h"
 
 static pthread_key_t tcpcube_master_pthread_key;
@@ -106,9 +107,7 @@ void tcpcube_master_start(struct tcpcube_master_args* master_args)
             if(pthread_create(worker_threads + index, &worker_thread_attr, tcpcube_worker_start, master_args->worker_args) != 0)
                 err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
         }
-
-        for(size_t index = 0; index != master_args->worker_count; ++index)
-            pthread_join(worker_threads[index], NULL);
+        pause();
     }
     free(tcpcube_master_jmp_buf);
     pthread_key_delete(tcpcube_master_pthread_key);
@@ -120,7 +119,10 @@ void tcpcube_master_start(struct tcpcube_master_args* master_args)
     free(master_args->worker_args);
 
     for(size_t index = 0; index != master_args->worker_count; ++index)
-        pthread_detach(worker_threads[index]);
+    {
+        tcpcube_global_running = false;
+        pthread_join(worker_threads[index], NULL);
+    }
 
     pthread_attr_destroy(&worker_thread_attr);
     free(worker_threads);
