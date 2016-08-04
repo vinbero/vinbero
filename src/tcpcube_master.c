@@ -6,6 +6,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/syscall.h>
 #include <libgonc/gonc_list.h>
 #include "config.h"
 #include "tcpcube_master.h"
@@ -15,7 +16,7 @@ static pthread_key_t tcpcube_master_pthread_key;
 
 static void tcpcube_master_exit_handler()
 {
-    warnx("tcpcube_master_exit_handler()");
+    warnx("tcpcube_master_exit_handler(), tid: %d", syscall(SYS_gettid));
     longjmp(pthread_getspecific(tcpcube_master_pthread_key), 1);
 }
 
@@ -119,7 +120,10 @@ void tcpcube_master_start(struct tcpcube_master_args* master_args)
     free(master_args->worker_args);
 
     for(size_t index = 0; index != master_args->worker_count; ++index)
-        pthread_detach(worker_threads[index]);
+    {
+        pthread_cancel(worker_threads[index]);
+        pthread_join(worker_threads[index], NULL);
+    }
 
     pthread_attr_destroy(&worker_thread_attr);
     free(worker_threads);
