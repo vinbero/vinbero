@@ -5,6 +5,7 @@
 #include <setjmp.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include <signal.h>
 #include <string.h>
 #include <sys/syscall.h>
 #include <libgonc/gonc_list.h>
@@ -13,6 +14,12 @@
 #include "tcpcube_worker.h"
 
 static pthread_key_t tcpcube_master_pthread_key;
+
+static void tcpcube_master_sigint_handler(int signal_number)
+{
+    warnx("tcpcube_sigint_handler(), tid: %d", syscall(SYS_gettid));
+    exit(EXIT_FAILURE);
+}
 
 static void tcpcube_master_exit_handler()
 {
@@ -89,6 +96,12 @@ void tcpcube_master_init_modules(struct tcpcube_master_args* master_args)
 
 void tcpcube_master_start(struct tcpcube_master_args* master_args)
 {
+    struct sigaction* signal_action = malloc(sizeof(struct sigaction));
+    signal_action->sa_handler = tcpcube_master_sigint_handler;
+    signal_action->sa_flags = SA_RESTART;
+    sigfillset(&signal_action->sa_mask);
+    sigaction(SIGINT, signal_action, NULL);
+
     pthread_t* worker_threads;
     pthread_attr_t worker_thread_attr;
     jmp_buf* tcpcube_master_jmp_buf = malloc(sizeof(jmp_buf));
@@ -112,6 +125,8 @@ void tcpcube_master_start(struct tcpcube_master_args* master_args)
     }
     free(tcpcube_master_jmp_buf);
     pthread_key_delete(tcpcube_master_pthread_key);
+
+    free(signal_action);
 
     for(size_t index = 0; index != master_args->worker_count; ++index)
     {
