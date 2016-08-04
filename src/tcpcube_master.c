@@ -15,6 +15,7 @@ static pthread_key_t tcpcube_master_pthread_key;
 
 static void tcpcube_master_exit_handler()
 {
+    warnx("tcpcube_master_exit_handler()");
     longjmp(pthread_getspecific(tcpcube_master_pthread_key), 1);
 }
 
