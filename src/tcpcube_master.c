@@ -106,9 +106,7 @@ void tcpcube_master_start(struct tcpcube_master_args* master_args)
             if(pthread_create(worker_threads + index, &worker_thread_attr, tcpcube_worker_start, master_args->worker_args) != 0)
                 err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
         }
-
-        for(size_t index = 0; index != master_args->worker_count; ++index)
-            pthread_join(worker_threads[index], NULL);
+        pause();
     }
     free(tcpcube_master_jmp_buf);
     pthread_key_delete(tcpcube_master_pthread_key);
