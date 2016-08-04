@@ -113,17 +113,16 @@ void tcpcube_master_start(struct tcpcube_master_args* master_args)
     free(tcpcube_master_jmp_buf);
     pthread_key_delete(tcpcube_master_pthread_key);
 
-    close(master_args->worker_args->server_socket);
-
-    pthread_mutex_destroy(master_args->worker_args->server_socket_mutex);
-    free(master_args->worker_args->server_socket_mutex);
-    free(master_args->worker_args);
-
     for(size_t index = 0; index != master_args->worker_count; ++index)
     {
         pthread_cancel(worker_threads[index]);
         pthread_join(worker_threads[index], NULL);
     }
+
+    close(master_args->worker_args->server_socket);
+    pthread_mutex_destroy(master_args->worker_args->server_socket_mutex);
+    free(master_args->worker_args->server_socket_mutex);
+    free(master_args->worker_args);
 
     pthread_attr_destroy(&worker_thread_attr);
     free(worker_threads);

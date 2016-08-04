@@ -9,7 +9,7 @@ struct tcpcube_module
 {
     void* object;
     size_t object_size;
-    pthread_mutex_t* object_mutex;
+    pthread_rwlock_t* object_rwlock;
     GONC_LIST_ELEMENT(struct tcpcube_module);
 };
 
