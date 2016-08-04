@@ -9,11 +9,14 @@
 
 static void tcpcube_worker_pthread_cleanup_handler(void* worker_args)
 {
-    ((struct tcpcube_worker_args*)worker_args)->tcpcube_module_tldestroy(((struct tcpcube_worker_args*)worker_args)->module);
+    if(((struct tcpcube_worker_args*)worker_args)->tcpcube_module_tldestroy(((struct tcpcube_worker_args*)worker_args)->module) == -1)
+        warnx("%s: %u: tcpcube_module_tldestroy() failed", __FILE__, __LINE__);
 }
 
 void* tcpcube_worker_start(void* worker_args)
 {
+    if(((struct tcpcube_worker_args*)worker_args)->tcpcube_module_tlinit(((struct tcpcube_worker_args*)worker_args)->module) == -1)
+        errx(EXIT_FAILURE, "%s: %u: tcpcube_module_tlinit() failed", __FILE__, __LINE__);
     pthread_cleanup_push(tcpcube_worker_pthread_cleanup_handler, worker_args);
     pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
 

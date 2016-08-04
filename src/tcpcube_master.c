@@ -64,6 +64,9 @@ void tcpcube_master_init_modules(struct tcpcube_master_args* master_args)
     if((master_args->tcpcube_module_init = dlsym(master_args->dl_handle, "tcpcube_module_init")) == NULL)
         errx(EXIT_FAILURE, "%s: %u: Unable to find tcpcube_module_init()", __FILE__, __LINE__);
 
+    if((master_args->worker_args->tcpcube_module_tlinit = dlsym(master_args->dl_handle, "tcpcube_module_tlinit")) == NULL)
+        errx(EXIT_FAILURE, "%s: %u: Unable to find tcpcube_module_tlinit()", __FILE__, __LINE__);
+
     if((master_args->worker_args->tcpcube_module_start = dlsym(master_args->dl_handle, "tcpcube_module_start")) == NULL)
         errx(EXIT_FAILURE, "%s: %u: Unable to find tcpcube_module_start()", __FILE__, __LINE__);
 
