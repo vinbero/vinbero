@@ -15,7 +15,7 @@ static void tcpcube_worker_pthread_cleanup_handler(void* worker_args)
 
 void* tcpcube_worker_start(void* worker_args)
 {
-    if(((struct tcpcube_worker_args*)worker_args)->tcpcube_module_tlinit(((struct tcpcube_worker_args*)worker_args)->module) == -1)
+    if(((struct tcpcube_worker_args*)worker_args)->tcpcube_module_tlinit(((struct tcpcube_worker_args*)worker_args)->module, ((struct tcpcube_worker_args*)worker_args)->module_args) == -1)
         errx(EXIT_FAILURE, "%s: %u: tcpcube_module_tlinit() failed", __FILE__, __LINE__);
     pthread_cleanup_push(tcpcube_worker_pthread_cleanup_handler, worker_args);
     pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
