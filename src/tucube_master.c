@@ -10,27 +10,27 @@
 #include <sys/syscall.h>
 #include <libgonc/gonc_list.h>
 #include "config.h"
-#include "tcpcube_master.h"
-#include "tcpcube_worker.h"
+#include "tucube_master.h"
+#include "tucube_worker.h"
 
-static pthread_key_t tcpcube_master_pthread_key;
+static pthread_key_t tucube_master_pthread_key;
 
-static void tcpcube_master_sigint_handler(int signal_number)
+static void tucube_master_sigint_handler(int signal_number)
 {
-    warnx("tcpcube_sigint_handler(), tid: %d", syscall(SYS_gettid));
+    warnx("tucube_sigint_handler(), tid: %d", syscall(SYS_gettid));
     exit(EXIT_FAILURE);
 }
 
-static void tcpcube_master_exit_handler()
+static void tucube_master_exit_handler()
 {
-    warnx("tcpcube_master_exit_handler(), tid: %d", syscall(SYS_gettid));
-    longjmp(pthread_getspecific(tcpcube_master_pthread_key), 1);
+    warnx("tucube_master_exit_handler(), tid: %d", syscall(SYS_gettid));
+    longjmp(pthread_getspecific(tucube_master_pthread_key), 1);
 }
 
-static void tcpcube_register_signal_handlers()
+static void tucube_register_signal_handlers()
 {
     struct sigaction signal_action;
-    signal_action.sa_handler = tcpcube_master_sigint_handler;
+    signal_action.sa_handler = tucube_master_sigint_handler;
     signal_action.sa_flags = SA_RESTART;
     if(sigfillset(&signal_action.sa_mask) == -1)
         err(EXIT_FAILURE, "%s, %u", __FILE__, __LINE__);
@@ -38,7 +38,7 @@ static void tcpcube_register_signal_handlers()
         err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
 }
 
-void tcpcube_master_init_core(struct tcpcube_master_args* master_args)
+void tucube_master_init_core(struct tucube_master_args* master_args)
 {
     struct sockaddr_in server_address_sockaddr_in;
     memset(server_address_sockaddr_in.sin_zero, 0, sizeof(server_address_sockaddr_in.sin_zero));
@@ -46,7 +46,7 @@ void tcpcube_master_init_core(struct tcpcube_master_args* master_args)
     inet_aton(master_args->address, &server_address_sockaddr_in.sin_addr);
     server_address_sockaddr_in.sin_port = htons(master_args->port);
 
-    master_args->worker_args = malloc(sizeof(struct tcpcube_worker_args));
+    master_args->worker_args = malloc(sizeof(struct tucube_worker_args));
 
     if((master_args->worker_args->server_socket = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) == -1)
         err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
@@ -67,47 +67,47 @@ void tcpcube_master_init_core(struct tcpcube_master_args* master_args)
     pthread_mutex_init(master_args->worker_args->server_socket_mutex, NULL);
 }
 
-void tcpcube_master_init_modules(struct tcpcube_master_args* master_args)
+void tucube_master_init_modules(struct tucube_master_args* master_args)
 {
     if((master_args->dl_handle = dlopen(GONC_LIST_HEAD(master_args->module_args_list)->module_path.chars, RTLD_LAZY)) == NULL)
         err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
 
-    if((master_args->tcpcube_module_init = dlsym(master_args->dl_handle, "tcpcube_module_init")) == NULL)
-        errx(EXIT_FAILURE, "%s: %u: Unable to find tcpcube_module_init()", __FILE__, __LINE__);
+    if((master_args->tucube_module_init = dlsym(master_args->dl_handle, "tucube_module_init")) == NULL)
+        errx(EXIT_FAILURE, "%s: %u: Unable to find tucube_module_init()", __FILE__, __LINE__);
 
-    if((master_args->worker_args->tcpcube_module_tlinit = dlsym(master_args->dl_handle, "tcpcube_module_tlinit")) == NULL)
-        errx(EXIT_FAILURE, "%s: %u: Unable to find tcpcube_module_tlinit()", __FILE__, __LINE__);
+    if((master_args->worker_args->tucube_module_tlinit = dlsym(master_args->dl_handle, "tucube_module_tlinit")) == NULL)
+        errx(EXIT_FAILURE, "%s: %u: Unable to find tucube_module_tlinit()", __FILE__, __LINE__);
 
-    if((master_args->worker_args->tcpcube_module_start = dlsym(master_args->dl_handle, "tcpcube_module_start")) == NULL)
-        errx(EXIT_FAILURE, "%s: %u: Unable to find tcpcube_module_start()", __FILE__, __LINE__);
+    if((master_args->worker_args->tucube_module_start = dlsym(master_args->dl_handle, "tucube_module_start")) == NULL)
+        errx(EXIT_FAILURE, "%s: %u: Unable to find tucube_module_start()", __FILE__, __LINE__);
 
-    if((master_args->worker_args->tcpcube_module_tldestroy = dlsym(master_args->dl_handle, "tcpcube_module_tldestroy")) == NULL)
-        errx(EXIT_FAILURE, "%s: %u: Unable to find tcpcube_module_tldestroy()", __FILE__, __LINE__);
+    if((master_args->worker_args->tucube_module_tldestroy = dlsym(master_args->dl_handle, "tucube_module_tldestroy")) == NULL)
+        errx(EXIT_FAILURE, "%s: %u: Unable to find tucube_module_tldestroy()", __FILE__, __LINE__);
 
-    if((master_args->tcpcube_module_destroy = dlsym(master_args->dl_handle, "tcpcube_module_destroy")) == NULL)
-        errx(EXIT_FAILURE, "%s: %u: Unable to find tcpcube_module_destroy()", __FILE__, __LINE__);
+    if((master_args->tucube_module_destroy = dlsym(master_args->dl_handle, "tucube_module_destroy")) == NULL)
+        errx(EXIT_FAILURE, "%s: %u: Unable to find tucube_module_destroy()", __FILE__, __LINE__);
 
-    master_args->module_list = malloc(sizeof(struct tcpcube_module_list));
+    master_args->module_list = malloc(sizeof(struct tucube_module_list));
     GONC_LIST_INIT(master_args->module_list);
 
-    if(master_args->tcpcube_module_init(GONC_LIST_HEAD(master_args->module_args_list), master_args->module_list) == -1)
-        errx(EXIT_FAILURE, "%s: %u: tcpcube_module_init() failed", __FILE__, __LINE__);
+    if(master_args->tucube_module_init(GONC_LIST_HEAD(master_args->module_args_list), master_args->module_list) == -1)
+        errx(EXIT_FAILURE, "%s: %u: tucube_module_init() failed", __FILE__, __LINE__);
 
     master_args->worker_args->module = GONC_LIST_HEAD(master_args->module_list);
     master_args->worker_args->module_args = GONC_LIST_HEAD(master_args->module_args_list);
 }
 
-void tcpcube_master_start(struct tcpcube_master_args* master_args)
+void tucube_master_start(struct tucube_master_args* master_args)
 {
-    tcpcube_register_signal_handlers();
+    tucube_register_signal_handlers();
     pthread_t* worker_threads;
     pthread_attr_t worker_thread_attr;
-    jmp_buf* tcpcube_master_jmp_buf = malloc(sizeof(jmp_buf));
-    if(setjmp(*tcpcube_master_jmp_buf) == 0)
+    jmp_buf* tucube_master_jmp_buf = malloc(sizeof(jmp_buf));
+    if(setjmp(*tucube_master_jmp_buf) == 0)
     {
-        pthread_key_create(&tcpcube_master_pthread_key, NULL);
-        pthread_setspecific(tcpcube_master_pthread_key, tcpcube_master_jmp_buf);
-        atexit(tcpcube_master_exit_handler);
+        pthread_key_create(&tucube_master_pthread_key, NULL);
+        pthread_setspecific(tucube_master_pthread_key, tucube_master_jmp_buf);
+        atexit(tucube_master_exit_handler);
 
         worker_threads = malloc(master_args->worker_count * sizeof(pthread_t));
         
@@ -116,17 +116,17 @@ void tcpcube_master_start(struct tcpcube_master_args* master_args)
 
         for(size_t index = 0; index != master_args->worker_count; ++index)
         {
-            if(pthread_create(worker_threads + index, &worker_thread_attr, tcpcube_worker_start, master_args->worker_args) != 0)
+            if(pthread_create(worker_threads + index, &worker_thread_attr, tucube_worker_start, master_args->worker_args) != 0)
                 err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
         }
         pause();
     }
-    free(tcpcube_master_jmp_buf);
-    pthread_key_delete(tcpcube_master_pthread_key);
+    free(tucube_master_jmp_buf);
+    pthread_key_delete(tucube_master_pthread_key);
 
-    GONC_LIST_REMOVE_FOR_EACH(master_args->module_args_list, struct tcpcube_module_args, module_args)
+    GONC_LIST_REMOVE_FOR_EACH(master_args->module_args_list, struct tucube_module_args, module_args)
     {
-        GONC_LIST_REMOVE_FOR_EACH(module_args, struct tcpcube_module_arg, module_arg)
+        GONC_LIST_REMOVE_FOR_EACH(module_args, struct tucube_module_arg, module_arg)
         {
             GONC_LIST_REMOVE(module_args, module_arg);
             free(module_arg->name.chars);
@@ -153,7 +153,7 @@ void tcpcube_master_start(struct tcpcube_master_args* master_args)
     pthread_attr_destroy(&worker_thread_attr);
     free(worker_threads);
 
-    if(master_args->tcpcube_module_destroy(GONC_LIST_HEAD(master_args->module_list)) == -1)
+    if(master_args->tucube_module_destroy(GONC_LIST_HEAD(master_args->module_list)) == -1)
         warn("%s: %u", __FILE__, __LINE__);
     free(master_args->module_list);
     dlclose(master_args->dl_handle);

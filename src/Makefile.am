@@ -1,5 +1,5 @@
-bin_PROGRAMS = tcpcube
-tcpcube_SOURCES = tcpcube.c tcpcube_help.h tcpcube_help.c tcpcube_options.h tcpcube_options.c tcpcube_master.h tcpcube_master.c tcpcube_worker.h tcpcube_worker.c tcpcube_module.h
-tcpcube_LDFLAGS = -l dl -l pthread
-pkginclude_HEADERS = tcpcube_module.h
+bin_PROGRAMS = tucube
+tucube_SOURCES = tucube.c tucube_help.h tucube_help.c tucube_options.h tucube_options.c tucube_master.h tucube_master.c tucube_worker.h tucube_worker.c tucube_module.h
+tucube_LDFLAGS = -l dl -l pthread
+pkginclude_HEADERS = tucube_module.h
 

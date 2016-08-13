@@ -3,11 +3,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include "config.h"
-#include "tcpcube_options.h"
-#include "tcpcube_master.h"
-#include "tcpcube_help.h"
+#include "tucube_options.h"
+#include "tucube_master.h"
+#include "tucube_help.h"
 
-void tcpcube_options_process(int argc, char* argv[], struct tcpcube_master_args* master_args)
+void tucube_options_process(int argc, char* argv[], struct tucube_master_args* master_args)
 {
     struct option options[] = {
         {"help", no_argument, NULL, 'h'},
@@ -22,8 +22,8 @@ void tcpcube_options_process(int argc, char* argv[], struct tcpcube_master_args*
         {NULL, 0, NULL, 0}
     };
 
-    struct tcpcube_module_args* module_args;
-    struct tcpcube_module_arg* module_arg;
+    struct tucube_module_args* module_args;
+    struct tucube_module_arg* module_arg;
     char* module_args_string;
     char* module_args_string_tmp;
     char* module_path_string;
@@ -35,7 +35,7 @@ void tcpcube_options_process(int argc, char* argv[], struct tcpcube_master_args*
         switch(option_char)
         {
         case 'h':
-            tcpcube_help_print();
+            tucube_help_print();
             exit(EXIT_SUCCESS);
             break;
         case 'u':
@@ -60,7 +60,7 @@ void tcpcube_options_process(int argc, char* argv[], struct tcpcube_master_args*
             master_args->worker_count = strtol(optarg, NULL, 10);
             break;
         case 'm':
-            module_args = malloc(sizeof(struct tcpcube_module_args));
+            module_args = malloc(sizeof(struct tucube_module_args));
             GONC_LIST_INIT(module_args);
             module_args_string = strdup(optarg);
             module_args_string_tmp = module_args_string;
@@ -73,7 +73,7 @@ void tcpcube_options_process(int argc, char* argv[], struct tcpcube_master_args*
                     GONC_STRING_SET(&module_args->module_path, module_path_string);
                     continue;
                 }
-                module_arg = malloc(sizeof(struct tcpcube_module_arg));
+                module_arg = malloc(sizeof(struct tucube_module_arg));
                 GONC_LIST_APPEND(module_args, module_arg);
                 module_arg_string = strdup(module_arg_string);
                 module_arg_string_tmp = module_arg_string;

@@ -1,10 +1,10 @@
 #include <stdio.h>
-#include "tcpcube_help.h"
+#include "tucube_help.h"
 
-void tcpcube_help_print()
+void tucube_help_print()
 {
-    printf("Usage: tcpcube [OPTION]...\n");
-    printf("A Modular TCP Server.\n");
+    printf("Usage: tucube [OPTION]...\n");
+    printf("A Modular TCP/UDP Server.\n");
     printf("Options:\n");
     printf("  -h --help                Print this help message.\n");
     printf("  -u --set-uid             Set Real & Effective User ID(string/number). Default: current euid\n");
