@@ -27,6 +27,17 @@ static void tcpcube_master_exit_handler()
     longjmp(pthread_getspecific(tcpcube_master_pthread_key), 1);
 }
 
+static void tcpcube_register_signal_handlers()
+{
+    struct sigaction signal_action;
+    signal_action.sa_handler = tcpcube_master_sigint_handler;
+    signal_action.sa_flags = SA_RESTART;
+    if(sigfillset(&signal_action.sa_mask) == -1)
+        err(EXIT_FAILURE, "%s, %u", __FILE__, __LINE__);
+    if(sigaction(SIGINT, &signal_action, NULL) == -1)
+        err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
+}
+
 void tcpcube_master_init_core(struct tcpcube_master_args* master_args)
 {
     struct sockaddr_in server_address_sockaddr_in;
@@ -88,13 +99,7 @@ void tcpcube_master_init_modules(struct tcpcube_master_args* master_args)
 
 void tcpcube_master_start(struct tcpcube_master_args* master_args)
 {
-    struct sigaction* signal_action = malloc(sizeof(struct sigaction));
-    signal_action->sa_handler = tcpcube_master_sigint_handler;
-    signal_action->sa_flags = SA_RESTART;
-    sigfillset(&signal_action->sa_mask);
-    sigaction(SIGINT, signal_action, NULL);
-    free(signal_action);
-
+    tcpcube_register_signal_handlers();
     pthread_t* worker_threads;
     pthread_attr_t worker_thread_attr;
     jmp_buf* tcpcube_master_jmp_buf = malloc(sizeof(jmp_buf));
