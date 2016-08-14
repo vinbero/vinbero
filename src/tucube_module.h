@@ -10,11 +10,9 @@ struct tucube_module
     void* object;
     size_t object_size;
     pthread_rwlock_t* object_rwlock;
+    pthread_key_t* tlmodule_key;
     GONC_LIST_ELEMENT(struct tucube_module);
 };
-
-#define TUCUBE_MODULE_CAST(module, type) \
-((type)module)
 
 struct tucube_module_list
 {
