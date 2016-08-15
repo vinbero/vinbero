@@ -13,7 +13,7 @@
 #include "tucube_master.h"
 #include "tucube_worker.h"
 
-static pthread_key_t tucube_master_pthread_key;
+static pthread_key_t tucube_master_tlkey;
 
 static void tucube_master_sigint_handler(int signal_number)
 {
@@ -23,8 +23,12 @@ static void tucube_master_sigint_handler(int signal_number)
 
 static void tucube_master_exit_handler()
 {
-    warnx("tucube_master_exit_handler(), tid: %d", syscall(SYS_gettid));
-    longjmp(pthread_getspecific(tucube_master_pthread_key), 1);
+    warnx("tucube_master_exit_handler(), tid: %d, pid: %d", syscall(SYS_gettid), getpid());
+    if(syscall(SYS_gettid) == getpid())
+    {
+        jmp_buf* jump_buffer = pthread_getspecific(tucube_master_tlkey);
+        longjmp(*jump_buffer, 1);
+    }
 }
 
 static void tucube_register_signal_handlers()
@@ -102,17 +106,18 @@ void tucube_master_start(struct tucube_master_args* master_args)
     tucube_register_signal_handlers();
     pthread_t* worker_threads;
     pthread_attr_t worker_thread_attr;
-    jmp_buf* tucube_master_jmp_buf = malloc(sizeof(jmp_buf));
-    if(setjmp(*tucube_master_jmp_buf) == 0)
+    jmp_buf* jump_buffer = malloc(sizeof(jmp_buf));
+    if(setjmp(*jump_buffer) == 0)
     {
-        pthread_key_create(&tucube_master_pthread_key, NULL);
-        pthread_setspecific(tucube_master_pthread_key, tucube_master_jmp_buf);
-        atexit(tucube_master_exit_handler);
+        pthread_key_create(&tucube_master_tlkey, NULL);
+        pthread_setspecific(tucube_master_tlkey, jump_buffer);
+
+        pthread_attr_init(&worker_thread_attr);
+        pthread_attr_setdetachstate(&worker_thread_attr, PTHREAD_CREATE_JOINABLE);
 
         worker_threads = malloc(master_args->worker_count * sizeof(pthread_t));
         
-        pthread_attr_init(&worker_thread_attr);
-        pthread_attr_setdetachstate(&worker_thread_attr, PTHREAD_CREATE_JOINABLE);
+        atexit(tucube_master_exit_handler);
 
         for(size_t index = 0; index != master_args->worker_count; ++index)
         {
@@ -121,8 +126,8 @@ void tucube_master_start(struct tucube_master_args* master_args)
         }
         pause();
     }
-    free(tucube_master_jmp_buf);
-    pthread_key_delete(tucube_master_pthread_key);
+    free(jump_buffer);
+    pthread_key_delete(tucube_master_tlkey);
 
     GONC_LIST_REMOVE_FOR_EACH(master_args->module_args_list, struct tucube_module_args, module_args)
     {
