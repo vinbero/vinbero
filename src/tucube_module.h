@@ -25,8 +25,8 @@ struct tucube_module_list
 
 struct tucube_module_arg
 {
-    char* name;
-    char* value;
+    struct gonc_string name;
+    struct gonc_string value;
     GONC_LIST_ELEMENT(struct tucube_module_arg);
 };
 

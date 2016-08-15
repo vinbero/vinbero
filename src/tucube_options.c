@@ -80,9 +80,9 @@ void tucube_options_process(int argc, char* argv[], struct tucube_master_args* m
                 for(size_t j = 0; j != 2 && (module_arg_name_or_value = strsep(&module_arg_string_tmp, ":")) != NULL; ++j)
                 {
                     if(j == 0)
-                        module_arg->name = strdup(module_arg_name_or_value);
+                        GONC_STRING_SET(&module_arg->name, strdup(module_arg_name_or_value));
                     else
-                        module_arg->value = strdup(module_arg_name_or_value);
+                        GONC_STRING_SET(&module_arg->value, strdup(module_arg_name_or_value));
                 }
                 free(module_arg_string);
             }
