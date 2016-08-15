@@ -7,9 +7,13 @@
 
 struct tucube_module
 {
-    void* object;
-    size_t object_size;
-    pthread_rwlock_t* object_rwlock;
+    union
+    {
+        int integer;
+        unsigned int uinteger;
+        void* pointer;
+    };
+    pthread_rwlock_t* rwlock;
     pthread_key_t* tlmodule_key;
     GONC_LIST_ELEMENT(struct tucube_module);
 };
