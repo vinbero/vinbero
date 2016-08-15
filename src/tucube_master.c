@@ -24,7 +24,7 @@ static void tucube_master_sigint_handler(int signal_number)
 static void tucube_master_exit_handler()
 {
     warnx("tucube_master_exit_handler(), tid: %d", syscall(SYS_gettid));
-    longjmp(*(jmp_buf*)pthread_getspecific(tucube_master_pthread_key), 1);
+    longjmp(pthread_getspecific(tucube_master_pthread_key), 1);
 }
 
 static void tucube_register_signal_handlers()
@@ -103,7 +103,6 @@ void tucube_master_start(struct tucube_master_args* master_args)
     pthread_t* worker_threads;
     pthread_attr_t worker_thread_attr;
     jmp_buf* tucube_master_jmp_buf = malloc(sizeof(jmp_buf));
-
     if(setjmp(*tucube_master_jmp_buf) == 0)
     {
         pthread_key_create(&tucube_master_pthread_key, NULL);
