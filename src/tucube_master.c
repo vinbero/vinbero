@@ -74,7 +74,7 @@ void tucube_master_init_core(struct tucube_master_args* master_args)
 
 void tucube_master_init_modules(struct tucube_master_args* master_args)
 {
-    if((master_args->dl_handle = dlopen(GONC_LIST_HEAD(master_args->module_args_list)->module_path.chars, RTLD_LAZY)) == NULL)
+    if((master_args->dl_handle = dlopen(GONC_LIST_HEAD(master_args->module_args_list)->module_path, RTLD_LAZY)) == NULL)
         err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
 
     if((master_args->tucube_module_init = dlsym(master_args->dl_handle, "tucube_module_init")) == NULL)
@@ -104,12 +104,11 @@ void tucube_master_init_modules(struct tucube_master_args* master_args)
     {
         struct tucube_module_arg* module_arg = malloc(sizeof(struct tucube_module_arg));
         GONC_LIST_ELEMENT_INIT(module_arg);
-        GONC_STRING_SET(&module_arg->name, strdup("tucube-worker-count"));
-        module_arg->value.chars = malloc(worker_count_length + 1);
-        module_arg->value.chars[worker_count_length] = '\0';
-        module_arg->value.length = worker_count_length;
+        module_arg->name = strdup("tucube-worker-count");
+        module_arg->value = malloc(worker_count_length + 1);
+        module_arg->value[worker_count_length] = '\0';
 
-        if(snprintf(module_arg->value.chars, worker_count_length + 1, "%d", master_args->worker_count) < 0)
+        if(snprintf(module_arg->value, worker_count_length + 1, "%d", master_args->worker_count) < 0)
             errx(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
         GONC_LIST_APPEND(module_args, module_arg);
     }
@@ -160,12 +159,12 @@ void tucube_master_start(struct tucube_master_args* master_args)
         GONC_LIST_REMOVE_FOR_EACH(module_args, struct tucube_module_arg, module_arg)
         {
             GONC_LIST_REMOVE(module_args, module_arg);
-            free(module_arg->name.chars);
-            free(module_arg->value.chars);
+            free(module_arg->name);
+            free(module_arg->value);
             free(module_arg);
         }
         GONC_LIST_REMOVE(master_args->module_args_list, module_args);
-        free(module_args->module_path.chars);
+        free(module_args->module_path);
         free(module_args);
     }
     free(master_args->module_args_list);

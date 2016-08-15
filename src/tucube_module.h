@@ -3,7 +3,6 @@
 
 #include <pthread.h>
 #include <libgonc/gonc_list.h>
-#include <libgonc/gonc_string.h>
 
 struct tucube_module
 {
@@ -25,14 +24,14 @@ struct tucube_module_list
 
 struct tucube_module_arg
 {
-    struct gonc_string name;
-    struct gonc_string value;
+    char* name;
+    char* value;
     GONC_LIST_ELEMENT(struct tucube_module_arg);
 };
 
 struct tucube_module_args
 {
-    struct gonc_string module_path;
+    char* module_path;
     GONC_LIST_ELEMENT(struct tucube_module_args);
     GONC_LIST(struct tucube_module_arg);
 };

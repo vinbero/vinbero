@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <libgonc/gonc_list.h>
-#include <libgonc/gonc_string.h>
 #include "config.h"
 #include "tucube_master.h"
 #include "tucube_options.h"

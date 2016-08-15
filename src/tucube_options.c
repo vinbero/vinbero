@@ -70,7 +70,7 @@ void tucube_options_process(int argc, char* argv[], struct tucube_master_args* m
                 {
                     if((module_path_string = realpath(module_arg_string, NULL)) == NULL)
                         err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
-                    GONC_STRING_SET(&module_args->module_path, module_path_string);
+                    module_args->module_path = module_path_string;
                     continue;
                 }
                 module_arg = malloc(sizeof(struct tucube_module_arg));
@@ -80,9 +80,9 @@ void tucube_options_process(int argc, char* argv[], struct tucube_master_args* m
                 for(size_t j = 0; j != 2 && (module_arg_name_or_value = strsep(&module_arg_string_tmp, ":")) != NULL; ++j)
                 {
                     if(j == 0)
-                        GONC_STRING_SET(&module_arg->name, strdup(module_arg_name_or_value));
+                        module_arg->name = strdup(module_arg_name_or_value);
                     else
-                        GONC_STRING_SET(&module_arg->value, strdup(module_arg_name_or_value));
+                        module_arg->value = strdup(module_arg_name_or_value);
                 }
                 free(module_arg_string);
             }
