@@ -129,8 +129,8 @@ void tucube_master_start(struct tucube_master_args* master_args)
         GONC_LIST_REMOVE_FOR_EACH(module_args, struct tucube_module_arg, module_arg)
         {
             GONC_LIST_REMOVE(module_args, module_arg);
-            free(module_arg->name.chars);
-            free(module_arg->value.chars);
+            free(module_arg->name);
+            free(module_arg->value);
             free(module_arg);
         }
         GONC_LIST_REMOVE(master_args->module_args_list, module_args);
