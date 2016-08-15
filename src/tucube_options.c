@@ -62,6 +62,7 @@ void tucube_options_process(int argc, char* argv[], struct tucube_master_args* m
         case 'm':
             module_args = malloc(sizeof(struct tucube_module_args));
             GONC_LIST_INIT(module_args);
+            GONC_LIST_ELEMENT_INIT(module_args);
             module_args_string = strdup(optarg);
             module_args_string_tmp = module_args_string;
             for(size_t i = 0; (module_arg_string = strsep(&module_args_string_tmp, ",")) != NULL; ++i)
@@ -74,6 +75,7 @@ void tucube_options_process(int argc, char* argv[], struct tucube_master_args* m
                     continue;
                 }
                 module_arg = malloc(sizeof(struct tucube_module_arg));
+                GONC_LIST_ELEMENT_INIT(module_arg);
                 GONC_LIST_APPEND(module_args, module_arg);
                 module_arg_string = strdup(module_arg_string);
                 module_arg_string_tmp = module_arg_string;
@@ -87,7 +89,6 @@ void tucube_options_process(int argc, char* argv[], struct tucube_master_args* m
                 free(module_arg_string);
             }
             free(module_args_string);
-            GONC_LIST_ELEMENT_INIT(module_args);
             GONC_LIST_APPEND(master_args->module_args_list, module_args);
             break;
         }
