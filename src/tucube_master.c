@@ -46,12 +46,12 @@ static void tucube_register_signal_handlers()
 void tucube_master_init_core(struct tucube_master_args* master_args)
 {
     struct sockaddr_in server_address_sockaddr_in;
-    memset(server_address_sockaddr_in.sin_zero, 0, sizeof(server_address_sockaddr_in.sin_zero));
+    memset(server_address_sockaddr_in.sin_zero, 0, 1 * sizeof(server_address_sockaddr_in.sin_zero));
     server_address_sockaddr_in.sin_family = AF_INET;
     inet_aton(master_args->address, &server_address_sockaddr_in.sin_addr);
     server_address_sockaddr_in.sin_port = htons(master_args->port);
 
-    master_args->worker_args = malloc(sizeof(struct tucube_worker_args));
+    master_args->worker_args = malloc(1 * sizeof(struct tucube_worker_args));
 
     if((master_args->worker_args->server_socket = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) == -1)
         err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
@@ -68,7 +68,7 @@ void tucube_master_init_core(struct tucube_master_args* master_args)
     if(listen(master_args->worker_args->server_socket, master_args->backlog) == -1)
         err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
 
-    master_args->worker_args->server_socket_mutex = malloc(sizeof(pthread_mutex_t));
+    master_args->worker_args->server_socket_mutex = malloc(1 * sizeof(pthread_mutex_t));
     pthread_mutex_init(master_args->worker_args->server_socket_mutex, NULL);
 }
 
@@ -102,10 +102,10 @@ void tucube_master_init_modules(struct tucube_master_args* master_args)
 
     GONC_LIST_FOR_EACH(master_args->module_args_list, struct tucube_module_args, module_args)
     {
-        struct tucube_module_arg* module_arg = malloc(sizeof(struct tucube_module_arg));
+        struct tucube_module_arg* module_arg = malloc(1 * sizeof(struct tucube_module_arg));
         GONC_LIST_ELEMENT_INIT(module_arg);
         module_arg->name = strdup("tucube-worker-count");
-        module_arg->value = malloc(worker_count_length + 1);
+        module_arg->value = malloc(1 * worker_count_length + 1);
         module_arg->value[worker_count_length] = '\0';
 
         if(snprintf(module_arg->value, worker_count_length + 1, "%d", master_args->worker_count) < 0)
@@ -113,7 +113,7 @@ void tucube_master_init_modules(struct tucube_master_args* master_args)
         GONC_LIST_APPEND(module_args, module_arg);
     }
 
-    master_args->module_list = malloc(sizeof(struct tucube_module_list));
+    master_args->module_list = malloc(1 * sizeof(struct tucube_module_list));
     GONC_LIST_INIT(master_args->module_list);
     if(master_args->tucube_module_init(GONC_LIST_HEAD(master_args->module_args_list), master_args->module_list) == -1)
         errx(EXIT_FAILURE, "%s: %u: tucube_module_init() failed", __FILE__, __LINE__);
@@ -127,7 +127,7 @@ void tucube_master_start(struct tucube_master_args* master_args)
     tucube_register_signal_handlers();
     pthread_t* worker_threads;
     pthread_attr_t worker_thread_attr;
-    jmp_buf* jump_buffer = malloc(sizeof(jmp_buf));
+    jmp_buf* jump_buffer = malloc(1 * sizeof(jmp_buf));
     if(setjmp(*jump_buffer) == 0)
     {
         pthread_key_create(&tucube_master_tlkey, NULL);
@@ -136,7 +136,7 @@ void tucube_master_start(struct tucube_master_args* master_args)
         pthread_attr_init(&worker_thread_attr);
         pthread_attr_setdetachstate(&worker_thread_attr, PTHREAD_CREATE_JOINABLE);
 
-        worker_threads = malloc(master_args->worker_count * sizeof(pthread_t));
+        worker_threads = malloc(1 * master_args->worker_count * sizeof(pthread_t));
         
         atexit(tucube_master_exit_handler);
 
