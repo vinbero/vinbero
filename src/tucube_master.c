@@ -32,7 +32,7 @@ static void tucube_master_exit_handler()
     }
 }
 
-static void tucube_register_signal_handlers()
+static void tucube_master_register_signal_handlers()
 {
     struct sigaction signal_action;
     signal_action.sa_handler = tucube_master_sigint_handler;
@@ -40,6 +40,13 @@ static void tucube_register_signal_handlers()
     if(sigfillset(&signal_action.sa_mask) == -1)
         err(EXIT_FAILURE, "%s, %u", __FILE__, __LINE__);
     if(sigaction(SIGINT, &signal_action, NULL) == -1)
+        err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
+
+    signal_action.sa_handler = SIG_IGN;
+    signal_action.sa_flags = SA_RESTART;
+    if(sigfillset(&signal_action.sa_mask) == -1)
+        err(EXIT_FAILURE, "%s, %u", __FILE__, __LINE__);
+    if(sigaction(SIGPIPE, &signal_action, NULL) == -1)
         err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
 }
 
@@ -124,7 +131,7 @@ void tucube_master_init_modules(struct tucube_master_args* master_args)
 
 void tucube_master_start(struct tucube_master_args* master_args)
 {
-    tucube_register_signal_handlers();
+    tucube_master_register_signal_handlers();
     pthread_t* worker_threads;
     pthread_attr_t worker_thread_attr;
     jmp_buf* jump_buffer = malloc(1 * sizeof(jmp_buf));

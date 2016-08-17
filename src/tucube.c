@@ -8,7 +8,6 @@
 
 int main(int argc, char* argv[])
 {
-
     struct tucube_master_args* master_args = malloc(1 * sizeof(struct tucube_master_args));
     master_args->module_args_list = malloc(1 * sizeof(struct tucube_module_args_list));
     GONC_LIST_INIT(master_args->module_args_list);
