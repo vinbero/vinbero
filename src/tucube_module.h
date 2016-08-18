@@ -42,12 +42,24 @@ struct tucube_module_args_list
     GONC_LIST(struct tucube_module_args);
 };
 
-#define TUCUBE_MODULE_DLSYM(tucube_module, module_type, module_function)         \
+#define TUCUBE_MODULE_DLOPEN(module, module_args)                 \
+do                                                                \
+{                                                                 \
+    if(((module)->dl_handle =                                     \
+         dlopen(GONC_LIST_ELEMENT_NEXT(module_args)->module_path, \
+              RTLD_LAZY)) == NULL)                                \
+    {                                                             \
+        err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);          \
+    }                                                             \
+}                                                                 \
+while(0)
+
+#define TUCUBE_MODULE_DLSYM(module, module_pointer_type, module_function)        \
 do                                                                               \
 {                                                                                \
-    if((GONC_CAST(tucube_module->pointer,                                        \
-         module_type*)->module_function =                                        \
-              dlsym(tucube_module->dl_handle, #module_function)) == NULL)        \
+    if((GONC_CAST((module)->pointer,                                             \
+         module_pointer_type)->module_function =                                 \
+              dlsym((module)->dl_handle, #module_function)) == NULL)             \
     {                                                                            \
         errx(EXIT_FAILURE,                                                       \
              "%s: %u: Unable to find "#module_function"()", __FILE__, __LINE__); \
