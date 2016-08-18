@@ -35,6 +35,5 @@ int main(int argc, char* argv[])
     tucube_master_start(master_args);
 
     free(master_args);
-
     return 0;
 }

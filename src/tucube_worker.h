@@ -2,10 +2,14 @@
 #define _TUCUBE_WORKER_H
 
 #include <pthread.h>
+#include <stdbool.h>
 #include "tucube_module.h"
 
 struct tucube_worker_args
 {
+    bool exit;
+    pthread_mutex_t* exit_mutex;
+    pthread_cond_t* exit_cond;
     int server_socket;
     pthread_mutex_t* server_socket_mutex;
     struct tucube_module* module;

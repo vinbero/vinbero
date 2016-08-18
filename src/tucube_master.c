@@ -18,17 +18,16 @@ static pthread_key_t tucube_master_tlkey;
 
 static void tucube_master_sigint_handler(int signal_number)
 {
-    warnx("tucube_sigint_handler(), tid: %d", syscall(SYS_gettid));
     exit(EXIT_FAILURE);
 }
 
 static void tucube_master_exit_handler()
 {
-    warnx("tucube_master_exit_handler(), tid: %d, pid: %d", syscall(SYS_gettid), getpid());
     if(syscall(SYS_gettid) == getpid())
     {
         jmp_buf* jump_buffer = pthread_getspecific(tucube_master_tlkey);
-        longjmp(*jump_buffer, 1);
+        if(jump_buffer != NULL)
+            longjmp(*jump_buffer, 1);
     }
 }
 
@@ -52,13 +51,19 @@ static void tucube_master_register_signal_handlers()
 
 void tucube_master_init_core(struct tucube_master_args* master_args)
 {
+    master_args->worker_args = malloc(1 * sizeof(struct tucube_worker_args));
+
+    master_args->worker_args->exit = false;
+    master_args->worker_args->exit_mutex = malloc(1 * sizeof(pthread_mutex_t));
+    pthread_mutex_init(master_args->worker_args->exit_mutex, NULL);
+    master_args->worker_args->exit_cond = malloc(1 * sizeof(pthread_cond_t));
+    pthread_cond_init(master_args->worker_args->exit_cond, NULL);
+
     struct sockaddr_in server_address_sockaddr_in;
     memset(server_address_sockaddr_in.sin_zero, 0, 1 * sizeof(server_address_sockaddr_in.sin_zero));
     server_address_sockaddr_in.sin_family = AF_INET;
     inet_aton(master_args->address, &server_address_sockaddr_in.sin_addr);
     server_address_sockaddr_in.sin_port = htons(master_args->port);
-
-    master_args->worker_args = malloc(1 * sizeof(struct tucube_worker_args));
 
     if((master_args->worker_args->server_socket = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) == -1)
         err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
@@ -152,10 +157,19 @@ void tucube_master_start(struct tucube_master_args* master_args)
             if(pthread_create(worker_threads + index, &worker_thread_attr, tucube_worker_start, master_args->worker_args) != 0)
                 err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
         }
+
+        pthread_mutex_lock(master_args->worker_args->exit_mutex);
+        while(master_args->worker_args->exit != true)
+        {
+            pthread_cond_wait(master_args->worker_args->exit_cond,
+                 master_args->worker_args->exit_mutex);
+        }
+        pthread_mutex_unlock(master_args->worker_args->exit_mutex);
+
         for(size_t index = 0; index != master_args->worker_count; ++index)
         {
-            void* return_value;
-            pthread_join(worker_threads[index], &return_value);
+            pthread_cancel(worker_threads[index]);
+            pthread_join(worker_threads[index], NULL);
         }
     }
     free(jump_buffer);
