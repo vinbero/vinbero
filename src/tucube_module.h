@@ -58,7 +58,7 @@ while(0)
 do                                                                               \
 {                                                                                \
     if((GONC_CAST((module)->pointer,                                             \
-         module_pointer_type)->module_function =                                 \
+         module_pointer_type*)->module_function =                                \
               dlsym((module)->dl_handle, #module_function)) == NULL)             \
     {                                                                            \
         errx(EXIT_FAILURE,                                                       \
