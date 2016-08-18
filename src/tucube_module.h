@@ -6,6 +6,7 @@
 
 struct tucube_module
 {
+    void* dl_handle;
     union
     {
         int integer;
