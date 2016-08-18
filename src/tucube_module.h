@@ -42,4 +42,17 @@ struct tucube_module_args_list
     GONC_LIST(struct tucube_module_args);
 };
 
+#define TUCUBE_MODULE_DLSYM(tucube_module, module_type, module_function)         \
+do                                                                               \
+{                                                                                \
+    if((GONC_CAST(tucube_module->pointer,                                        \
+         module_type*)->module_function =                                        \
+              dlsym(tucube_module->dl_handle, #module_function)) == NULL)        \
+    {                                                                            \
+        errx(EXIT_FAILURE,                                                       \
+             "%s: %u: Unable to find "#module_function"()", __FILE__, __LINE__); \
+    }                                                                            \
+}                                                                                \
+while(0)
+
 #endif
