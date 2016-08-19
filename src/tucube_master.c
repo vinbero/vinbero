@@ -120,7 +120,7 @@ void tucube_master_init_modules(struct tucube_master_args* master_args)
         module_arg->value = malloc(1 * worker_count_length + 1);
         module_arg->value[worker_count_length] = '\0';
 
-        if(snprintf(module_arg->value, worker_count_length + 1, "%d", master_args->worker_count) < 0)
+        if(snprintf(module_arg->value, worker_count_length + 1, "%u", master_args->worker_count) < 0)
             errx(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
         GONC_LIST_APPEND(module_args, module_arg);
     }
