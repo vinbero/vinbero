@@ -94,5 +94,5 @@ void tucube_options_process(int argc, char* argv[], struct tucube_master_args* m
         }
     }
     if(GONC_LIST_SIZE(master_args->module_args_list) < 1)
-        errx(EXIT_FAILURE, "You need at least one --module-args option", __FILE__, __LINE__);
+        errx(EXIT_FAILURE, "%s: %u: You need at least one --module-args option", __FILE__, __LINE__);
 }
