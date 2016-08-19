@@ -30,7 +30,8 @@ void tucube_options_process(int argc, char* argv[], struct tucube_master_args* m
     char* module_arg_string;
     char* module_arg_string_tmp;
     char* module_arg_name_or_value;
-    for(char option_char; option_char != -1; option_char = getopt_long(argc, argv, "hu:g:a:p:b:rw:m:", options, NULL))
+    
+    for(char option_char = '\0'; option_char != -1; option_char = getopt_long(argc, argv, "hu:g:a:p:b:rw:m:", options, NULL))
     {
         switch(option_char)
         {

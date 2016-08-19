@@ -10,6 +10,7 @@
 #include <string.h>
 #include <sys/syscall.h>
 #include <libgonc/gonc_list.h>
+#include <libgonc/gonc_uinttostr.h>
 #include "config.h"
 #include "tucube_master.h"
 #include "tucube_worker.h"
@@ -104,24 +105,12 @@ void tucube_master_init_modules(struct tucube_master_args* master_args)
     if((master_args->tucube_module_destroy = dlsym(master_args->dl_handle, "tucube_module_destroy")) == NULL)
         errx(EXIT_FAILURE, "%s: %u: Unable to find tucube_module_destroy()", __FILE__, __LINE__);
 
-    size_t worker_count = master_args->worker_count;
-    size_t worker_count_length = 0;
-    while(worker_count != 0)
-    {
-        worker_count /= 10;
-        ++worker_count_length;
-    }
-
     GONC_LIST_FOR_EACH(master_args->module_args_list, struct tucube_module_args, module_args)
     {
         struct tucube_module_arg* module_arg = malloc(1 * sizeof(struct tucube_module_arg));
         GONC_LIST_ELEMENT_INIT(module_arg);
         module_arg->name = strdup("tucube-worker-count");
-        module_arg->value = malloc(1 * worker_count_length + 1);
-        module_arg->value[worker_count_length] = '\0';
-
-        if(snprintf(module_arg->value, worker_count_length + 1, "%u", master_args->worker_count) < 0)
-            errx(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
+        gonc_uinttostr(master_args->worker_count, 10, &module_arg->value);
         GONC_LIST_APPEND(module_args, module_arg);
     }
 
