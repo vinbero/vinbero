@@ -10,14 +10,16 @@
 
 static void tucube_worker_pthread_cleanup_handler(void* worker_args)
 {
-warnx("cleanup handler");
+warnx("%s: %u: cleanup handler", __FILE__, __LINE__);
     if(GONC_CAST(worker_args, struct tucube_worker_args*)->tucube_module_tldestroy(((struct tucube_worker_args*)worker_args)->module) == -1)
         warnx("%s: %u: tucube_module_tldestroy() failed", __FILE__, __LINE__);
-
+warnx("%s: %u: before locking mutex", __FILE__, __LINE__);
     pthread_mutex_lock(GONC_CAST(worker_args, struct tucube_worker_args*)->exit_mutex);
+warnx("%s: %u: after locking mutex", __FILE__, __LINE__);
     GONC_CAST(worker_args, struct tucube_worker_args*)->exit = true;
     pthread_cond_signal(GONC_CAST(worker_args, struct tucube_worker_args*)->exit_cond);
     pthread_mutex_unlock(GONC_CAST(worker_args, struct tucube_worker_args*)->exit_mutex);
+warnx("%s: %u: cleanup handler returning", __FILE__, __LINE__);
 }
 
 void* tucube_worker_start(void* worker_args)

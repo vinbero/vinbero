@@ -163,6 +163,7 @@ void tucube_master_start(struct tucube_master_args* master_args)
     }
     free(jump_buffer);
     pthread_key_delete(tucube_master_tlkey);
+    pthread_mutex_unlock(master_args->worker_args->exit_mutex);
 
     GONC_LIST_REMOVE_FOR_EACH(master_args->module_args_list, struct tucube_module_args, module_args)
     {
@@ -183,7 +184,9 @@ void tucube_master_start(struct tucube_master_args* master_args)
     {
         master_args->worker_args->exit = false;
         warnx("cancel result: %d", pthread_cancel(worker_threads[index]));
+warnx("%s: %u: before locking mutex", __FILE__, __LINE__);
         pthread_mutex_lock(master_args->worker_args->exit_mutex);
+warnx("%s: %u: after locking mutex", __FILE__, __LINE__);
         while(master_args->worker_args->exit != true)
         {
             pthread_cond_wait(master_args->worker_args->exit_cond,
