@@ -164,11 +164,6 @@ void tucube_master_start(struct tucube_master_args* master_args)
     free(jump_buffer);
     pthread_key_delete(tucube_master_tlkey);
 
-    pthread_cond_destroy(master_args->worker_args->exit_cond);
-    free(master_args->worker_args->exit_cond);
-    pthread_mutex_destroy(master_args->worker_args->exit_mutex);
-    free(master_args->worker_args->exit_mutex);
-
     GONC_LIST_REMOVE_FOR_EACH(master_args->module_args_list, struct tucube_module_args, module_args)
     {
         GONC_LIST_REMOVE_FOR_EACH(module_args, struct tucube_module_arg, module_arg)
@@ -183,13 +178,28 @@ void tucube_master_start(struct tucube_master_args* master_args)
         free(module_args);
     }
     free(master_args->module_args_list);
-/*
+
     for(size_t index = 0; index != master_args->worker_count; ++index)
     {
-        pthread_cancel(worker_threads[index]);
+        master_args->worker_args->exit = false;
+        warnx("cancel result: %d", pthread_cancel(worker_threads[index]));
+        pthread_mutex_lock(master_args->worker_args->exit_mutex);
+        while(master_args->worker_args->exit != true)
+        {
+            pthread_cond_wait(master_args->worker_args->exit_cond,
+                 master_args->worker_args->exit_mutex);
+        }
+        pthread_mutex_unlock(master_args->worker_args->exit_mutex);
+
         pthread_join(worker_threads[index], NULL);
     }
-*/
+
+    pthread_cond_destroy(master_args->worker_args->exit_cond);
+    free(master_args->worker_args->exit_cond);
+    pthread_mutex_destroy(master_args->worker_args->exit_mutex);
+    free(master_args->worker_args->exit_mutex);
+
+
     close(master_args->worker_args->server_socket);
     pthread_mutex_destroy(master_args->worker_args->server_socket_mutex);
     free(master_args->worker_args->server_socket_mutex);
