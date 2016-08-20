@@ -126,7 +126,7 @@ void tucube_master_init_modules(struct tucube_master_args* master_args)
 void tucube_master_start(struct tucube_master_args* master_args)
 {
     tucube_master_register_signal_handlers();
-    pthread_t* worker_threads = NULL;
+    pthread_t* worker_threads;
     pthread_attr_t worker_thread_attr;
     jmp_buf* jump_buffer = malloc(1 * sizeof(jmp_buf));
     if(setjmp(*jump_buffer) == 0)
