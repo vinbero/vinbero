@@ -178,13 +178,13 @@ void tucube_master_start(struct tucube_master_args* master_args)
         free(module_args);
     }
     free(master_args->module_args_list);
-
+/*
     for(size_t index = 0; index != master_args->worker_count; ++index)
     {
-        if(pthread_cancel(worker_threads[index]) == 0)
-            pthread_join(worker_threads[index], NULL);
+        pthread_cancel(worker_threads[index]);
+        pthread_join(worker_threads[index], NULL);
     }
-
+*/
     close(master_args->worker_args->server_socket);
     pthread_mutex_destroy(master_args->worker_args->server_socket_mutex);
     free(master_args->worker_args->server_socket_mutex);
