@@ -164,6 +164,11 @@ void tucube_master_start(struct tucube_master_args* master_args)
     free(jump_buffer);
     pthread_key_delete(tucube_master_tlkey);
 
+    pthread_cond_destroy(master_args->worker_args->exit_cond);
+    free(master_args->worker_args->exit_cond);
+    pthread_mutex_destroy(master_args->worker_args->exit_mutex);
+    free(master_args->worker_args->exit_mutex);
+
     GONC_LIST_REMOVE_FOR_EACH(master_args->module_args_list, struct tucube_module_args, module_args)
     {
         GONC_LIST_REMOVE_FOR_EACH(module_args, struct tucube_module_arg, module_arg)
@@ -196,5 +201,5 @@ void tucube_master_start(struct tucube_master_args* master_args)
     if(master_args->tucube_module_destroy(GONC_LIST_HEAD(master_args->module_list)) == -1)
         warn("%s: %u", __FILE__, __LINE__);
     free(master_args->module_list);
-    dlclose(master_args->dl_handle);
+//    dlclose(master_args->dl_handle);
 }
