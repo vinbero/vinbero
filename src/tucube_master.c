@@ -73,7 +73,7 @@ void tucube_master_init_core(struct tucube_master_args* master_args)
         err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
 
     if(setsockopt(master_args->worker_args->server_socket, SOL_SOCKET, SO_REUSEPORT, &master_args->reuse_port, sizeof(int)) == -1)
-        err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
+        warn("%s: %u", __FILE__, __LINE__);
 
     if(bind(master_args->worker_args->server_socket, (struct sockaddr*)&server_address_sockaddr_in, sizeof(struct sockaddr)) == -1)
         err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
