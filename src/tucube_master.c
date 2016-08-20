@@ -183,10 +183,8 @@ void tucube_master_start(struct tucube_master_args* master_args)
     for(size_t index = 0; index != master_args->worker_count; ++index)
     {
         master_args->worker_args->exit = false;
-        warnx("cancel result: %d", pthread_cancel(worker_threads[index]));
-warnx("%s: %u: before locking mutex", __FILE__, __LINE__);
+        pthread_cancel(worker_threads[index]);
         pthread_mutex_lock(master_args->worker_args->exit_mutex);
-warnx("%s: %u: after locking mutex", __FILE__, __LINE__);
         while(master_args->worker_args->exit != true)
         {
             pthread_cond_wait(master_args->worker_args->exit_cond,
