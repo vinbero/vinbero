@@ -138,7 +138,7 @@ void tucube_master_start(struct tucube_master_args* master_args)
         pthread_attr_setdetachstate(&worker_thread_attr, PTHREAD_CREATE_JOINABLE);
 
         worker_threads = malloc(1 * master_args->worker_count * sizeof(pthread_t));
-        
+
         atexit(tucube_master_exit_handler);
 
         for(size_t index = 0; index != master_args->worker_count; ++index)

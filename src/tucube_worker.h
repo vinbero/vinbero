@@ -3,6 +3,7 @@
 
 #include <pthread.h>
 #include <stdbool.h>
+#include "config.h"
 #include "tucube_module.h"
 
 struct tucube_worker_args
