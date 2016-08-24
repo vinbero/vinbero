@@ -10,7 +10,7 @@
 #include <string.h>
 #include <sys/syscall.h>
 #include <libgonc/gonc_list.h>
-#include <libgonc/gonc_uinttostr.h>
+#include <libgonc/gonc_ltostr.h>
 #include "config.h"
 #include "tucube_master.h"
 #include "tucube_worker.h"
@@ -110,7 +110,7 @@ void tucube_master_init_modules(struct tucube_master_args* master_args)
         struct tucube_module_arg* module_arg = malloc(1 * sizeof(struct tucube_module_arg));
         GONC_LIST_ELEMENT_INIT(module_arg);
         module_arg->name = strdup("tucube-worker-count");
-        gonc_uinttostr(master_args->worker_count, 10, &module_arg->value);
+        gonc_ltostr(master_args->worker_count, 10, &module_arg->value);
         GONC_LIST_APPEND(module_args, module_arg);
     }
 
@@ -160,10 +160,45 @@ void tucube_master_start(struct tucube_master_args* master_args)
             pthread_cancel(worker_threads[index]);
             pthread_join(worker_threads[index], NULL);
         }
+        master_args->worker_args->exit = true;
     }
     free(jump_buffer);
     pthread_key_delete(tucube_master_tlkey);
     pthread_mutex_unlock(master_args->worker_args->exit_mutex);
+
+    if(master_args->worker_args->exit == false)
+    {
+        for(size_t index = 0; index != master_args->worker_count; ++index)
+        {
+            pthread_cancel(worker_threads[index]);
+            pthread_mutex_lock(master_args->worker_args->exit_mutex);
+            while(master_args->worker_args->exit != true)
+            {
+                pthread_cond_wait(master_args->worker_args->exit_cond,
+                     master_args->worker_args->exit_mutex);
+            }
+            pthread_mutex_unlock(master_args->worker_args->exit_mutex);
+            pthread_join(worker_threads[index], NULL);
+            master_args->worker_args->exit = false;
+        }
+    }
+
+    pthread_cond_destroy(master_args->worker_args->exit_cond);
+    free(master_args->worker_args->exit_cond);
+    pthread_mutex_destroy(master_args->worker_args->exit_mutex);
+    free(master_args->worker_args->exit_mutex);
+
+    close(master_args->worker_args->server_socket);
+    pthread_mutex_destroy(master_args->worker_args->server_socket_mutex);
+    free(master_args->worker_args->server_socket_mutex);
+    free(master_args->worker_args);
+
+    pthread_attr_destroy(&worker_thread_attr);
+    free(worker_threads);
+
+    if(master_args->tucube_module_destroy(GONC_LIST_HEAD(master_args->module_list)) == -1)
+        warn("%s: %u", __FILE__, __LINE__);
+    free(master_args->module_list);
 
     GONC_LIST_REMOVE_FOR_EACH(master_args->module_args_list, struct tucube_module_args, module_args)
     {
@@ -180,37 +215,5 @@ void tucube_master_start(struct tucube_master_args* master_args)
     }
     free(master_args->module_args_list);
 
-    for(size_t index = 0; index != master_args->worker_count; ++index)
-    {
-        master_args->worker_args->exit = false;
-        pthread_cancel(worker_threads[index]);
-        pthread_mutex_lock(master_args->worker_args->exit_mutex);
-        while(master_args->worker_args->exit != true)
-        {
-            pthread_cond_wait(master_args->worker_args->exit_cond,
-                 master_args->worker_args->exit_mutex);
-        }
-        pthread_mutex_unlock(master_args->worker_args->exit_mutex);
-
-        pthread_join(worker_threads[index], NULL);
-    }
-
-    pthread_cond_destroy(master_args->worker_args->exit_cond);
-    free(master_args->worker_args->exit_cond);
-    pthread_mutex_destroy(master_args->worker_args->exit_mutex);
-    free(master_args->worker_args->exit_mutex);
-
-
-    close(master_args->worker_args->server_socket);
-    pthread_mutex_destroy(master_args->worker_args->server_socket_mutex);
-    free(master_args->worker_args->server_socket_mutex);
-    free(master_args->worker_args);
-
-    pthread_attr_destroy(&worker_thread_attr);
-    free(worker_threads);
-
-    if(master_args->tucube_module_destroy(GONC_LIST_HEAD(master_args->module_list)) == -1)
-        warn("%s: %u", __FILE__, __LINE__);
-    free(master_args->module_list);
 //    dlclose(master_args->dl_handle);
 }
