@@ -47,7 +47,7 @@ do                                                                \
 {                                                                 \
     if(((module)->dl_handle =                                     \
          dlopen(GONC_LIST_ELEMENT_NEXT(module_args)->module_path, \
-              RTLD_LAZY)) == NULL)                                \
+              RTLD_LAZY | RTLD_GLOBAL)) == NULL)                  \
     {                                                             \
         err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);          \
     }                                                             \

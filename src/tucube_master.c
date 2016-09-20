@@ -87,7 +87,7 @@ void tucube_master_init_core(struct tucube_master_args* master_args)
 
 void tucube_master_init_modules(struct tucube_master_args* master_args)
 {
-    if((master_args->dl_handle = dlopen(GONC_LIST_HEAD(master_args->module_args_list)->module_path, RTLD_LAZY)) == NULL)
+    if((master_args->dl_handle = dlopen(GONC_LIST_HEAD(master_args->module_args_list)->module_path, RTLD_LAZY | RTLD_GLOBAL)) == NULL)
         err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
 
     if((master_args->tucube_module_init = dlsym(master_args->dl_handle, "tucube_module_init")) == NULL)
