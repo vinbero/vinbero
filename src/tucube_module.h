@@ -42,16 +42,16 @@ struct tucube_module_args_list
     GONC_LIST(struct tucube_module_args);
 };
 
-#define TUCUBE_MODULE_DLOPEN(module, module_args)                 \
-do                                                                \
-{                                                                 \
-    if(((module)->dl_handle =                                     \
-         dlopen(GONC_LIST_ELEMENT_NEXT(module_args)->module_path, \
-              RTLD_LAZY | RTLD_GLOBAL)) == NULL)                  \
-    {                                                             \
-        err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);          \
-    }                                                             \
-}                                                                 \
+#define TUCUBE_MODULE_DLOPEN(module, module_args)                                                                                     \
+do                                                                                                                                    \
+{                                                                                                                                     \
+    if(((module)->dl_handle =                                                                                                         \
+         dlopen(GONC_LIST_ELEMENT_NEXT(module_args)->module_path,                                                                     \
+              RTLD_LAZY | RTLD_GLOBAL)) == NULL)                                                                                      \
+    {                                                                                                                                 \
+        errx(EXIT_FAILURE, "%s: %u: Failed to load module %s", __FILE__, __LINE__, GONC_LIST_ELEMENT_NEXT(module_args)->module_path); \
+    }                                                                                                                                 \
+}                                                                                                                                     \
 while(0)
 
 #define TUCUBE_MODULE_DLSYM(module, module_pointer_type, module_function)        \
