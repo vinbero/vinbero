@@ -3,37 +3,37 @@
 #include <unistd.h>
 #include <libgonc/gonc_list.h>
 #include "config.h"
-#include "tucube_master.h"
-#include "tucube_options.h"
+#include "tucube_Master.h"
+#include "tucube_Options.h"
 
 int main(int argc, char* argv[])
 {
-    struct tucube_master_args* master_args = malloc(1 * sizeof(struct tucube_master_args));
-    master_args->module_args_list = malloc(1 * sizeof(struct tucube_module_args_list));
-    GONC_LIST_INIT(master_args->module_args_list);
+    struct tucube_Master_Args* masterArgs = malloc(1 * sizeof(struct tucube_Master_Args));
+    masterArgs->moduleArgsList = malloc(1 * sizeof(struct tucube_Module_ArgsList));
+    GONC_LIST_INIT(masterArgs->moduleArgsList);
 
-    master_args->set_uid = geteuid();
-    master_args->set_gid = getegid();
-    master_args->address = "0.0.0.0";
-    master_args->port = 8080;
-    master_args->backlog = 1024;
-    master_args->reuse_port = 0;
-    master_args->worker_count = 4;
+    masterArgs->setUid = geteuid();
+    masterArgs->setGid = getegid();
+    masterArgs->address = "0.0.0.0";
+    masterArgs->port = 8080;
+    masterArgs->backlog = 1024;
+    masterArgs->reusePort = 0;
+    masterArgs->workerCount = 4;
 
-    tucube_options_process(argc, argv, master_args);
+    tucube_Options_process(argc, argv, masterArgs);
 
-    tucube_master_init_core(master_args);
+    tucube_Master_initCore(masterArgs);
 
-    if(setgid(master_args->set_gid) == -1)
+    if(setgid(masterArgs->setGid) == -1)
         err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
 
-    if(setuid(master_args->set_uid) == -1)
+    if(setuid(masterArgs->setUid) == -1)
         err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
 
-    tucube_master_init_modules(master_args);
+    tucube_Master_initModules(masterArgs);
 
-    tucube_master_start(master_args);
+    tucube_Master_start(masterArgs);
 
-    free(master_args);
+    free(masterArgs);
     return 0;
 }
