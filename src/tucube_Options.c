@@ -33,7 +33,7 @@ void tucube_Options_process(int argc, char* argv[], struct tucube_Master_Args* m
     while((optionChar = getopt_long(argc, argv, "hu:g:a:p:b:rw:m:", options, NULL)) != (char)-1) {
         switch(optionChar) {
         case 'h':
-            tucube_help_print();
+            tucube_Help_print();
             exit(EXIT_SUCCESS);
             break;
         case 'u':

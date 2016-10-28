@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include "tucube_Help.h"
 
-void tucube_help_print() {
+void tucube_Help_print() {
     printf("Usage: tucube [OPTION]...\n");
     printf("A Modular TCP/UDP Server.\n");
     printf("Options:\n");
