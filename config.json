@@ -1,0 +1,6 @@
+[
+    {"worker-count": 4},
+    ["/usr/local/lib/tucube/tucube_tcp_epoll.so", {}],
+    ["/usr/local/lib/tucube/tucube_epoll_http.so", {}], 
+    ["/usr/local/lib/tucube/tucube_http_lua.so", {"script-file": "/usr/share/lua/5.3/cublog.lua"}]
+]
