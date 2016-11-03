@@ -6,7 +6,7 @@
 #include "tucube_Module.h"
 #include "tucube_Worker.h"
 
-struct tucube_Master_Args {
+struct tucube_Master {
     gid_t setGid;
     uid_t setUid;
     char* address;
@@ -14,18 +14,17 @@ struct tucube_Master_Args {
     int backlog;
     int reusePort;
     size_t workerCount;
-    struct tucube_Module_ArgsList* moduleArgsList;
+    struct tucube_Module_ConfigList* moduleConfigList;
     struct tucube_Module_List* moduleList;
     void* dlHandle;
-    int (*tucube_Module_init)(struct tucube_Module_Args*, struct tucube_Module_List*);
+    int (*tucube_Module_init)(struct tucube_Module_Config*, struct tucube_Module_List*);
     int (*tucube_Module_destroy)(struct tucube_Module*);
-    struct tucube_Worker_Args* workerArgs;
 };
 
-void tucube_Master_initCore(struct tucube_Master_Args* masterArgs);
+void tucube_Master_initCore(struct tucube_Master* master, struct tucube_Worker* worker);
 
-void tucube_Master_initModules(struct tucube_Master_Args* masterArgs);
+void tucube_Master_initModules(struct tucube_Master* master, struct tucube_Worker* worker);
 
-void tucube_Master_start(struct tucube_Master_Args* masterArgs);
+void tucube_Master_start(struct tucube_Master* master, struct tucube_Worker* worker);
 
 #endif

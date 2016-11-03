@@ -13,8 +13,8 @@ int main()
 
     if(json_is_array(root))
         printf("yes it is array\n");
-    if(json_array_size(root) < 1)
-        errx(EXIT_FAILURE, "minimum size of array is 1");
+    if(json_array_size(root) < 2)
+        errx(EXIT_FAILURE, "minimum size of array is 2");
     json_t* core_args = json_array_get(root, 0);
     json_t* worker_count = json_object_get(core_args, "worker-count");
     printf("%d\n", json_integer_value(worker_count));

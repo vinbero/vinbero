@@ -7,87 +7,62 @@
 #include "tucube_Master.h"
 #include "tucube_Help.h"
 
-void tucube_Options_process(int argc, char* argv[], struct tucube_Master_Args* masterArgs) {
+int tucube_Options_process(int argc, char* argv[], struct tucube_Core_Config* coreConfig, struct tucube_Module_ConfigList* moduleConfigList) {
+
     struct option options[] = {
         {"help", no_argument, NULL, 'h'},
-        {"set-uid", required_argument, NULL, 'u'},
-        {"set-gid", required_argument, NULL, 'g'},
-        {"address", required_argument, NULL, 'a'},
-        {"port", required_argument, NULL, 'p'},
-        {"backlog", required_argument, NULL, 'b'},
-        {"reuse-port", required_argument, NULL, 'r'},
-        {"worker-count", required_argument, NULL, 'w'},
-        {"module-args", required_argument, NULL, 'm'},
+        {"config-inline", required_argument, NULL, 'i'},
+        {"config-file", required_argument, NULL, 'f'},
         {NULL, 0, NULL, 0}
     };
 
-    struct tucube_Module_Args* moduleArgs;
-    struct tucube_Module_Arg* moduleArg;
-    char* moduleArgsString;
-    char* moduleArgsStringTmp;
-    char* modulePathString;
-    char* moduleArgString;
-    char* moduleArgStringTmp;
-    char* moduleArgNameOrValue;
+    json_t* configRoot;
     char optionChar;
-    while((optionChar = getopt_long(argc, argv, "hu:g:a:p:b:rw:m:", options, NULL)) != (char)-1) {
+
+    while((optionChar = getopt_long(argc, argv, "hi:f:", options, NULL)) != (char)-1) {
         switch(optionChar) {
         case 'h':
             tucube_Help_print();
             exit(EXIT_SUCCESS);
             break;
-        case 'u':
-            masterArgs->setUid = strtol(optarg, NULL, 10);
+        case 'i':
+            configRoot = json_loads(optarg);
             break;
-        case 'g':
-            masterArgs->setGid = strtol(optarg, NULL, 10);
-            break;
-        case 'a':
-            masterArgs->address = optarg;
-            break;
-        case 'p':
-            masterArgs->port = strtol(optarg, NULL, 10);
-            break;
-        case 'b':
-            masterArgs->backlog = strtol(optarg, NULL, 10);
-            break;
-        case 'r':
-            masterArgs->reusePort = strtol(optarg, NULL, 10);
-            break;
-        case 'w':
-            masterArgs->workerCount = strtol(optarg, NULL, 10);
-            break;
-        case 'm':
-            moduleArgs = malloc(sizeof(struct tucube_Module_Args));
-            GONC_LIST_INIT(moduleArgs);
-            GONC_LIST_ELEMENT_INIT(moduleArgs);
-            moduleArgsString = strdup(optarg);
-            moduleArgsStringTmp = moduleArgsString;
-            for(size_t i = 0; (moduleArgString = strsep(&moduleArgsStringTmp, ",")) != NULL; ++i) {
-                if(i == 0) {
-                    if((modulePathString = realpath(moduleArgString, NULL)) == NULL)
-                        err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
-                    moduleArgs->modulePath = modulePathString;
-                    continue;
-                }
-                moduleArg = malloc(sizeof(struct tucube_Module_Arg));
-                GONC_LIST_ELEMENT_INIT(moduleArg);
-                GONC_LIST_APPEND(moduleArgs, moduleArg);
-                moduleArgString = strdup(moduleArgString);
-                moduleArgStringTmp = moduleArgString;
-                for(size_t j = 0; j != 2 && (moduleArgNameOrValue = strsep(&moduleArgStringTmp, ":")) != NULL; ++j) {
-                    if(j == 0)
-                        moduleArg->name = strdup(moduleArgNameOrValue);
-                    else
-                        moduleArg->value = strdup(moduleArgNameOrValue);
-                }
-                free(moduleArgString);
-            }
-            free(moduleArgsString);
-            GONC_LIST_APPEND(masterArgs->moduleArgsList, moduleArgs);
+        case 'f':
+            configRoot = json_load_file(optarg);
             break;
         }
     }
-    if(GONC_LIST_SIZE(masterArgs->moduleArgsList) < 1)
-        errx(EXIT_FAILURE, "%s: %u: You need at least one --module-args option", __FILE__, __LINE__);
+
+    if(configRoot == NULL)
+        errx(EXIT_FAILURE, "%s: %u: %s", error.source, error.line, error.text);
+
+    if(!json_is_array(configRoot))
+        errx(EXIT_FAILURE, "%s: %u: configRoot must be an array", __FILE__, __LINE__);
+
+    if(json_array_size(configRoot) < 2)
+        errx(EXIT_FAILURE, "%s: %u: configRoot must have at least two elements", __FILE__, __LINE__);
+    
+    if(!json_is_object(json_array_get(configRoot, 0)))
+        errx(EXIT_FAILURE, "%s: %u: first element must be an object", __FILE__, __LINE__);
+
+    coreConfig->jsonObject = json_incref(json_array_get(configRoot, 0));
+
+    for(size_t index = 1; index != json_array_size(configRoot); ++index)
+    {
+        if(!json_is_array(json_array_get(configRoot, index)))
+            errx(EXIT_FAILURE, "%s: %u: elements except first elemnt must be arrays", __FILE__, __LINE__);
+        
+        struct tucube_Module_Config* moduleConfig = malloc(sizeof(struct tucube_Module_Config));
+        GONC_LIST_ELEMENT_INIT(moduleConfig);
+        moduleConfig->jsonObject = json_incref(json_array_get(configRoot, index));
+        GONC_LIST_APPEND(moduleConfigList, moduleConfig);
+    }
+
+    if(GONC_LIST_SIZE(moduleConfigList) < 1)
+        errx(EXIT_FAILURE, "%s: %u: You need to specify at least one moduleConfig", __FILE__, __LINE__);
+
+    json_decref(configRoot);
+
+    return 0;
 }

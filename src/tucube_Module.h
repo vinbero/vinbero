@@ -1,6 +1,7 @@
 #ifndef _TUCUBE_MODULE_H
 #define _TUCUBE_MODULE_H
 
+#include <jansson.h>
 #include <pthread.h>
 #include <libgonc/gonc_list.h>
 
@@ -20,20 +21,13 @@ struct tucube_Module_List {
     GONC_LIST(struct tucube_Module);
 };
 
-struct tucube_Module_Arg {
-    char* name;
-    char* value;
-    GONC_LIST_ELEMENT(struct tucube_Module_Arg);
-};
+struct tucube_Module_Config {
+    json_t* jsonObject;
+    GONC_LIST_ELEMENT(struct tucube_Module_Config);
+}
 
-struct tucube_Module_Args {
-    char* modulePath;
-    GONC_LIST_ELEMENT(struct tucube_Module_Args);
-    GONC_LIST(struct tucube_Module_Arg);
-};
-
-struct tucube_Module_ArgsList {
-    GONC_LIST(struct tucube_Module_Args);
+struct tucube_Module_ConfigList {
+    GONC_LIST(struct tucube_Module_ConfigList);
 };
 
 #define TUCUBE_MODULE_DLOPEN(module, moduleArgs)                \
