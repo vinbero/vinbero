@@ -1,6 +1,4 @@
-#include <err.h>
-#include <stdlib.h>
-#include <unistd.h>
+#include <jansson.h>
 #include <libgonc/gonc_list.h>
 #include "config.h"
 #include "tucube_Core.h"
@@ -14,5 +12,9 @@ int main(int argc, char* argv[])
     GONC_LIST_INIT(&moduleConfigList);
     tucube_Options_process(argc, argv, &coreConfig, &moduleConfigList);
     tucube_Core_start(&core, &coreConfig, &moduleConfigList);
+    json_decref(coreConfig.json);
+    GONC_LIST_FOR_EACH(&moduleConfigList, struct tucube_Module_Config, moduleConfig) {
+        json_decref(moduleConfig->json);
+    }
     return 0;
 }

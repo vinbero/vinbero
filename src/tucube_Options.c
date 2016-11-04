@@ -61,7 +61,7 @@ int tucube_Options_process(int argc, char* argv[], struct tucube_Core_Config* co
         if(!json_is_array(json_array_get(config, index)))
             errx(EXIT_FAILURE, "%s: %u: elements except first elemnt must be arrays", __FILE__, __LINE__);
         
-        struct tucube_Module_Config* moduleConfig = malloc(sizeof(struct tucube_Module_Config));
+        struct tucube_Module_Config* moduleConfig = malloc(1 * sizeof(struct tucube_Module_Config));
         GONC_LIST_ELEMENT_INIT(moduleConfig);
         moduleConfig->json = json_incref(json_array_get(config, index));
         GONC_LIST_APPEND(moduleConfigList, moduleConfig);

@@ -195,10 +195,10 @@ int tucube_Core_start(struct tucube_Core* core, struct tucube_Core_Config* coreC
 
         atexit(tucube_Core_exitHandler);
 
+        void* workerArgs[2] = {core, moduleConfigList};
         for(size_t index = 0; index != core->workerCount; ++index)
         {
-            void* workerArgs[2] = {core, moduleConfigList};
-            if(pthread_create(workerThreads + index, &coreThreadAttr, tucube_Core_startWorker, workerArgs) != 0)
+           if(pthread_create(workerThreads + index, &coreThreadAttr, tucube_Core_startWorker, workerArgs) != 0)
                 err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
         }
 
@@ -243,7 +243,6 @@ int tucube_Core_start(struct tucube_Core* core, struct tucube_Core_Config* coreC
     close(core->serverSocket);
     pthread_mutex_destroy(core->serverSocketMutex);
     free(core->serverSocketMutex);
-    free(core);
 
     pthread_attr_destroy(&coreThreadAttr);
     free(workerThreads);
