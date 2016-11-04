@@ -101,7 +101,7 @@ int tucube_Core_init(struct tucube_Core* core, struct tucube_Core_Config* coreCo
 
     //initModules
 
-    if((core->dlHandle = dlopen(json_string_value(json_array_get(GONC_LIST_HEAD(core->moduleConfigList), 0)), RTLD_LAZY | RTLD_GLOBAL)) == NULL)
+    if((core->dlHandle = dlopen(json_string_value(json_array_get(GONC_LIST_HEAD(core->moduleConfigList)->jsonObject, 0)), RTLD_LAZY | RTLD_GLOBAL)) == NULL)
         err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
 
     if((core->tucube_Module_init = dlsym(core->dlHandle, "tucube_Module_init")) == NULL)
