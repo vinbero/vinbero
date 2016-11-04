@@ -66,6 +66,14 @@ int tucube_Core_init(struct tucube_Core* core, struct tucube_Core_Config* coreCo
     if(json_object_get(coreConfig, "tucube.workerCount") != NULL)
         core->workerCount = json_integer_value(json_object_get(coreConfig, "tucube.workerCount"));
 
+    core->setUid = geteuid();
+    if(json_object_get(coreConfig, "tucube.setUid") != NULL)
+        core->setUid = json_integer_value(json_object_get(coreConfig, "tucube.setUid"));
+
+    core->setGid = getegid();
+    if(json_object_get(coreConfig, "tucube.setGid") != NULL)
+        core->setGid = json_integer_value(json_object_get(coreConfig, "tucube.setGid"));
+
     GONC_LIST_FOR_EACH(core->moduleConfigList, struct tucube_Module_Config, moduleConfig)
         json_object_set_new(json_array_get(moduleConfig->json, 1), "tucube.workerCount", json_integer(core->workerCount));
 
@@ -118,6 +126,12 @@ int tucube_Core_init(struct tucube_Core* core, struct tucube_Core_Config* coreCo
 
     if((core->tucube_Module_destroy = dlsym(core->dlHandle, "tucube_Module_destroy")) == NULL)
         errx(EXIT_FAILURE, "%s: %u: Unable to find tucube_Module_destroy()", __FILE__, __LINE__);
+
+    if(setgid(core->setGid) == -1)
+        err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
+
+    if(setuid(core->setUid) == -1)
+        err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
 
     core->moduleList = malloc(1 * sizeof(struct tucube_Module_List));
     GONC_LIST_INIT(core->moduleList);
