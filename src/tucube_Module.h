@@ -10,6 +10,7 @@ struct tucube_Module {
     union {
         int integer;
         unsigned int uInteger;
+        json_t* json;
         void* pointer;
     };
     pthread_rwlock_t* rwLock;
@@ -22,7 +23,7 @@ struct tucube_Module_List {
 };
 
 struct tucube_Module_Config {
-    json_t* jsonObject;
+    json_t* json;
     GONC_LIST_ELEMENT(struct tucube_Module_Config);
 }
 
@@ -34,7 +35,7 @@ struct tucube_Module_ConfigList {
 do {                                                                    \
     if(((module)->dlHandle =                                            \
                 dlopen(json_string_value(                               \
-                        json_array_get((moduleConfig)->jsonObject, 0)), \
+                        json_array_get((moduleConfig)->json, 0)), \
                     RTLD_LAZY | RTLD_GLOBAL)) == NULL) {                \
         err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);                \
     }                                                                   \

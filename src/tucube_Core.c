@@ -67,7 +67,7 @@ int tucube_Core_init(struct tucube_Core* core, struct tucube_Core_Config* coreCo
         core->workerCount = json_integer_value(json_object_get(coreConfig, "tucube.workerCount"));
 
     GONC_LIST_FOR_EACH(core->moduleConfigList, struct tucube_Module_Config, moduleConfig)
-        json_object_set_new(json_array_get(moduleConfig->jsonObject, 1), "tucube.workerCount", json_integer(core->workerCount));
+        json_object_set_new(json_array_get(moduleConfig->json, 1), "tucube.workerCount", json_integer(core->workerCount));
 
     core->exit = false;
     core->exitMutex = malloc(1 * sizeof(pthread_mutex_t));
@@ -101,7 +101,7 @@ int tucube_Core_init(struct tucube_Core* core, struct tucube_Core_Config* coreCo
 
     //initModules
 
-    if((core->dlHandle = dlopen(json_string_value(json_array_get(GONC_LIST_HEAD(core->moduleConfigList)->jsonObject, 0)), RTLD_LAZY | RTLD_GLOBAL)) == NULL)
+    if((core->dlHandle = dlopen(json_string_value(json_array_get(GONC_LIST_HEAD(core->moduleConfigList)->json, 0)), RTLD_LAZY | RTLD_GLOBAL)) == NULL)
         err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
 
     if((core->tucube_Module_init = dlsym(core->dlHandle, "tucube_Module_init")) == NULL)

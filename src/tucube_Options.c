@@ -46,7 +46,7 @@ int tucube_Options_process(int argc, char* argv[], struct tucube_Core_Config* co
     if(!json_is_object(json_array_get(configRoot, 0)))
         errx(EXIT_FAILURE, "%s: %u: first element must be an object", __FILE__, __LINE__);
 
-    coreConfig->jsonObject = json_incref(json_array_get(configRoot, 0));
+    coreConfig->json = json_incref(json_array_get(configRoot, 0));
 
     for(size_t index = 1; index != json_array_size(configRoot); ++index)
     {
@@ -55,7 +55,7 @@ int tucube_Options_process(int argc, char* argv[], struct tucube_Core_Config* co
         
         struct tucube_Module_Config* moduleConfig = malloc(sizeof(struct tucube_Module_Config));
         GONC_LIST_ELEMENT_INIT(moduleConfig);
-        moduleConfig->jsonObject = json_incref(json_array_get(configRoot, index));
+        moduleConfig->json = json_incref(json_array_get(configRoot, index));
         GONC_LIST_APPEND(moduleConfigList, moduleConfig);
     }
 

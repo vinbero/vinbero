@@ -32,7 +32,7 @@ struct tucube_Core {
 };
 
 struct tucube_Core_Config {
-    json_t* jsonObject;
+    json_t* json;
 };
 
 int tucube_Core_init(struct tucube_Core* core, struct tucube_Core_Config* coreConfig, struct tucube_Module_ConfigList* moduleConfigList);
