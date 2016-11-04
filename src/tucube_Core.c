@@ -9,6 +9,8 @@
 #include <signal.h>
 #include <string.h>
 #include <sys/syscall.h>
+#include <unistd.h>
+#include <libgonc/gonc_cast.h>
 #include <libgonc/gonc_list.h>
 #include <libgonc/gonc_ltostr.h>
 #include "config.h"
@@ -45,36 +47,70 @@ static void tucube_Core_registerSignalHandlers() {
         err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
 }
 
-int tucube_Core_init(struct tucube_Core* core, struct tucube_Core_Config* coreConfig, struct tucube_Module_ConfigList* moduleConfigList) {
+static void tucube_Core_pthreadCleanupHandler(void* args) {
+    struct tucube_Core* core = args;
+
+    if(core->tucube_Module_tlDestroy(GONC_LIST_HEAD(core->moduleList)) == -1)
+        warnx("%s: %u: tucube_Module_tlDestroy() failed", __FILE__, __LINE__);
+    pthread_mutex_lock(core->exitMutex);
+    core->exit = true;
+    pthread_cond_signal(core->exitCond);
+    pthread_mutex_unlock(core->exitMutex);
+}
+
+static void* tucube_Core_startWorker(void* args) {
+    struct tucube_Core* core = ((void**)args)[0];
+    struct tucube_Module_ConfigList* moduleConfigList = ((void**)args)[1];
+    pthread_cleanup_push(tucube_Core_pthreadCleanupHandler, core);
+    pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
+
+    if(core->tucube_Module_tlInit(GONC_LIST_HEAD(core->moduleList), GONC_LIST_HEAD(moduleConfigList)) == -1)
+        errx(EXIT_FAILURE, "%s: %u: tucube_Module_tlInit() failed", __FILE__, __LINE__);
+
+    sigset_t signalSet;
+    sigemptyset(&signalSet);
+    sigaddset(&signalSet, SIGINT);
+    if(pthread_sigmask(SIG_BLOCK, &signalSet, NULL) != 0)
+        errx(EXIT_FAILURE, "%s: %u: pthread_sigmask() failed", __FILE__, __LINE__);
+
+    if(core->tucube_Module_start(GONC_LIST_HEAD(core->moduleList), &core->serverSocket, core->serverSocketMutex) == -1)
+        errx(EXIT_FAILURE, "%s: %u: tucube_Module_start() failed", __FILE__, __LINE__);
+
+    pthread_cleanup_pop(1);
+
+    return NULL;
+}
+
+static int tucube_Core_init(struct tucube_Core* core, struct tucube_Core_Config* coreConfig, struct tucube_Module_ConfigList* moduleConfigList) {
     core->address = "0.0.0.0";
-    if(json_object_get(coreConfig, "tucube.address") != NULL)
-        core->address = json_string_value(json_object_get(coreConfig, "tucube.address"));
+    if(json_object_get(coreConfig->json, "tucube.address") != NULL)
+        core->address = json_string_value(json_object_get(coreConfig->json, "tucube.address"));
 
     core->port = 8080;
-    if(json_object_get(coreConfig, "tucube.port") != NULL)
-        core->port = json_integer_value(json_object_get(coreConfig, "tucube.port"));
+    if(json_object_get(coreConfig->json, "tucube.port") != NULL)
+        core->port = json_integer_value(json_object_get(coreConfig->json, "tucube.port"));
 
     core->reusePort = 0;
-    if(json_object_get(coreConfig, "tucube.reusePort") != NULL)
-        core->reusePort = json_integer_value(json_object_get(coreConfig, "tucube.reusePort"));
+    if(json_object_get(coreConfig->json, "tucube.reusePort") != NULL)
+        core->reusePort = json_integer_value(json_object_get(coreConfig->json, "tucube.reusePort"));
 
     core->backlog = 1024;
-    if(json_object_get(coreConfig, "tucube.backlog") != NULL)
-        core->backlog = json_integer_value(json_object_get(coreConfig, "tucube.backlog"));
+    if(json_object_get(coreConfig->json, "tucube.backlog") != NULL)
+        core->backlog = json_integer_value(json_object_get(coreConfig->json, "tucube.backlog"));
 
     core->workerCount = 4;
-    if(json_object_get(coreConfig, "tucube.workerCount") != NULL)
-        core->workerCount = json_integer_value(json_object_get(coreConfig, "tucube.workerCount"));
+    if(json_object_get(coreConfig->json, "tucube.workerCount") != NULL)
+        core->workerCount = json_integer_value(json_object_get(coreConfig->json, "tucube.workerCount"));
 
     core->setUid = geteuid();
-    if(json_object_get(coreConfig, "tucube.setUid") != NULL)
-        core->setUid = json_integer_value(json_object_get(coreConfig, "tucube.setUid"));
+    if(json_object_get(coreConfig->json, "tucube.setUid") != NULL)
+        core->setUid = json_integer_value(json_object_get(coreConfig->json, "tucube.setUid"));
 
     core->setGid = getegid();
-    if(json_object_get(coreConfig, "tucube.setGid") != NULL)
-        core->setGid = json_integer_value(json_object_get(coreConfig, "tucube.setGid"));
+    if(json_object_get(coreConfig->json, "tucube.setGid") != NULL)
+        core->setGid = json_integer_value(json_object_get(coreConfig->json, "tucube.setGid"));
 
-    GONC_LIST_FOR_EACH(core->moduleConfigList, struct tucube_Module_Config, moduleConfig)
+    GONC_LIST_FOR_EACH(moduleConfigList, struct tucube_Module_Config, moduleConfig)
         json_object_set_new(json_array_get(moduleConfig->json, 1), "tucube.workerCount", json_integer(core->workerCount));
 
     core->exit = false;
@@ -91,7 +127,7 @@ int tucube_Core_init(struct tucube_Core* core, struct tucube_Core_Config* coreCo
     serverAddressSockAddrIn.sin_port = htons(core->port);
 
     if((core->serverSocket = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) == -1)
-        err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__)
+        err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
 
     if(setsockopt(core->serverSocket, SOL_SOCKET, SO_REUSEADDR, &(const int){1}, sizeof(int)) == -1)
         err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
@@ -109,7 +145,7 @@ int tucube_Core_init(struct tucube_Core* core, struct tucube_Core_Config* coreCo
 
     //initModules
 
-    if((core->dlHandle = dlopen(json_string_value(json_array_get(GONC_LIST_HEAD(core->moduleConfigList)->json, 0)), RTLD_LAZY | RTLD_GLOBAL)) == NULL)
+    if((core->dlHandle = dlopen(json_string_value(json_array_get(GONC_LIST_HEAD(moduleConfigList)->json, 0)), RTLD_LAZY | RTLD_GLOBAL)) == NULL)
         err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
 
     if((core->tucube_Module_init = dlsym(core->dlHandle, "tucube_Module_init")) == NULL)
@@ -135,13 +171,14 @@ int tucube_Core_init(struct tucube_Core* core, struct tucube_Core_Config* coreCo
 
     core->moduleList = malloc(1 * sizeof(struct tucube_Module_List));
     GONC_LIST_INIT(core->moduleList);
-    if(core->tucube_Module_init(GONC_LIST_HEAD(core->moduleConfigList), core->moduleList) == -1)
+    if(core->tucube_Module_init(GONC_LIST_HEAD(moduleConfigList), core->moduleList) == -1)
         errx(EXIT_FAILURE, "%s: %u: tucube_Module_init() failed", __FILE__, __LINE__);
 
     return 0;
 }
 
-int tucube_Core_start(struct tucube_Core* core) {
+int tucube_Core_start(struct tucube_Core* core, struct tucube_Core_Config* coreConfig, struct tucube_Module_ConfigList* moduleConfigList) {
+    tucube_Core_init(core, coreConfig, moduleConfigList);
     tucube_Core_registerSignalHandlers();
     pthread_t* workerThreads;
     pthread_attr_t coreThreadAttr;
@@ -160,7 +197,8 @@ int tucube_Core_start(struct tucube_Core* core) {
 
         for(size_t index = 0; index != core->workerCount; ++index)
         {
-            if(pthread_create(workerThreads + index, &coreThreadAttr, tucube_Core_startWorker, core) != 0)
+            void* workerArgs[2] = {core, moduleConfigList};
+            if(pthread_create(workerThreads + index, &coreThreadAttr, tucube_Core_startWorker, workerArgs) != 0)
                 err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
         }
 
@@ -218,33 +256,4 @@ int tucube_Core_start(struct tucube_Core* core) {
     return 0;
 }
 
-static void tucube_Core_pthreadCleanupHandler(void* core) {
-    if(GONC_CAST(core, struct tucube_Core*)->tucube_Module_tlDestroy(((struct tucube_Core*)core)->module) == -1)
-        warnx("%s: %u: tucube_Module_tlDestroy() failed", __FILE__, __LINE__);
-    pthread_mutex_lock(GONC_CAST(core, struct tucube_Core*)->exitMutex);
-    GONC_CAST(core, struct tucube_Core*)->exit = true;
-    pthread_cond_signal(GONC_CAST(core, struct tucube_Core*)->exitCond);
-    pthread_mutex_unlock(GONC_CAST(core, struct tucube_Core*)->exitMutex);
-}
-
-static void* tucube_Core_startWorker(void* core) {
-    pthread_cleanup_push(tucube_Core_pthreadCleanupHandler, core);
-    pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
-
-    if(((struct tucube_Core*)core)->tucube_Module_tlInit(((struct tucube_Core*)core)->module, ((struct tucube_Core*)core)->moduleArgs) == -1)
-        errx(EXIT_FAILURE, "%s: %u: tucube_Module_tlInit() failed", __FILE__, __LINE__);
-
-    sigset_t signalSet;
-    sigemptyset(&signalSet);
-    sigaddset(&signalSet, SIGINT);
-    if(pthread_sigmask(SIG_BLOCK, &signalSet, NULL) != 0)
-        errx(EXIT_FAILURE, "%s: %u: pthread_sigmask() failed", __FILE__, __LINE__);
-
-    if(((struct tucube_Core*)core)->tucube_Module_start(((struct tucube_Core*)core)->module, &((struct tucube_Core*)core)->serverSocket, ((struct tucube_Core*)core)->serverSocketMutex) == -1)
-        errx(EXIT_FAILURE, "%s: %u: tucube_Module_start() failed", __FILE__, __LINE__);
-
-    pthread_cleanup_pop(1);
-
-    return NULL;
-}
 

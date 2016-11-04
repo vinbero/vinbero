@@ -25,10 +25,10 @@ struct tucube_Module_List {
 struct tucube_Module_Config {
     json_t* json;
     GONC_LIST_ELEMENT(struct tucube_Module_Config);
-}
+};
 
 struct tucube_Module_ConfigList {
-    GONC_LIST(struct tucube_Module_ConfigList);
+    GONC_LIST(struct tucube_Module_Config);
 };
 
 #define TUCUBE_MODULE_DLOPEN(module, moduleConfig)                      \

@@ -13,7 +13,6 @@ int main(int argc, char* argv[])
     struct tucube_Module_ConfigList moduleConfigList;
     GONC_LIST_INIT(&moduleConfigList);
     tucube_Options_process(argc, argv, &coreConfig, &moduleConfigList);
-    tucube_Core_init(&core, &coreConfig, &moduleConfigList);
-    tucube_Core_start(&core);
+    tucube_Core_start(&core, &coreConfig, &moduleConfigList);
     return 0;
 }
