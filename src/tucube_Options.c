@@ -11,7 +11,7 @@ int tucube_Options_process(int argc, char* argv[], struct tucube_Core_Config* co
 
     struct option options[] = {
         {"help", no_argument, NULL, 'h'},
-        {"config-inline", required_argument, NULL, 'i'},
+        {"inline-config", required_argument, NULL, 'i'},
         {"config-file", required_argument, NULL, 'f'},
         {NULL, 0, NULL, 0}
     };
@@ -56,8 +56,7 @@ int tucube_Options_process(int argc, char* argv[], struct tucube_Core_Config* co
 
     coreConfig->json = json_incref(json_array_get(config, 0));
 
-    for(size_t index = 1; index != json_array_size(config); ++index)
-    {
+    for(size_t index = 1; index != json_array_size(config); ++index) {
         if(!json_is_array(json_array_get(config, index)))
             errx(EXIT_FAILURE, "%s: %u: elements except first elemnt must be arrays", __FILE__, __LINE__);
         

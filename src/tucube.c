@@ -13,8 +13,8 @@ int main(int argc, char* argv[])
     tucube_Options_process(argc, argv, &coreConfig, &moduleConfigList);
     tucube_Core_start(&core, &coreConfig, &moduleConfigList);
     json_decref(coreConfig.json);
-    GONC_LIST_FOR_EACH(&moduleConfigList, struct tucube_Module_Config, moduleConfig) {
+    GONC_LIST_FOR_EACH(&moduleConfigList, struct tucube_Module_Config, moduleConfig)
         json_decref(moduleConfig->json);
-    }
+
     return 0;
 }
