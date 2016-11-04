@@ -11,6 +11,13 @@ struct tucube_Core {
     int reusePort;
     int backlog;
     size_t workerCount;
+    
+    bool exit;
+    pthread_mutex_t* exitMutex;
+    pthread_cond_t* exitCond;
+
+    int serverSocket;
+    pthread_mutex_t* serverSocketMutex;
 
     struct tucube_Module_List* moduleList;
 
@@ -21,12 +28,7 @@ struct tucube_Core {
     int (*tucube_Module_start)(struct tucube_Module*, int*, pthread_mutex_t*);
     int (*tucube_Module_tlDestroy)(struct tucube_Module*);
 
-    bool exit;
-    pthread_mutex_t* exitMutex;
-    pthread_cond_t* exitCond;
-
-    int serverSocket;
-    pthread_mutex_t* serverSocketMutex;
+    struct tucube_Module_List* moduleList;
 };
 
 struct tucube_Core_Config {

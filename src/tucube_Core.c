@@ -46,6 +46,29 @@ static void tucube_Core_registerSignalHandlers() {
 }
 
 int tucube_Core_init(struct tucube_Core* core, struct tucube_Core_Config* coreConfig, struct tucube_Module_ConfigList* moduleConfigList) {
+    core->address = "0.0.0.0";
+    if(json_object_get(coreConfig, "tucube.address") != NULL)
+        core->address = json_string_value(json_object_get(coreConfig, "tucube.address"));
+
+    core->port = 8080;
+    if(json_object_get(coreConfig, "tucube.port") != NULL)
+        core->port = json_integer_value(json_object_get(coreConfig, "tucube.port"));
+
+    core->reusePort = 0;
+    if(json_object_get(coreConfig, "tucube.reusePort") != NULL)
+        core->reusePort = json_integer_value(json_object_get(coreConfig, "tucube.reusePort"));
+
+    core->backlog = 1024;
+    if(json_object_get(coreConfig, "tucube.backlog") != NULL)
+        core->backlog = json_integer_value(json_object_get(coreConfig, "tucube.backlog"));
+
+    core->workerCount = 4;
+    if(json_object_get(coreConfig, "tucube.workerCount") != NULL)
+        core->workerCount = json_integer_value(json_object_get(coreConfig, "tucube.workerCount"));
+
+    GONC_LIST_FOR_EACH(core->moduleConfigList, struct tucube_Module_Config, moduleConfig)
+        json_object_set_new(json_array_get(moduleConfig->jsonObject, 1), "tucube.workerCount", json_integer(core->workerCount));
+
     core->exit = false;
     core->exitMutex = malloc(1 * sizeof(pthread_mutex_t));
     pthread_mutex_init(core->exitMutex, NULL);
@@ -54,15 +77,9 @@ int tucube_Core_init(struct tucube_Core* core, struct tucube_Core_Config* coreCo
 
     struct sockaddr_in serverAddressSockAddrIn;
     memset(serverAddressSockAddrIn.sin_zero, 0, 1 * sizeof(serverAddressSockAddrIn.sin_zero));
-    serverAddressSockAddrIn.sin_family = AF_INET;
-    core->address = "0.0.0.0";
-    if(json_object_get(coreConfig, "tucube.address") != NULL)
-        core->address = json_string_value(json_object_get(coreConfig, "tucube.address"));
-    inet_aton(core->address, &serverAddressSockAddrIn.sin_addr);
+    serverAddressSockAddrIn.sin_family = AF_INET; 
 
-    core->port = 8080;
-    if(json_object_get(coreConfig, "tucube.port") != NULL)
-        core->port = json_integer_value(json_object_get(coreConfig, "tucube.port"));
+    inet_aton(core->address, &serverAddressSockAddrIn.sin_addr);
     serverAddressSockAddrIn.sin_port = htons(core->port);
 
     if((core->serverSocket = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) == -1)
@@ -71,19 +88,12 @@ int tucube_Core_init(struct tucube_Core* core, struct tucube_Core_Config* coreCo
     if(setsockopt(core->serverSocket, SOL_SOCKET, SO_REUSEADDR, &(const int){1}, sizeof(int)) == -1)
         err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
 
-    core->reusePort = 0;
-    if(json_object_get(coreConfig, "tucube.reusePort") != NULL)
-        core->reusePort = json_integer_value(json_object_get(coreConfig, "tucube.reusePort");
     if(setsockopt(core->serverSocket, SOL_SOCKET, SO_REUSEPORT, &core->reusePort, sizeof(int)) == -1)
         warn("%s: %u", __FILE__, __LINE__);
 
     if(bind(core->serverSocket, (struct sockaddr*)&serverAddressSockAddrIn, sizeof(struct sockaddr)) == -1)
         err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
-
-    core->backlog = 1024;
-    if(json_object_get(coreConfig, "tucube.backlog") != NULL)
-        core->backlog = json_integer_value(json_object_get(coreConfig, "tucube.backlog"));
-    if(listen(core->serverSocket, backlog) == -1)
+    if(listen(core->serverSocket, core->backlog) == -1)
         err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
 
     core->serverSocketMutex = malloc(1 * sizeof(pthread_mutex_t));
@@ -108,14 +118,6 @@ int tucube_Core_init(struct tucube_Core* core, struct tucube_Core_Config* coreCo
 
     if((core->tucube_Module_destroy = dlsym(core->dlHandle, "tucube_Module_destroy")) == NULL)
         errx(EXIT_FAILURE, "%s: %u: Unable to find tucube_Module_destroy()", __FILE__, __LINE__);
-
-    
-    core->workerCount = 4;
-    if(json_object_get(coreConfig, "tucube.workerCount") != NULL)
-        core->workerCount = json_integer_value(json_object_get(coreConfig, "tucube.workerCount"));
-    
-    GONC_LIST_FOR_EACH(core->moduleConfigList, struct tucube_Module_Config, moduleConfig)
-        json_object_set_new(json_array_get(moduleConfig->jsonObject, 1), "tucube.workerCount", json_integer(core->workerCount));
 
     core->moduleList = malloc(1 * sizeof(struct tucube_Module_List));
     GONC_LIST_INIT(core->moduleList);
