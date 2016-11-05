@@ -31,15 +31,17 @@ struct tucube_Module_ConfigList {
     GONC_LIST(struct tucube_Module_Config);
 };
 
-#define TUCUBE_MODULE_DLOPEN(module, moduleConfig)                                      \
-do {                                                                                    \
-    if(((module)->dlHandle =                                                            \
-                dlopen(json_string_value(                                               \
-                        json_array_get(GONC_LIST_ELEMENT_NEXT(moduleConfig)->json, 0)), \
-                    RTLD_LAZY | RTLD_GLOBAL)) == NULL) {                                \
-        err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);                                \
-    }                                                                                   \
-}                                                                                       \
+#define TUCUBE_MODULE_DLOPEN(module, moduleConfig)                                               \
+do {                                                                                             \
+    if(json_string_value(json_array_get(GONC_LIST_ELEMENT_NEXT(moduleConfig)->json, 0)) == NULL) \
+        errx(EXIT_FAILURE, "%s: %u: Unable to find path of next module", __FILE__, __LINE__);    \
+    if(((module)->dlHandle =                                                                     \
+                dlopen(json_string_value(                                                        \
+                        json_array_get(GONC_LIST_ELEMENT_NEXT(moduleConfig)->json, 0)),          \
+                    RTLD_LAZY | RTLD_GLOBAL)) == NULL) {                                         \
+        err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);                                         \
+    }                                                                                            \
+}                                                                                                \
 while(0)
 
 #define TUCUBE_MODULE_DLSYM(module, modulePointerType, moduleFunction)          \

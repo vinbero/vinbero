@@ -154,6 +154,9 @@ static int tucube_Core_init(struct tucube_Core* core, struct tucube_Core_Config*
 
     //initModules
 
+    if(json_string_value(json_array_get(GONC_LIST_HEAD(moduleConfigList)->json, 0)) == NULL)
+        errx(EXIT_FAILURE, "%s: %u: Unable to find path of next module", __FILE__, __LINE__);
+
     if((core->dlHandle = dlopen(json_string_value(json_array_get(GONC_LIST_HEAD(moduleConfigList)->json, 0)), RTLD_LAZY | RTLD_GLOBAL)) == NULL)
         err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
 
