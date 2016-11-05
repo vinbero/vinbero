@@ -7,6 +7,7 @@
 #include "tucube_Module.h"
 
 struct tucube_Core {
+    const char* protocol;
     const char* address;
     int port;
     int reusePort;

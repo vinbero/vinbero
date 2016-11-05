@@ -82,6 +82,10 @@ static void* tucube_Core_startWorker(void* args) {
 }
 
 static int tucube_Core_init(struct tucube_Core* core, struct tucube_Core_Config* coreConfig, struct tucube_Module_ConfigList* moduleConfigList) {
+    core->protocol = "TCP";
+    if(json_object_get(coreConfig->json, "tucube.protocol") != NULL)
+        core->protocol = json_string_value(json_object_get(coreConfig->json, "tucube.protocol"));
+
     core->address = "0.0.0.0";
     if(json_object_get(coreConfig->json, "tucube.address") != NULL)
         core->address = json_string_value(json_object_get(coreConfig->json, "tucube.address"));
@@ -126,19 +130,24 @@ static int tucube_Core_init(struct tucube_Core* core, struct tucube_Core_Config*
     inet_aton(core->address, &serverAddressSockAddrIn.sin_addr);
     serverAddressSockAddrIn.sin_port = htons(core->port);
 
-    if((core->serverSocket = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) == -1)
-        err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
-
-    if(setsockopt(core->serverSocket, SOL_SOCKET, SO_REUSEADDR, &(const int){1}, sizeof(int)) == -1)
-        err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
-
-    if(setsockopt(core->serverSocket, SOL_SOCKET, SO_REUSEPORT, &core->reusePort, sizeof(int)) == -1)
-        warn("%s: %u", __FILE__, __LINE__);
-
-    if(bind(core->serverSocket, (struct sockaddr*)&serverAddressSockAddrIn, sizeof(struct sockaddr)) == -1)
-        err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
-    if(listen(core->serverSocket, core->backlog) == -1)
-        err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
+    if(strcmp(core->protocol, "TCP") == 0) {
+        if((core->serverSocket = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) == -1)
+            err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
+        if(setsockopt(core->serverSocket, SOL_SOCKET, SO_REUSEADDR, &(const int){1}, sizeof(int)) == -1)
+            err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
+        if(setsockopt(core->serverSocket, SOL_SOCKET, SO_REUSEPORT, &core->reusePort, sizeof(int)) == -1)
+            warn("%s: %u", __FILE__, __LINE__);
+        if(bind(core->serverSocket, (struct sockaddr*)&serverAddressSockAddrIn, sizeof(struct sockaddr)) == -1)
+            err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
+        if(listen(core->serverSocket, core->backlog) == -1)
+            err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
+    } else if(strcmp(core->protocol, "UDP") == 0) {
+        if((core->serverSocket = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP)) == -1)
+            err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
+        if(bind(core->serverSocket, (struct sockaddr*)&serverAddressSockAddrIn, sizeof(struct sockaddr)) == -1)
+            err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
+    } else
+        errx(EXIT_FAILURE, "%s: %u: Unknown protocol %s", __FILE__, __LINE__, core->protocol);
 
     core->serverSocketMutex = malloc(1 * sizeof(pthread_mutex_t));
     pthread_mutex_init(core->serverSocketMutex, NULL);
