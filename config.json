@@ -2,5 +2,17 @@
     {"tucube.workerCount": 4, "tucube.protocol": "TCP"},
     ["/usr/local/lib/tucube/tucube_tcp_epoll.so", {}],
     ["/usr/local/lib/tucube/tucube_epoll_http.so", {}], 
-    ["/usr/local/lib/tucube/tucube_http_lua.so", {"tucube_http_lua.scriptFile": "/usr/share/lua/5.3/cublog.lua"}]
+    [
+        "/usr/local/lib/tucube/tucube_http_lua.so",
+        {
+            "tucube_http_lua.scriptFile": "/usr/share/lua/5.3/cublog.lua",
+            "tucube_http_lua.scriptArg": {
+                "database": "cublog.db",
+                "admin.id": "admin",
+                "admin.password": "password",
+                "jwt.key": "jwt-key",
+                "jwt.issuer": "cublog"
+            }
+        }
+    ]
 ]
