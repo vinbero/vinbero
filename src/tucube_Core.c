@@ -195,8 +195,7 @@ int tucube_Core_start(struct tucube_Core* core, struct tucube_Core_Config* coreC
     pthread_t* workerThreads;
     pthread_attr_t coreThreadAttr;
     jmp_buf* jumpBuffer = malloc(1 * sizeof(jmp_buf));
-    if(setjmp(*jumpBuffer) == 0)
-    {
+    if(setjmp(*jumpBuffer) == 0) {
         pthread_key_create(&tucube_Core_tlKey, NULL);
         pthread_setspecific(tucube_Core_tlKey, jumpBuffer);
 
@@ -208,22 +207,19 @@ int tucube_Core_start(struct tucube_Core* core, struct tucube_Core_Config* coreC
         atexit(tucube_Core_exitHandler);
 
         void* workerArgs[2] = {core, moduleConfigList};
-        for(size_t index = 0; index != core->workerCount; ++index)
-        {
+        for(size_t index = 0; index != core->workerCount; ++index) {
            if(pthread_create(workerThreads + index, &coreThreadAttr, tucube_Core_startWorker, workerArgs) != 0)
                 err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
         }
 
         pthread_mutex_lock(core->exitMutex);
-        while(core->exit != true)
-        {
+        while(core->exit != true) {
             pthread_cond_wait(core->exitCond,
                  core->exitMutex);
         }
         pthread_mutex_unlock(core->exitMutex);
 
-        for(size_t index = 0; index != core->workerCount; ++index)
-        {
+        for(size_t index = 0; index != core->workerCount; ++index) {
             pthread_cancel(workerThreads[index]);
             pthread_join(workerThreads[index], NULL);
         }
