@@ -39,7 +39,7 @@ do {                                                                            
                 dlopen(json_string_value(                                                        \
                         json_array_get(GONC_LIST_ELEMENT_NEXT(moduleConfig)->json, 0)),          \
                     RTLD_LAZY | RTLD_GLOBAL)) == NULL) {                                         \
-        err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);                                         \
+        errx(EXIT_FAILURE, "%s: %u: Failed to load next module", __FILE__, __LINE__);            \
     }                                                                                            \
 }                                                                                                \
 while(0)
