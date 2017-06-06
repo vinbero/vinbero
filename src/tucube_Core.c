@@ -73,8 +73,8 @@ static void* tucube_Core_startWorker(void* args) {
     if(pthread_sigmask(SIG_BLOCK, &signalSet, NULL) != 0)
         errx(EXIT_FAILURE, "%s: %u: pthread_sigmask() failed", __FILE__, __LINE__);
 
-    if(core->tucube_Module_start(GON_C_LIST_HEAD(core->moduleList), &core->serverSocket, core->serverSocketMutex) == -1)
-        errx(EXIT_FAILURE, "%s: %u: tucube_Module_start() failed", __FILE__, __LINE__);
+    if(core->tucube_Module_service(GON_C_LIST_HEAD(core->moduleList), &core->serverSocket, core->serverSocketMutex) == -1)
+        errx(EXIT_FAILURE, "%s: %u: tucube_Module_service() failed", __FILE__, __LINE__);
 
     pthread_cleanup_pop(1);
 
@@ -166,8 +166,8 @@ static int tucube_Core_init(struct tucube_Core* core, struct tucube_Core_Config*
     if((core->tucube_Module_tlInit = dlsym(core->dlHandle, "tucube_Module_tlInit")) == NULL)
         errx(EXIT_FAILURE, "%s: %u: Unable to find tucube_Module_tlInit()", __FILE__, __LINE__);
 
-    if((core->tucube_Module_start = dlsym(core->dlHandle, "tucube_Module_start")) == NULL)
-        errx(EXIT_FAILURE, "%s: %u: Unable to find tucube_Module_start()", __FILE__, __LINE__);
+    if((core->tucube_Module_service = dlsym(core->dlHandle, "tucube_Module_service")) == NULL)
+        errx(EXIT_FAILURE, "%s: %u: Unable to find tucube_Module_service()", __FILE__, __LINE__);
 
     if((core->tucube_Module_tlDestroy = dlsym(core->dlHandle, "tucube_Module_tlDestroy")) == NULL)
         errx(EXIT_FAILURE, "%s: %u: Unable to find tucube_Module_tlDestroy()", __FILE__, __LINE__);

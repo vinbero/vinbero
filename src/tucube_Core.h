@@ -27,7 +27,7 @@ struct tucube_Core {
     int (*tucube_Module_init)(struct tucube_Module_Config*, struct tucube_Module_List*);
     int (*tucube_Module_destroy)(struct tucube_Module*);
     int (*tucube_Module_tlInit)(struct tucube_Module*, struct tucube_Module_Config*);
-    int (*tucube_Module_start)(struct tucube_Module*, int*, pthread_mutex_t*);
+    int (*tucube_Module_service)(struct tucube_Module*, int*, pthread_mutex_t*);
     int (*tucube_Module_tlDestroy)(struct tucube_Module*);
 
     struct tucube_Module_List* moduleList;
