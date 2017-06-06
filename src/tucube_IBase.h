@@ -3,7 +3,7 @@
 
 #include "tucube_Module.h"
 
-#define TUCUBE_IBASE_FUNCTINOS                                                                           \
+#define TUCUBE_IBASE_FUNCTIONS                                                                           \
 int tucube_IBase_init(struct tucube_Module_Config* moduleConfig, struct tucube_Module_List* moduleList); \
 int tucube_IBase_tlInit(struct tucube_Module* module, struct tucube_Module_Config* moduleConfig);        \
 int tucube_IBase_tlDestroy(struct tucube_Module* module);                                                \
