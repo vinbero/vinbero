@@ -50,7 +50,7 @@ static void tucube_Core_registerSignalHandlers() {
 static void tucube_Core_pthreadCleanupHandler(void* args) {
     struct tucube_Core* core = args;
 
-    if(core->tucube_Module_tlDestroy(GON_C_LIST_HEAD(core->moduleList)) == -1)
+    if(core->tucube_IBase_tlDestroy(GON_C_LIST_HEAD(core->moduleList)) == -1)
         warnx("%s: %u: tucube_Module_tlDestroy() failed", __FILE__, __LINE__);
     pthread_mutex_lock(core->exitMutex);
     core->exit = true;
@@ -64,7 +64,7 @@ static void* tucube_Core_startWorker(void* args) {
     pthread_cleanup_push(tucube_Core_pthreadCleanupHandler, core);
     pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
 
-    if(core->tucube_Module_tlInit(GON_C_LIST_HEAD(core->moduleList), GON_C_LIST_HEAD(moduleConfigList)) == -1)
+    if(core->tucube_IBase_tlInit(GON_C_LIST_HEAD(core->moduleList), GON_C_LIST_HEAD(moduleConfigList)) == -1)
         errx(EXIT_FAILURE, "%s: %u: tucube_Module_tlInit() failed", __FILE__, __LINE__);
 
     sigset_t signalSet;
@@ -73,8 +73,8 @@ static void* tucube_Core_startWorker(void* args) {
     if(pthread_sigmask(SIG_BLOCK, &signalSet, NULL) != 0)
         errx(EXIT_FAILURE, "%s: %u: pthread_sigmask() failed", __FILE__, __LINE__);
 
-    if(core->tucube_Module_service(GON_C_LIST_HEAD(core->moduleList), &core->serverSocket, core->serverSocketMutex) == -1)
-        errx(EXIT_FAILURE, "%s: %u: tucube_Module_service() failed", __FILE__, __LINE__);
+    if(core->tucube_ICore_service(GON_C_LIST_HEAD(core->moduleList), &core->serverSocket, core->serverSocketMutex) == -1)
+        errx(EXIT_FAILURE, "%s: %u: tucube_ICore_service() failed", __FILE__, __LINE__);
 
     pthread_cleanup_pop(1);
 
@@ -160,20 +160,20 @@ static int tucube_Core_init(struct tucube_Core* core, struct tucube_Core_Config*
     if((core->dlHandle = dlopen(json_string_value(json_array_get(GON_C_LIST_HEAD(moduleConfigList)->json, 0)), RTLD_LAZY | RTLD_GLOBAL)) == NULL)
         err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
 
-    if((core->tucube_Module_init = dlsym(core->dlHandle, "tucube_Module_init")) == NULL)
-        errx(EXIT_FAILURE, "%s: %u: Unable to find tucube_Module_init()", __FILE__, __LINE__);
+    if((core->tucube_IBase_init = dlsym(core->dlHandle, "tucube_IBase_init")) == NULL)
+        errx(EXIT_FAILURE, "%s: %u: Unable to find tucube_IBase_init()", __FILE__, __LINE__);
 
-    if((core->tucube_Module_tlInit = dlsym(core->dlHandle, "tucube_Module_tlInit")) == NULL)
-        errx(EXIT_FAILURE, "%s: %u: Unable to find tucube_Module_tlInit()", __FILE__, __LINE__);
+    if((core->tucube_IBase_tlInit = dlsym(core->dlHandle, "tucube_IBase_tlInit")) == NULL)
+        errx(EXIT_FAILURE, "%s: %u: Unable to find tucube_IBase_tlInit()", __FILE__, __LINE__);
 
-    if((core->tucube_Module_service = dlsym(core->dlHandle, "tucube_Module_service")) == NULL)
-        errx(EXIT_FAILURE, "%s: %u: Unable to find tucube_Module_service()", __FILE__, __LINE__);
+    if((core->tucube_ICore_service = dlsym(core->dlHandle, "tucube_ICore_service")) == NULL)
+        errx(EXIT_FAILURE, "%s: %u: Unable to find tucube_ICore_service()", __FILE__, __LINE__);
 
-    if((core->tucube_Module_tlDestroy = dlsym(core->dlHandle, "tucube_Module_tlDestroy")) == NULL)
-        errx(EXIT_FAILURE, "%s: %u: Unable to find tucube_Module_tlDestroy()", __FILE__, __LINE__);
+    if((core->tucube_IBase_tlDestroy = dlsym(core->dlHandle, "tucube_IBase_tlDestroy")) == NULL)
+        errx(EXIT_FAILURE, "%s: %u: Unable to find tucube_IBase_tlDestroy()", __FILE__, __LINE__);
 
-    if((core->tucube_Module_destroy = dlsym(core->dlHandle, "tucube_Module_destroy")) == NULL)
-        errx(EXIT_FAILURE, "%s: %u: Unable to find tucube_Module_destroy()", __FILE__, __LINE__);
+    if((core->tucube_IBase_destroy = dlsym(core->dlHandle, "tucube_IBase_destroy")) == NULL)
+        errx(EXIT_FAILURE, "%s: %u: Unable to find tucube_IBase_destroy()", __FILE__, __LINE__);
 
     if(setgid(core->setGid) == -1)
         err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
@@ -183,8 +183,8 @@ static int tucube_Core_init(struct tucube_Core* core, struct tucube_Core_Config*
 
     core->moduleList = malloc(1 * sizeof(struct tucube_Module_List));
     GON_C_LIST_INIT(core->moduleList);
-    if(core->tucube_Module_init(GON_C_LIST_HEAD(moduleConfigList), core->moduleList) == -1)
-        errx(EXIT_FAILURE, "%s: %u: tucube_Module_init() failed", __FILE__, __LINE__);
+    if(core->tucube_IBase_init(GON_C_LIST_HEAD(moduleConfigList), core->moduleList) == -1)
+        errx(EXIT_FAILURE, "%s: %u: tucube_IBase_init() failed", __FILE__, __LINE__);
 
     return 0;
 }
@@ -255,7 +255,7 @@ int tucube_Core_start(struct tucube_Core* core, struct tucube_Core_Config* coreC
     pthread_attr_destroy(&coreThreadAttr);
     free(workerThreads);
 
-    if(core->tucube_Module_destroy(GON_C_LIST_HEAD(core->moduleList)) == -1)
+    if(core->tucube_IBase_destroy(GON_C_LIST_HEAD(core->moduleList)) == -1)
         warn("%s: %u", __FILE__, __LINE__);
     free(core->moduleList);
 
