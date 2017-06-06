@@ -10,4 +10,7 @@ int tucube_ICore_service(struct tucube_Module* module, int* serverSocket, pthrea
 #define TUCUBE_ICORE_FUNCTION_POINTERS \
 int (*tucube_ICore_service)(struct tucube_Module*, int*, pthread_mutex_t*)
 
+#define TUCUBE_ICORE_DLSYM(module, modulePointerType) \
+TUCUBE_MODULE_DLSYM(module, modulePointerType, tucube_ICore_service)
+
 #endif

@@ -15,4 +15,10 @@ int (*tucube_IBase_destroy)(struct tucube_Module*);                             
 int (*tucube_IBase_tlInit)(struct tucube_Module*, struct tucube_Module_Config*);    \
 int (*tucube_IBase_tlDestroy)(struct tucube_Module*)
 
+#define TUCUBE_IBASE_DLSYM(module, modulePointerType)                 \
+TUCUBE_MODULE_DLSYM(module, modulePointerType, tucube_IBase_init);    \
+TUCUBE_MODULE_DLSYM(module, modulePointerType, tucube_IBase_destroy); \
+TUCUBE_MODULE_DLSYM(module, modulePointerType, tucube_IBase_tlInit);  \
+TUCUBE_MODULE_DLSYM(module, modulePointerType, tucube_IBase_tlDestroy)
+
 #endif

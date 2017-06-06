@@ -46,7 +46,7 @@ while(0)
 
 #define TUCUBE_MODULE_DLSYM(module, modulePointerType, moduleFunction)          \
 do {                                                                            \
-    if((GON_C_CAST((module)->pointer,                                            \
+    if((GON_C_CAST((module)->pointer,                                           \
          modulePointerType*)->moduleFunction =                                  \
               dlsym((module)->dlHandle, #moduleFunction)) == NULL) {            \
         errx(EXIT_FAILURE,                                                      \
