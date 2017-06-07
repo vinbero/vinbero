@@ -12,6 +12,7 @@ struct tucube_Module {
         unsigned int uInteger;
         json_t* json;
         void* pointer;
+	void** array;
     };
     pthread_rwlock_t* rwLock;
     pthread_key_t* tlModuleKey;

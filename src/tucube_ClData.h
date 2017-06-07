@@ -10,6 +10,7 @@ struct tucube_ClData {
         unsigned int uInteger;
         json_t* json;
         void* pointer;
+	void** array;
     };
     GON_C_LIST_ELEMENT(struct tucube_ClData);
 };
