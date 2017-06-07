@@ -73,7 +73,7 @@ static void* tucube_Core_startWorker(void* args) {
     if(pthread_sigmask(SIG_BLOCK, &signalSet, NULL) != 0)
         errx(EXIT_FAILURE, "%s: %u: pthread_sigmask() failed", __FILE__, __LINE__);
 
-    if(core->tucube_IThreadLocal_service(GON_C_LIST_HEAD(core->moduleList), (void*[]){&core->serverSocket, core->serverSocketMutex}) == -1)
+    if(core->tucube_IThreadLocal_service(GON_C_LIST_HEAD(core->moduleList), (void*[]){&core->serverSocket}) == -1)
         errx(EXIT_FAILURE, "%s: %u: tucube_IThreadLocal_service() failed", __FILE__, __LINE__);
 
     pthread_cleanup_pop(1);
@@ -148,9 +148,6 @@ static int tucube_Core_init(struct tucube_Core* core, struct tucube_Core_Config*
             err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
     } else
         errx(EXIT_FAILURE, "%s: %u: Unknown protocol %s", __FILE__, __LINE__, core->protocol);
-
-    core->serverSocketMutex = malloc(1 * sizeof(pthread_mutex_t));
-    pthread_mutex_init(core->serverSocketMutex, NULL);
 
     //initModules
 
@@ -249,8 +246,6 @@ int tucube_Core_start(struct tucube_Core* core, struct tucube_Core_Config* coreC
     free(core->exitMutex);
 
     close(core->serverSocket);
-    pthread_mutex_destroy(core->serverSocketMutex);
-    free(core->serverSocketMutex);
 
     pthread_attr_destroy(&coreThreadAttr);
     free(workerThreads);
