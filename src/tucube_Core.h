@@ -27,7 +27,7 @@ struct tucube_Core {
 
     void* dlHandle;
     TUCUBE_IBASE_FUNCTION_POINTERS;
-    TUCUBE_ITL_SERVICE_FUNCTION_POINTERS;
+    TUCUBE_ITLSERVICE_FUNCTION_POINTERS;
     struct tucube_Module_List* moduleList;
 };
 
