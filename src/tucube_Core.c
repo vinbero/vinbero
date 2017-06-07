@@ -163,7 +163,7 @@ static int tucube_Core_init(struct tucube_Core* core, struct tucube_Core_Config*
     if((core->tucube_IBase_tlInit = dlsym(core->dlHandle, "tucube_IBase_tlInit")) == NULL)
         errx(EXIT_FAILURE, "%s: %u: Unable to find tucube_IBase_tlInit()", __FILE__, __LINE__);
 
-    if((core->tucube_ITlService_call = dlsym(core->dlHandle, "tucube_IThreadLocal_service")) == NULL)
+    if((core->tucube_ITlService_call = dlsym(core->dlHandle, "tucube_ITlService_call")) == NULL)
         errx(EXIT_FAILURE, "%s: %u: Unable to find tucube_ITlService_call()", __FILE__, __LINE__);
 
     if((core->tucube_IBase_tlDestroy = dlsym(core->dlHandle, "tucube_IBase_tlDestroy")) == NULL)
