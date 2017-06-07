@@ -22,10 +22,6 @@ int tucube_Options_process(int argc, char* argv[], struct tucube_Core_Config* co
 
     while((optionChar = getopt_long(argc, argv, "hi:f:", options, NULL)) != (char)-1) {
         switch(optionChar) {
-        case 'h':
-            tucube_Help_print();
-            exit(EXIT_SUCCESS);
-            break;
         case 'i':
             if(config == NULL) {
                 if((config = json_loads(optarg, 0, &configError)) == NULL)
@@ -38,11 +34,19 @@ int tucube_Options_process(int argc, char* argv[], struct tucube_Core_Config* co
                     errx(EXIT_FAILURE, "%s: %d: %s", configError.source, configError.line, configError.text);
             }
             break;
+        case 'h':
+        default:
+            tucube_Help_print();
+            exit(EXIT_SUCCESS);
+            break;
+
         }
     }
 
     if(config == NULL) {
-        errx(EXIT_FAILURE, "%s: %u: You need to specify at least one option", __FILE__, __LINE__);
+        tucube_Help_print();
+        exit(EXIT_SUCCESS);
+//        errx(EXIT_FAILURE, "%s: %u: You need to specify at least one option", __FILE__, __LINE__);
     }
 
     if(!json_is_array(config))
