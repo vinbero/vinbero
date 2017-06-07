@@ -6,7 +6,7 @@
 #include <jansson.h>
 #include "tucube_Module.h"
 #include "tucube_IBase.h"
-#include "tucube_ICore.h"
+#include "tucube_IThreadLocal.h"
 
 struct tucube_Core {
     const char* protocol;
@@ -27,7 +27,7 @@ struct tucube_Core {
 
     void* dlHandle;
     TUCUBE_IBASE_FUNCTION_POINTERS;
-    TUCUBE_ICORE_FUNCTION_POINTERS;
+    TUCUBE_ITHREAD_LOCAL_FUNCTION_POINTERS;
     struct tucube_Module_List* moduleList;
 };
 
