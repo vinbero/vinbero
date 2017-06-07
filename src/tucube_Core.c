@@ -73,8 +73,8 @@ static void* tucube_Core_startWorker(void* args) {
     if(pthread_sigmask(SIG_BLOCK, &signalSet, NULL) != 0)
         errx(EXIT_FAILURE, "%s: %u: pthread_sigmask() failed", __FILE__, __LINE__);
 
-    if(core->tucube_IThreadLocal_service(GON_C_LIST_HEAD(core->moduleList), (void*[]){&core->serverSocket}) == -1)
-        errx(EXIT_FAILURE, "%s: %u: tucube_IThreadLocal_service() failed", __FILE__, __LINE__);
+    if(core->tucube_ITlService_call(GON_C_LIST_HEAD(core->moduleList), (void*[]){&core->serverSocket}) == -1)
+        errx(EXIT_FAILURE, "%s: %u: tucube_ITlService_call() failed", __FILE__, __LINE__);
 
     pthread_cleanup_pop(1);
 
@@ -163,8 +163,8 @@ static int tucube_Core_init(struct tucube_Core* core, struct tucube_Core_Config*
     if((core->tucube_IBase_tlInit = dlsym(core->dlHandle, "tucube_IBase_tlInit")) == NULL)
         errx(EXIT_FAILURE, "%s: %u: Unable to find tucube_IBase_tlInit()", __FILE__, __LINE__);
 
-    if((core->tucube_IThreadLocal_service = dlsym(core->dlHandle, "tucube_IThreadLocal_service")) == NULL)
-        errx(EXIT_FAILURE, "%s: %u: Unable to find tucube_IThreadLocal_service()", __FILE__, __LINE__);
+    if((core->tucube_ITlService_call = dlsym(core->dlHandle, "tucube_IThreadLocal_service")) == NULL)
+        errx(EXIT_FAILURE, "%s: %u: Unable to find tucube_ITlService_call()", __FILE__, __LINE__);
 
     if((core->tucube_IBase_tlDestroy = dlsym(core->dlHandle, "tucube_IBase_tlDestroy")) == NULL)
         errx(EXIT_FAILURE, "%s: %u: Unable to find tucube_IBase_tlDestroy()", __FILE__, __LINE__);
