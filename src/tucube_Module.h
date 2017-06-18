@@ -4,16 +4,11 @@
 #include <jansson.h>
 #include <pthread.h>
 #include <libgon_c/gon_c_list.h>
+#include "tucube_Generic.h"
 
 struct tucube_Module {
     void* dlHandle;
-    union {
-        int integer;
-        unsigned int uInteger;
-        json_t* json;
-        void* pointer;
-	void** array;
-    };
+    TUCUBE_GENERIC;
     pthread_rwlock_t* rwLock;
     pthread_key_t* tlModuleKey;
     GON_C_LIST_ELEMENT(struct tucube_Module);
