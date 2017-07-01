@@ -2,10 +2,10 @@
 #define _TUCUBE_CLDATA_H
 
 #include <libgon_c/gon_c_list.h>
-#include "tucube_Generic.h"
+#include <libgon_c/gon_c_Generic.h>
 
 struct tucube_ClData {
-    TUCUBE_GENERIC;
+    union gon_c_Generic generic;
     GON_C_LIST_ELEMENT(struct tucube_ClData);
 };
 
