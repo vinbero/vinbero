@@ -2,7 +2,7 @@
 #define _TUCUBE_CLDATA_H
 
 #include <libgon_c/gon_c_list.h>
-#include <libgon_c/gon_c_Generic.h>
+#include <libgon_c/gon_c_generic.h>
 
 struct tucube_ClData {
     union gon_c_Generic generic;

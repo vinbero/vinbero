@@ -4,7 +4,7 @@
 #include <jansson.h>
 #include <pthread.h>
 #include <libgon_c/gon_c_list.h>
-#include <libgon_c/gon_c_Generic.h>
+#include <libgon_c/gon_c_generic.h>
 
 struct tucube_Module {
     void* dlHandle;
