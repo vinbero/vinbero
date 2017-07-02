@@ -16,7 +16,7 @@ AC_PROG_CC
 # Checks for libraries.
 
 # Checks for header files.
-AC_CHECK_HEADERS([arpa/inet.h stdlib.h string.h sys/socket.h unistd.h libgon_c/gon_c_array.h libgon_c/gon_c_string.h])
+AC_CHECK_HEADERS([arpa/inet.h stdlib.h string.h sys/socket.h unistd.h libgenc/genc_array.h libgenc/genc_string.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_CHECK_HEADER_STDBOOL

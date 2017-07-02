@@ -2,6 +2,7 @@
 #include <getopt.h>
 #include <stdlib.h>
 #include <string.h>
+#include <libgenc/genc_list.h>
 #include "config.h"
 #include "tucube_Options.h"
 #include "tucube_Core.h"
@@ -65,12 +66,12 @@ int tucube_Options_process(int argc, char* argv[], struct tucube_Core_Config* co
             errx(EXIT_FAILURE, "%s: %u: elements except first elemnt must be arrays", __FILE__, __LINE__);
         
         struct tucube_Module_Config* moduleConfig = malloc(1 * sizeof(struct tucube_Module_Config));
-        GON_C_LIST_ELEMENT_INIT(moduleConfig);
+        GENC_LIST_ELEMENT_INIT(moduleConfig);
         moduleConfig->json = json_incref(json_array_get(config, index));
-        GON_C_LIST_APPEND(moduleConfigList, moduleConfig);
+        GENC_LIST_APPEND(moduleConfigList, moduleConfig);
     }
 
-    if(GON_C_LIST_SIZE(moduleConfigList) < 1)
+    if(GENC_LIST_SIZE(moduleConfigList) < 1)
         errx(EXIT_FAILURE, "%s: %u: You need to specify at least one moduleConfig", __FILE__, __LINE__);
 
     json_decref(config);

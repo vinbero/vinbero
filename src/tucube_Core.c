@@ -10,9 +10,9 @@
 #include <string.h>
 #include <sys/syscall.h>
 #include <unistd.h>
-#include <libgon_c/gon_c_cast.h>
-#include <libgon_c/gon_c_list.h>
-#include <libgon_c/gon_c_ltostr.h>
+#include <libgenc/genc_cast.h>
+#include <libgenc/genc_list.h>
+#include <libgenc/genc_ltostr.h>
 #include "config.h"
 #include "tucube_Core.h"
 
@@ -50,7 +50,7 @@ static void tucube_Core_registerSignalHandlers() {
 static void tucube_Core_pthreadCleanupHandler(void* args) {
     struct tucube_Core* core = args;
 
-    if(core->tucube_IBase_tlDestroy(GON_C_LIST_HEAD(core->moduleList)) == -1)
+    if(core->tucube_IBase_tlDestroy(GENC_LIST_HEAD(core->moduleList)) == -1)
         warnx("%s: %u: tucube_Module_tlDestroy() failed", __FILE__, __LINE__);
     pthread_mutex_lock(core->exitMutex);
     core->exit = true;
@@ -64,7 +64,7 @@ static void* tucube_Core_startWorker(void* args) {
     pthread_cleanup_push(tucube_Core_pthreadCleanupHandler, core);
     pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
 
-    if(core->tucube_IBase_tlInit(GON_C_LIST_HEAD(core->moduleList), GON_C_LIST_HEAD(moduleConfigList), NULL) == -1)
+    if(core->tucube_IBase_tlInit(GENC_LIST_HEAD(core->moduleList), GENC_LIST_HEAD(moduleConfigList), NULL) == -1)
         errx(EXIT_FAILURE, "%s: %u: tucube_Module_tlInit() failed", __FILE__, __LINE__);
 
     sigset_t signalSet;
@@ -73,7 +73,7 @@ static void* tucube_Core_startWorker(void* args) {
     if(pthread_sigmask(SIG_BLOCK, &signalSet, NULL) != 0)
         errx(EXIT_FAILURE, "%s: %u: pthread_sigmask() failed", __FILE__, __LINE__);
 
-    if(core->tucube_ITlService_call(GON_C_LIST_HEAD(core->moduleList), (void*[]){&core->serverSocket}) == -1)
+    if(core->tucube_ITlService_call(GENC_LIST_HEAD(core->moduleList), (void*[]){&core->serverSocket}) == -1)
         errx(EXIT_FAILURE, "%s: %u: tucube_ITlService_call() failed", __FILE__, __LINE__);
 
     pthread_cleanup_pop(1);
@@ -114,7 +114,7 @@ static int tucube_Core_init(struct tucube_Core* core, struct tucube_Core_Config*
     if(json_object_get(coreConfig->json, "tucube.setGid") != NULL)
         core->setGid = json_integer_value(json_object_get(coreConfig->json, "tucube.setGid"));
 
-    GON_C_LIST_FOR_EACH(moduleConfigList, struct tucube_Module_Config, moduleConfig)
+    GENC_LIST_FOR_EACH(moduleConfigList, struct tucube_Module_Config, moduleConfig)
         json_object_set_new(json_array_get(moduleConfig->json, 1), "tucube.workerCount", json_integer(core->workerCount));
 
     core->exit = false;
@@ -151,10 +151,10 @@ static int tucube_Core_init(struct tucube_Core* core, struct tucube_Core_Config*
 
     //initModules
 
-    if(json_string_value(json_array_get(GON_C_LIST_HEAD(moduleConfigList)->json, 0)) == NULL)
+    if(json_string_value(json_array_get(GENC_LIST_HEAD(moduleConfigList)->json, 0)) == NULL)
         errx(EXIT_FAILURE, "%s: %u: Unable to find path of next module", __FILE__, __LINE__);
 
-    if((core->dlHandle = dlopen(json_string_value(json_array_get(GON_C_LIST_HEAD(moduleConfigList)->json, 0)), RTLD_LAZY | RTLD_GLOBAL)) == NULL)
+    if((core->dlHandle = dlopen(json_string_value(json_array_get(GENC_LIST_HEAD(moduleConfigList)->json, 0)), RTLD_LAZY | RTLD_GLOBAL)) == NULL)
         err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
 
     if((core->tucube_IBase_init = dlsym(core->dlHandle, "tucube_IBase_init")) == NULL)
@@ -179,8 +179,8 @@ static int tucube_Core_init(struct tucube_Core* core, struct tucube_Core_Config*
         err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
 
     core->moduleList = malloc(1 * sizeof(struct tucube_Module_List));
-    GON_C_LIST_INIT(core->moduleList);
-    if(core->tucube_IBase_init(GON_C_LIST_HEAD(moduleConfigList), core->moduleList, NULL) == -1)
+    GENC_LIST_INIT(core->moduleList);
+    if(core->tucube_IBase_init(GENC_LIST_HEAD(moduleConfigList), core->moduleList, NULL) == -1)
         errx(EXIT_FAILURE, "%s: %u: tucube_IBase_init() failed", __FILE__, __LINE__);
 
     return 0;
@@ -250,7 +250,7 @@ int tucube_Core_start(struct tucube_Core* core, struct tucube_Core_Config* coreC
     pthread_attr_destroy(&coreThreadAttr);
     free(workerThreads);
 
-    if(core->tucube_IBase_destroy(GON_C_LIST_HEAD(core->moduleList)) == -1)
+    if(core->tucube_IBase_destroy(GENC_LIST_HEAD(core->moduleList)) == -1)
         warn("%s: %u", __FILE__, __LINE__);
     free(core->moduleList);
 
