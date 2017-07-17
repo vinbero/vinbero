@@ -172,16 +172,16 @@ static int tucube_Core_init(struct tucube_Core* core, struct tucube_Core_Config*
     if((core->tucube_IBase_destroy = dlsym(core->dlHandle, "tucube_IBase_destroy")) == NULL)
         errx(EXIT_FAILURE, "%s: %u: Unable to find tucube_IBase_destroy()", __FILE__, __LINE__);
 
+    core->moduleList = malloc(1 * sizeof(struct tucube_Module_List));
+    GENC_LIST_INIT(core->moduleList);
+    if(core->tucube_IBase_init(GENC_LIST_HEAD(moduleConfigList), core->moduleList, (void*[]){NULL}) == -1)
+        errx(EXIT_FAILURE, "%s: %u: tucube_IBase_init() failed", __FILE__, __LINE__);
+
     if(setgid(core->setGid) == -1)
         err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
 
     if(setuid(core->setUid) == -1)
         err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
-
-    core->moduleList = malloc(1 * sizeof(struct tucube_Module_List));
-    GENC_LIST_INIT(core->moduleList);
-    if(core->tucube_IBase_init(GENC_LIST_HEAD(moduleConfigList), core->moduleList, (void*[]){NULL}) == -1)
-        errx(EXIT_FAILURE, "%s: %u: tucube_IBase_init() failed", __FILE__, __LINE__);
 
     return 0;
 }
