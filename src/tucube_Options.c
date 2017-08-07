@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <libgenc/genc_list.h>
-#include "config.h"
 #include "tucube_Options.h"
 #include "tucube_Core.h"
 #include "tucube_Help.h"
