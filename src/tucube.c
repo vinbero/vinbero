@@ -1,6 +1,5 @@
 #include <jansson.h>
 #include <libgenc/genc_list.h>
-#include "config.h"
 #include "tucube_Core.h"
 #include "tucube_Options.h"
 

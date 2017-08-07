@@ -13,7 +13,6 @@
 #include <libgenc/genc_cast.h>
 #include <libgenc/genc_list.h>
 #include <libgenc/genc_ltostr.h>
-#include "config.h"
 #include "tucube_Core.h"
 
 static pthread_key_t tucube_Core_tlKey;
