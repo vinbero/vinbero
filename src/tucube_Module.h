@@ -3,8 +3,8 @@
 
 #include <jansson.h>
 #include <pthread.h>
-#include <libgenc/genc_list.h>
-#include <libgenc/genc_generic.h>
+#include <libgenc/genc_List.h>
+#include <libgenc/genc_Generic.h>
 
 struct tucube_Module {
     void* dlHandle;
