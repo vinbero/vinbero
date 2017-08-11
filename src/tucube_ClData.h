@@ -1,7 +1,7 @@
 #ifndef _TUCUBE_CLDATA_H
 #define _TUCUBE_CLDATA_H
 
-#include <libgenc/genc_list.h>
+#include <libgenc/genc_List.h>
 #include <libgenc/genc_generic.h>
 
 struct tucube_ClData {
