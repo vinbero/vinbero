@@ -2,7 +2,7 @@
 #define _TUCUBE_CLDATA_H
 
 #include <libgenc/genc_List.h>
-#include <libgenc/genc_generic.h>
+#include <libgenc/genc_Generic.h>
 
 struct tucube_ClData {
     union genc_Generic generic;
