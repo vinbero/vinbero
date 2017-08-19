@@ -1,5 +1,31 @@
 image: dock0/arch
 
+before_script:
+  - pacman -S --noconfirm cmake gcc make cmocka jansson lua
+  - mkdir deps
+  - cd deps
+  - BASE_URL=`echo $CI_REPOSITORY_URL | sed "s;\/*$CI_PROJECT_PATH.*;;"`
+  
+  - git clone "$BASE_URL/gonapps/libgenc" libgenc
+  - cd libgenc
+  - mkdir build
+  - cd build
+  - cmake ..
+  - make
+  - make install
+  - cd ../../
+  
+  - git clone "$BASE_URL/gonapps/libgaio" libgaio
+  - cd libgaio
+  - mkdir build
+  - cd build
+  - cmake ..
+  - make
+  - make install
+  - cd ../../
+  
+  - cd ../
+
 build:
   stage: build
   script: 
