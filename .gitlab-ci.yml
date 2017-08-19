@@ -29,7 +29,6 @@ before_script:
 build:
   stage: build
   script: 
-    - pacman -S --noconfirm cmake gcc make cmocka jansson lua
     - mkdir build
     - cd build
     - cmake ..
@@ -38,7 +37,6 @@ build:
 test:
   stage: test
   script:
-    - pacman -S --noconfirm cmake gcc make cmocka jansson lua
     - mkdir build
     - cd build
     - cmake ..
