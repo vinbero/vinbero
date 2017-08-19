@@ -1,0 +1,20 @@
+image: dock0/arch
+
+build:
+  stage: build
+  script: 
+    - pacman -S --noconfirm cmake gcc make cmocka jansson lua
+    - mkdir build
+    - cd build
+    - cmake ..
+    - make
+
+test:
+  stage: test
+  script:
+    - pacman -S --noconfirm cmake gcc make cmocka jansson lua
+    - mkdir build
+    - cd build
+    - cmake ..
+    - make
+    - make test
