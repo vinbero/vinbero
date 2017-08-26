@@ -42,7 +42,7 @@ while(0)
 
 #define TUCUBE_MODULE_DLSYM(module, modulePointerType, moduleFunction)          \
 do {                                                                            \
-    if((GENC_CAST((module)->generic.pointer,                                   \
+    if((GENC_CAST((module)->generic.pointer,                                    \
          modulePointerType*)->moduleFunction =                                  \
               dlsym((module)->dlHandle, #moduleFunction)) == NULL) {            \
         errx(EXIT_FAILURE,                                                      \
@@ -50,5 +50,16 @@ do {                                                                            
     }                                                                           \
 }                                                                               \
 while(0)
+
+#define TUCUBE_MODULE_GET_CONFIG(moduleConfig, valueName, valueType, defaultValue, variable)                    \
+do {                                                                                                            \
+    if(json_object_get(json_array_get((moduleConfig)->json, 1), valueName) != NULL)                             \
+        *(variable) = json_#valueType_get(json_object_get(json_array_get((moduleConfig)->json, 1)), valueName); \
+    else                                                                                                        \
+        *(variable) = defaultValue;                                                                             \
+} while(0)
+//if(json_object_get(json_array_get(moduleConfig->json, 1), "tucube_epoll_http.parserHeaderBufferCapacity") != NULL)
+//    TUCUBE_LOCAL_MODULE->parserHeaderBufferCapacity = json_integer_value(json_object_get(json_array_get(moduleConfig->json, 1), "tucube_epoll_http.parserHeaderBufferCapacity"));
+
 
 #endif
