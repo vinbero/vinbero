@@ -27,6 +27,35 @@ struct tucube_Module_ConfigList {
     GENC_LIST(struct tucube_Module_Config);
 };
 
+struct tucube_Module_ConfigTree {
+    size_t childCount;
+    GENC_LIST(struct tucube_Module_ConfigTree);
+};
+
+#define TUCUBE_MODULE_TREE_NODE(type) \
+size_t childCount;                    \
+GENC_LIST(type)
+
+#define TUCUBE_MODULE_TREE_GET_LAST_CHILD(node, child)
+#define TUCUBE_MODULE_TREE_GET_FIRST_CHILD(node, child) 
+#define TUCUBE_MODULE_TREE_APPEND_CHILD(node, child)
+#define TUCUBE_MODULE_TREE_FOR_EACH_NODE(node)
+#define TUCUBE_MODULE_TREE_FOR_EACH_CHILD_NODE_BEGIN(_node, type) \
+do {                                                              \
+    type* begin;                                                  \
+    type* end;                                                    \
+    type* node;                                                   \
+    TUCUBE_MODULE_TREE_GET_FIRST_CHILD(_node, begin);             \
+    TUCUBE_MODULE_TREE_GET_LAST_CHILD(_node, end);                \
+    if(begin == NULL || end == NULL)                              \
+        break;                                                    \
+    while(node != end) {                                          \
+        node = GENC_LIST_ELEMENT_NEXT(current);
+
+#define TUCUBE_MODULE_TREE_FOR_EACH_CHILD_NODE_END()              \
+    }                                                             \
+} while(0)
+
 #define TUCUBE_MODULE_DLOPEN(module, moduleConfig)                                               \
 do {                                                                                             \
     if(json_string_value(json_array_get(GENC_LIST_ELEMENT_NEXT(moduleConfig)->json, 0)) == NULL) \
