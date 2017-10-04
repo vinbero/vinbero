@@ -27,19 +27,53 @@ struct tucube_Module_ConfigList {
     GENC_LIST(struct tucube_Module_Config);
 };
 
-struct tucube_Module_ConfigTree {
+struct tucube_Module_ConfigTreeNode {
     size_t childCount;
-    GENC_LIST(struct tucube_Module_ConfigTree);
+    TUCUBE_MODULE_TREE_NODE(struct tucube_Module_ConfigTreeNode);
 };
 
 #define TUCUBE_MODULE_TREE_NODE(type) \
 size_t childCount;                    \
 GENC_LIST(type)
 
-#define TUCUBE_MODULE_TREE_GET_LAST_CHILD(node, child)
-#define TUCUBE_MODULE_TREE_GET_FIRST_CHILD(node, child) 
-#define TUCUBE_MODULE_TREE_APPEND_CHILD(node, child)
-#define TUCUBE_MODULE_TREE_FOR_EACH_NODE(node)
+#define TUCUBE_MODULE_TREE_NODE_CHILD_COUNT(node) \
+(node)->childCount
+
+#define TUCUBE_MODULE_TREE_GET_LAST_CHILD(_node, child) \
+do {
+    if(TUCUBE_MODULE_TREE_NODE_CHILD_COUNT(_node) == 0)
+        (*child) = NULL;
+    size_t backwardCount = 0;
+    type* node = _node;
+    while(GENC_LIST_ELEMENT_PREVIOUS(node) != NULL &&
+           GENC_MODULE_TREE_NODE_CHILD_COUNT(GENC_LIST_ELEMENT_PREVIOUS(node) != 0) {
+        node = node.prev;
+        ++backwardCount;
+    }
+    type* lastChild = GENC_LIST_ELEMENT_FORWARD()
+} while(0)
+#define TUCUBE_MODULE_TREE_GET_FIRST_CHILD(node, child) \
+
+
+#define TUCUBE_MODULE_TREE_APPEND_CHILD(node, child) \
+do {
+    type* lastChild = TUCUBE_MODULE_TREE_GET_LAST_CHILD(node);
+    type* prevLastChild = NULL;
+    if(GENC_LIST_ELEMENT_PREVIOUS(node) != NULL)
+        prevLastChild = TUCUBE_MODULE_TREE_GET_LAST_CHILD(GENC_LIST_ELEMENT_PREVIOUS(node));
+    if(lastChild == NULL) {
+        if(prevLastChild == NULL)
+            GENC_LIST_ELEMENT_APPEND(node, child);
+        else
+            GENC_LIST_ELEMENT_APPEND(prevLastChild, child);
+    } else
+        GENC_LIST_ELEMENT_APPEND(lastChild, child);
+    ++TUCUBE_MODULE_TREE_NODE_CHILD_COUNT(node);
+} while(0)
+
+#define TUCUBE_MODULE_TREE_FOR_EACH_NODE(_node, type) \
+for(type* node = _node; GENC_LIST_ELEMENT_NEXT(node) != NULL; node = GENC_LIST_ELEMENT_NEXT(node))
+
 #define TUCUBE_MODULE_TREE_FOR_EACH_CHILD_NODE_BEGIN(_node, type) \
 do {                                                              \
     type* begin;                                                  \
@@ -49,6 +83,8 @@ do {                                                              \
     TUCUBE_MODULE_TREE_GET_LAST_CHILD(_node, end);                \
     if(begin == NULL || end == NULL)                              \
         break;                                                    \
+    node = begin;                                                 \
+    end = GENC_LIST_ELEMENT_NEXT(end)                             \
     while(node != end) {                                          \
         node = GENC_LIST_ELEMENT_NEXT(current);
 
