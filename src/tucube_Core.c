@@ -79,41 +79,21 @@ static void* tucube_Core_startWorker(void* args) {
     return NULL;
 }
 
-static int tucube_Core_init(struct tucube_Core* core, struct tucube_Core_Config* coreConfig, struct tucube_Module_ConfigList* moduleConfigList) {
-    core->protocol = "TCP";
-    if(json_object_get(coreConfig->json, "tucube.protocol") != NULL)
-        core->protocol = json_string_value(json_object_get(coreConfig->json, "tucube.protocol"));
+static int tucube_Core_init(struct tucube_Core* core, struct tucube_Config* config) {
 
-    core->address = "0.0.0.0";
-    if(json_object_get(coreConfig->json, "tucube.address") != NULL)
-        core->address = json_string_value(json_object_get(coreConfig->json, "tucube.address"));
-
-    core->port = 8080;
-    if(json_object_get(coreConfig->json, "tucube.port") != NULL)
-        core->port = json_integer_value(json_object_get(coreConfig->json, "tucube.port"));
-
-    core->reusePort = 0;
-    if(json_object_get(coreConfig->json, "tucube.reusePort") != NULL)
-        core->reusePort = json_integer_value(json_object_get(coreConfig->json, "tucube.reusePort"));
-
-    core->backlog = 1024;
-    if(json_object_get(coreConfig->json, "tucube.backlog") != NULL)
-        core->backlog = json_integer_value(json_object_get(coreConfig->json, "tucube.backlog"));
-
-    core->workerCount = 4;
-    if(json_object_get(coreConfig->json, "tucube.workerCount") != NULL)
-        core->workerCount = json_integer_value(json_object_get(coreConfig->json, "tucube.workerCount"));
-
-    core->setUid = geteuid();
-    if(json_object_get(coreConfig->json, "tucube.setUid") != NULL)
-        core->setUid = json_integer_value(json_object_get(coreConfig->json, "tucube.setUid"));
-
-    core->setGid = getegid();
-    if(json_object_get(coreConfig->json, "tucube.setGid") != NULL)
-        core->setGid = json_integer_value(json_object_get(coreConfig->json, "tucube.setGid"));
-
+    TUCUBE_CONFIG_GET(config, "core", "tucube.protocol", string, &core->protocol, "TCP");
+    TUCUBE_CONFIG_GET(config, "core", "tucube.address", string, &core->address, "0.0.0.0");
+    TUCUBE_CONFIG_GET(config, "core", "tucube.port", integer, &core->port, 8080);
+    TUCUBE_CONFIG_GET(config, "core", "tucube.reusePort", integer, &core->reusePort, 0);
+    TUCUBE_CONFIG_GET(config, "core", "tucube.backlog", integer, &core->backlog, 1024);
+    TUCUBE_CONFIG_GET(config, "core", "tucube.workerCount", integer, &core->workerCount, 4);
+    TUCUBE_CONFIG_GET(config, "core", "tucube.setUid", integer, &core->setUid, geteuid());
+    TUCUBE_CONFIG_GET(config, "core", "tucube.setGid", integer, &core->setGid, getegid());
+/*
     GENC_LIST_FOR_EACH(moduleConfigList, struct tucube_Module_Config, moduleConfig)
         json_object_set_new(json_array_get(moduleConfig->json, 1), "tucube.workerCount", json_integer(core->workerCount));
+    TODO: REPLACE THIS
+*/
 
     core->exit = false;
     core->exitMutex = malloc(1 * sizeof(pthread_mutex_t));
@@ -184,8 +164,8 @@ static int tucube_Core_init(struct tucube_Core* core, struct tucube_Core_Config*
     return 0;
 }
 
-int tucube_Core_start(struct tucube_Core* core, struct tucube_Core_Config* coreConfig, struct tucube_Module_ConfigList* moduleConfigList) {
-    tucube_Core_init(core, coreConfig, moduleConfigList);
+int tucube_Core_start(struct tucube_Core* core, struct tucube_Config* config) {
+    tucube_Core_init(core, config);
     tucube_Core_registerSignalHandlers();
     pthread_t* workerThreads;
     pthread_attr_t coreThreadAttr;
