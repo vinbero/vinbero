@@ -31,10 +31,6 @@ struct tucube_Core {
     struct tucube_Module_List* moduleList;
 };
 
-struct tucube_Core_Config {
-    json_t* json;
-};
-
-int tucube_Core_start(struct tucube_Core* core, struct tucube_Core_Config* coreConfig, struct tucube_Module_ConfigList* moduleConfigList);
+int tucube_Core_start(struct tucube_Core* core, struct tucube_Config* config);
 
 #endif
