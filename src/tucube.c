@@ -3,8 +3,7 @@
 #include "tucube_Core.h"
 #include "tucube_Options.h"
 
-int main(int argc, char* argv[])
-{
+int main(int argc, char* argv[]) {
     struct tucube_Core core;
     struct tucube_Config config;
     GENC_LIST_INIT(&moduleConfigList);
