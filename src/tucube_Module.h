@@ -15,7 +15,7 @@ struct tucube_Module {
     union genc_Generic generic;
     pthread_rwlock_t* rwLock;
     pthread_key_t* tlModuleKey;
-    GENC_LIST_ELEMENT(struct tucube_Module);
+    GENC_TREE_NODE(struct tucube_Module);
 };
 
 struct tucube_Module_List {
