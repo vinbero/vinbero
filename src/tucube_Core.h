@@ -25,9 +25,12 @@ struct tucube_Core {
     int serverSocket;
     pthread_mutex_t* serverSocketMutex;
 
-    void* dlHandle;
-    TUCUBE_IBASE_FUNCTION_POINTERS;
-    TUCUBE_ITLSERVICE_FUNCTION_POINTERS;
+    struct {
+        GENC_ARRAY_LIST(void*); 
+    } dlHandles;
+    
+    TUCUBE_IBASE_FUNCTION_POINTERS; // Make this and
+    TUCUBE_ITLSERVICE_FUNCTION_POINTERS; // this as an ArrayList
     struct tucube_Module_List* moduleList;
 };
 

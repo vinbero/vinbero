@@ -3,7 +3,7 @@
 
 #include <jansson.h>
 #include <pthread.h>
-#include <libgenc/genc_List.h>
+#include <libgenc/genc_Tree.h>
 #include <libgenc/genc_Generic.h>
 
 struct tucube_Config {
@@ -11,7 +11,9 @@ struct tucube_Config {
 };
 
 struct tucube_Module {
-    void* dlHandle;
+    struct {
+        GENC_ARRAY_LIST(void*);
+    } dlHandles;
     union genc_Generic generic;
     pthread_rwlock_t* rwLock;
     pthread_key_t* tlModuleKey;
@@ -42,22 +44,39 @@ do {                                                                            
 }                                                                               \
 while(0)
 
-#define TUCUBE_CONFIG_GET(config, moduleName, valueName, valueType, variable, defaultValue)                              \
+#define TUCUBE_CONFIG_GET(config, moduleName, valueName, valueType, output, defaultValue)                              \
 do {                                                                                                                     \
     json_t* moduleConfig;                                                                                                \
     if((moduleConfig = json_object_get(json_object_get(json_object_get((config)->json, moduleName)), "config")) != NULL) \
-        *(variable) = json_##valueType##_value(moduleConfig, valueName);                                                 \
+        *(output) = json_##valueType##_value(moduleConfig, valueName);                                                 \
     else                                                                                                                 \
-        *(variable) = defaultValue;                                                                                      \
+        *(output) = defaultValue;                                                                                      \
 } while(0)
 
-#define TUCUBE_CONFIG_GET_REQUIRED(config, moduleName, valueName, valueType, variable)                            \
+#define TUCUBE_CONFIG_GET_REQUIRED(config, moduleName, valueName, valueType, output)                            \
 do {                                                                                                                     \
     json_t* moduleConfig;                                                                                                \
     if((moduleConfig = json_object_get(json_object_get(json_object_get((config)->json, moduleName)), "config")) != NULL) \
-        *(variable) = json_##valueType##_value(moduleConfig, valueName);                                                 \
+        *(output) = json_##valueType##_value(moduleConfig, valueName);                                                 \
     else                                                                                                                 \
         errx(EXIT_FAILURE, "%s: %u: In module %s, configuration argument %s is required", __FILE__, __LINE__, moduleName, valueName); \
+} while(0)
+
+#define TUCUBE_CONFIG_GET_MODULE_PATH(config, moduleName, modulePath)                                        \
+do {                                                                                                         \
+    *(modulePath) = json_string_value(json_object_get(json_object_get((config)->json, moduleName)), "path"); \
+    //needs some error handling
+} while(0)
+
+#define TUCUBE_FOR_EACH_NEXT_MODULE_BEGIN(config, currentModuleName, nextModuleName) \
+do {
+    json_t* next = json_object_get(json_object_get((config)->json, currentModuleName), "next")
+    if(json_is_array(next)) {
+        size_t index;
+        json_array_foreach(next, index, nextModuleName) {
+#define TUCUBE_FOR_EACH_NEXT_MODULE_END() \
+        }
+    }
 } while(0)
 
 #endif
