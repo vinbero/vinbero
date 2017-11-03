@@ -58,11 +58,11 @@ static void tucube_Core_pthreadCleanupHandler(void* args) {
 
 static void* tucube_Core_startWorker(void* args) {
     struct tucube_Core* core = ((void**)args)[0];
-    struct tucube_Module_ConfigList* moduleConfigList = ((void**)args)[1];
+    struct tucube_Config* config = ((void**)args)[1];
     pthread_cleanup_push(tucube_Core_pthreadCleanupHandler, core);
     pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
 
-    if(core->tucube_IBase_tlInit(GENC_LIST_HEAD(core->moduleList), GENC_LIST_HEAD(moduleConfigList), (void*[]){NULL}) == -1)
+    if(core->tucube_IBase_tlInit(GENC_LIST_HEAD(core->moduleList), config, (void*[]){NULL}) == -1)
         errx(EXIT_FAILURE, "%s: %u: tucube_Module_tlInit() failed", __FILE__, __LINE__);
 
     sigset_t signalSet;
@@ -80,7 +80,6 @@ static void* tucube_Core_startWorker(void* args) {
 }
 
 static int tucube_Core_init(struct tucube_Core* core, struct tucube_Config* config) {
-
     TUCUBE_CONFIG_GET(config, "core", "tucube.protocol", string, &core->protocol, "TCP");
     TUCUBE_CONFIG_GET(config, "core", "tucube.address", string, &core->address, "0.0.0.0");
     TUCUBE_CONFIG_GET(config, "core", "tucube.port", integer, &core->port, 8080);
@@ -181,7 +180,7 @@ int tucube_Core_start(struct tucube_Core* core, struct tucube_Config* config) {
 
         atexit(tucube_Core_exitHandler);
 
-        void* workerArgs[2] = {core, moduleConfigList};
+        void* workerArgs[2] = {core, config};
         for(size_t index = 0; index != core->workerCount; ++index) {
            if(pthread_create(workerThreads + index, &coreThreadAttr, tucube_Core_startWorker, workerArgs) != 0)
                 err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
