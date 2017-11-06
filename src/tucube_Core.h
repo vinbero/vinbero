@@ -30,7 +30,7 @@ struct tucube_Core {
     } dlHandles;
     
     TUCUBE_IBASE_FUNCTION_POINTERS; // Make this and
-    TUCUBE_ITLSERVICE_FUNCTION_POINTERS; // this as an ArrayList
+    TUCUBE_ITLSERVICE_FUNCTION_POINTERS; // this as ArrayLists
     struct tucube_Module_List* moduleList;
 };
 
