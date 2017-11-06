@@ -8,6 +8,12 @@
 #include "tucube_IBase.h"
 #include "tucube_ITlService.h"
 
+struct tucube_Core_functionPointers {
+    GENC_ARRAY_LIST(struct tucube_Core_functionPointers);
+    TUCUBE_IBASE_FUNCTION_POINTERS;
+    TUCUBE_ITLSERVICE_FUNCTION_POINTERS;
+};
+
 struct tucube_Core {
     const char* protocol;
     const char* address;
@@ -28,10 +34,7 @@ struct tucube_Core {
     struct {
         GENC_ARRAY_LIST(void*); 
     } dlHandles;
-    
-    TUCUBE_IBASE_FUNCTION_POINTERS; // Make this and
-    TUCUBE_ITLSERVICE_FUNCTION_POINTERS; // this as ArrayLists
-    struct tucube_Module_List* moduleList;
+    struct tucube_Core_functionPointers functionPointers;
 };
 
 int tucube_Core_start(struct tucube_Core* core, struct tucube_Config* config);
