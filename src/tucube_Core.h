@@ -18,6 +18,10 @@ struct tucube_Core_NextModules {
     GENC_ARRAY_LIST(struct tucube_Module*);
 };
 
+struct tucube_Core_DlHandles {
+    GENC_ARRAY_LIST(void*);
+};
+
 struct tucube_Core {
     const char* protocol;
     const char* address;
@@ -35,9 +39,7 @@ struct tucube_Core {
     int serverSocket;
     pthread_mutex_t* serverSocketMutex;
 
-    struct {
-        GENC_ARRAY_LIST(void*); 
-    } dlHandles;
+    struct tucube_Core_DlHandles dlHandles;
     struct tucube_Core_FunctionPointers functionPointers;
     struct tucube_Core_NextModules nextModules;
 };
