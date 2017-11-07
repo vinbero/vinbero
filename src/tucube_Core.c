@@ -48,7 +48,7 @@ static void tucube_Core_registerSignalHandlers() {
 static void tucube_Core_pthreadCleanupHandler(void* args) {
     struct tucube_Core* core = args;
 
-    if(core->tucube_IBase_tlDestroy(GENC_LIST_HEAD(core->moduleList)) == -1)
+    if(core->tucube_IBase_tlDestroy(core->nextModules) == -1)
         warnx("%s: %u: tucube_Module_tlDestroy() failed", __FILE__, __LINE__);
     pthread_mutex_lock(core->exitMutex);
     core->exit = true;
@@ -62,7 +62,7 @@ static void* tucube_Core_startWorker(void* args) {
     pthread_cleanup_push(tucube_Core_pthreadCleanupHandler, core);
     pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
 
-    if(core->tucube_IBase_tlInit(GENC_LIST_HEAD(core->moduleList), config, (void*[]){NULL}) == -1)
+    if(core->tucube_IBase_tlInit(core->nextModules, config, (void*[]){NULL}) == -1)
         errx(EXIT_FAILURE, "%s: %u: tucube_Module_tlInit() failed", __FILE__, __LINE__);
 
     sigset_t signalSet;
@@ -71,12 +71,40 @@ static void* tucube_Core_startWorker(void* args) {
     if(pthread_sigmask(SIG_BLOCK, &signalSet, NULL) != 0)
         errx(EXIT_FAILURE, "%s: %u: pthread_sigmask() failed", __FILE__, __LINE__);
 
-    if(core->tucube_ITlService_call(GENC_LIST_HEAD(core->moduleList), (void*[]){&core->serverSocket, NULL}) == -1)
+    if(core->tucube_ITlService_call(core->nextModules, (void*[]){&core->serverSocket, NULL}) == -1)
         errx(EXIT_FAILURE, "%s: %u: tucube_ITlService_call() failed", __FILE__, __LINE__);
 
     pthread_cleanup_pop(1);
 
     return NULL;
+}
+
+static int tucube_Core_loadDlHandles(struct tucube_Core_DlHandles* dlHandles) {
+   if(json_string_value(json_array_get(GENC_LIST_HEAD(moduleConfigList)->json, 0)) == NULL)
+        errx(EXIT_FAILURE, "%s: %u: Unable to find path of next module", __FILE__, __LINE__);
+
+    if((core->dlHandle = dlopen(json_string_value(json_array_get(GENC_LIST_HEAD(moduleConfigList)->json, 0)), RTLD_LAZY | RTLD_GLOBAL)) == NULL)
+        errx(EXIT_FAILURE, "%s: %u: dlopen() failed, possible causes are:\n1. Unable to find next module\n2. The next module didn't linked required shared libraries properly", __FILE__, __LINE__);
+    return 0;
+}
+
+static int tucube_Core_loadFunctionPointers(struct tucube_Core_FunctionPointers* functionPointers) {
+    if((core->tucube_IBase_init = dlsym(core->dlHandle, "tucube_IBase_init")) == NULL)
+        errx(EXIT_FAILURE, "%s: %u: Unable to find tucube_IBase_init()", __FILE__, __LINE__);
+
+    if((core->tucube_IBase_tlInit = dlsym(core->dlHandle, "tucube_IBase_tlInit")) == NULL)
+        errx(EXIT_FAILURE, "%s: %u: Unable to find tucube_IBase_tlInit()", __FILE__, __LINE__);
+
+    if((core->tucube_ITlService_call = dlsym(core->dlHandle, "tucube_ITlService_call")) == NULL)
+        errx(EXIT_FAILURE, "%s: %u: Unable to find tucube_ITlService_call()", __FILE__, __LINE__);
+
+    if((core->tucube_IBase_tlDestroy = dlsym(core->dlHandle, "tucube_IBase_tlDestroy")) == NULL)
+        errx(EXIT_FAILURE, "%s: %u: Unable to find tucube_IBase_tlDestroy()", __FILE__, __LINE__);
+
+    if((core->tucube_IBase_destroy = dlsym(core->dlHandle, "tucube_IBase_destroy")) == NULL)
+        errx(EXIT_FAILURE, "%s: %u: Unable to find tucube_IBase_destroy()", __FILE__, __LINE__);
+
+    return 0;
 }
 
 static int tucube_Core_init(struct tucube_Core* core, struct tucube_Config* config) {
@@ -127,31 +155,15 @@ static int tucube_Core_init(struct tucube_Core* core, struct tucube_Config* conf
         errx(EXIT_FAILURE, "%s: %u: Unknown protocol %s", __FILE__, __LINE__, core->protocol);
 
     //initModules
+    if(tucube_Core_loadDlHandles(&(core->dlHandles)) == -1)
+        errx(EXIT_FAILURE, "%s: %u: tucube_Core_loadDlHandles() failed", __FILE__, __LINE__);
 
-    if(json_string_value(json_array_get(GENC_LIST_HEAD(moduleConfigList)->json, 0)) == NULL)
-        errx(EXIT_FAILURE, "%s: %u: Unable to find path of next module", __FILE__, __LINE__);
+    if(tucube_Core_loadFunctionPointers(&(core->functionPointers)) == -1)
+        errx(EXIT_FAILURE, "%s: %u: tucube_Core_loadFunctionPointers() failed", __FILE__, __LINE__);
 
-    if((core->dlHandle = dlopen(json_string_value(json_array_get(GENC_LIST_HEAD(moduleConfigList)->json, 0)), RTLD_LAZY | RTLD_GLOBAL)) == NULL)
-        errx(EXIT_FAILURE, "%s: %u: dlopen() failed, possible causes are:\n1. Unable to find next module\n2. The next module didn't linked required shared libraries properly", __FILE__, __LINE__);
 
-    if((core->tucube_IBase_init = dlsym(core->dlHandle, "tucube_IBase_init")) == NULL)
-        errx(EXIT_FAILURE, "%s: %u: Unable to find tucube_IBase_init()", __FILE__, __LINE__);
-
-    if((core->tucube_IBase_tlInit = dlsym(core->dlHandle, "tucube_IBase_tlInit")) == NULL)
-        errx(EXIT_FAILURE, "%s: %u: Unable to find tucube_IBase_tlInit()", __FILE__, __LINE__);
-
-    if((core->tucube_ITlService_call = dlsym(core->dlHandle, "tucube_ITlService_call")) == NULL)
-        errx(EXIT_FAILURE, "%s: %u: Unable to find tucube_ITlService_call()", __FILE__, __LINE__);
-
-    if((core->tucube_IBase_tlDestroy = dlsym(core->dlHandle, "tucube_IBase_tlDestroy")) == NULL)
-        errx(EXIT_FAILURE, "%s: %u: Unable to find tucube_IBase_tlDestroy()", __FILE__, __LINE__);
-
-    if((core->tucube_IBase_destroy = dlsym(core->dlHandle, "tucube_IBase_destroy")) == NULL)
-        errx(EXIT_FAILURE, "%s: %u: Unable to find tucube_IBase_destroy()", __FILE__, __LINE__);
-
-    core->moduleList = malloc(1 * sizeof(struct tucube_Module_List));
-    GENC_LIST_INIT(core->moduleList);
-    if(core->tucube_IBase_init(GENC_LIST_HEAD(moduleConfigList), core->moduleList, (void*[]){NULL}) == -1)
+    GENC_ARRAY_LIST_INIT(&(core->nextModules));
+    if(core->tucube_IBase_init(config, core->nextModules, (void*[]){NULL}) == -1)
         errx(EXIT_FAILURE, "%s: %u: tucube_IBase_init() failed", __FILE__, __LINE__);
 
     if(setgid(core->setGid) == -1)
@@ -227,9 +239,8 @@ int tucube_Core_start(struct tucube_Core* core, struct tucube_Config* config) {
     pthread_attr_destroy(&coreThreadAttr);
     free(workerThreads);
 
-    if(core->tucube_IBase_destroy(GENC_LIST_HEAD(core->moduleList)) == -1)
+    if(core->tucube_IBase_destroy(core->nextModules) == -1)
         warn("%s: %u", __FILE__, __LINE__);
-    free(core->moduleList);
 
 //    dlclose(core->dlHandle);
     return 0;
