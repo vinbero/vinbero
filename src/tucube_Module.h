@@ -10,11 +10,17 @@ struct tucube_Config {
     json_t* json;
 };
 
+struct tucube_DlHandles {
+    GENC_ARRAY_LIST(void*);
+};
+
+struct tucube_Generics {
+    GENC_ARRAY_LIST(union tucube_Generic);
+};
+
 struct tucube_Module {
-    struct {
-        GENC_ARRAY_LIST(void*);
-    } dlHandles;
-    union genc_Generic generic;
+    struct tucube_DlHandles dlHandles;
+    struct tucube_Generics generics;
     pthread_rwlock_t* rwLock;
     pthread_key_t* tlModuleKey;
     GENC_TREE_NODE(struct tucube_Module);
@@ -61,18 +67,18 @@ do {                                                                            
 #define TUCUBE_CONFIG_GET_MODULE_PATH(config, moduleName, modulePath)                                        \
 do {                                                                                                         \
     *(modulePath) = json_string_value(json_object_get(json_object_get((config)->json, moduleName)), "path"); \
-    //needs some error handling
 } while(0)
 
 #define TUCUBE_FOR_EACH_NEXT_MODULE_BEGIN(config, currentModuleName, nextModuleName) \
-do {
-    json_t* next = json_object_get(json_object_get((config)->json, currentModuleName), "next")
-    if(json_is_array(next)) {
-        size_t index;
+do { \
+    json_t* next = json_object_get(json_object_get((config)->json, currentModuleName), "next") \
+    if(json_is_array(next)) { \
+        size_t index; \
         json_array_foreach(next, index, nextModuleName) {
+
 #define TUCUBE_FOR_EACH_NEXT_MODULE_END() \
-        }
-    }
+        } \
+    } \
 } while(0)
 
 #endif

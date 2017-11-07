@@ -234,5 +234,3 @@ int tucube_Core_start(struct tucube_Core* core, struct tucube_Config* config) {
 //    dlclose(core->dlHandle);
     return 0;
 }
-
-
