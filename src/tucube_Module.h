@@ -69,16 +69,17 @@ do {                                                                            
     *(modulePath) = json_string_value(json_object_get(json_object_get((config)->json, moduleName)), "path"); \
 } while(0)
 
-#define TUCUBE_FOR_EACH_NEXT_MODULE_BEGIN(config, currentModuleName, nextModuleName) \
-do { \
-    json_t* next = json_object_get(json_object_get((config)->json, currentModuleName), "next") \
-    if(json_is_array(next)) { \
-        size_t index; \
-        json_array_foreach(next, index, nextModuleName) {
+#define TUCUBE_CONFIG_FOR_EACH_NEXT_MODULE_BEGIN(config, currentModuleName)                                \
+do {                                                                                                       \
+    json_t* nextModuleNames = json_object_get(json_object_get((config)->json, currentModuleName), "next"); \
+    if(json_is_array(nextModuleNames)) {                                                                   \
+        size_t index;                                                                                      \
+        json_t* nextModuleName;                                                                            \
+        json_array_foreach(nextModuleNames, index, nextModuleName) { 
 
-#define TUCUBE_FOR_EACH_NEXT_MODULE_END() \
-        } \
-    } \
-} while(0)
+#define TUCUBE_CONFIG_FOR_EACH_NEXT_MODULE_END \
+        }                                      \
+    }                                          \
+} while(0);
 
 #endif
