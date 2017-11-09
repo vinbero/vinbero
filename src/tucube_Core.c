@@ -11,7 +11,7 @@
 #include <sys/syscall.h>
 #include <unistd.h>
 #include <libgenc/genc_cast.h>
-#include <libgenc/genc_List.h>
+#include <libgenc/genc_ArrayList.h>
 #include "tucube_Core.h"
 
 static pthread_key_t tucube_Core_tlKey;
@@ -176,7 +176,7 @@ static int tucube_Core_init(struct tucube_Core* core, struct tucube_Config* conf
     if(tucube_Core_loadFunctionPointers(&(core->dlHandles), &(core->functionPointers)) == -1)
         errx(EXIT_FAILURE, "%s: %u: tucube_Core_loadFunctionPointers() failed", __FILE__, __LINE__);
 
-    GENC_ARRAY_LIST_INIT(&(core->nextModules));
+    GENC_ARRAY_LIST_INIT(&(core->nextModules), 16);
     if(core->tucube_IBase_init(config, core->nextModules, (void*[]){NULL}) == -1)
         errx(EXIT_FAILURE, "%s: %u: tucube_IBase_init() failed", __FILE__, __LINE__);
 
