@@ -11,10 +11,10 @@
 struct tucube_Core_FunctionPointersElement {
     TUCUBE_IBASE_FUNCTION_POINTERS;
     TUCUBE_ITLSERVICE_FUNCTION_POINTERS;
-}
+};
 
 struct tucube_Core_FunctionPointers {
-    GENC_ARRAY_LIST(struct tucube_Core_functionPointersElement);
+    GENC_ARRAY_LIST(struct tucube_Core_FunctionPointersElement);
 };
 
 struct tucube_Core_NextModules {

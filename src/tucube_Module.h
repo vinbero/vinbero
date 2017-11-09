@@ -46,21 +46,21 @@ do {                                                                            
 }                                                                               \
 while(0)
 
-#define TUCUBE_CONFIG_GET(config, moduleName, valueName, valueType, output, defaultValue)                              \
-do {                                                                                                                     \
-    json_t* moduleConfig;                                                                                                \
-    if((moduleConfig = json_object_get(json_object_get(json_object_get((config)->json, moduleName)), "config")) != NULL) \
-        *(output) = json_##valueType##_value(moduleConfig, valueName);                                                 \
-    else                                                                                                                 \
-        *(output) = defaultValue;                                                                                      \
+#define TUCUBE_CONFIG_GET(config, moduleName, valueName, valueType, output, defaultValue)                                         \
+do {                                                                                                                              \
+    json_t* jsonOutput;                                                                                                           \
+    if((jsonOutput = json_object_get(json_object_get(json_object_get((config)->json, moduleName), "config"), valueName)) != NULL) \
+        *(output) = json_##valueType##_value(jsonOutput);                                                                         \
+    else                                                                                                                          \
+        *(output) = defaultValue;                                                                                                 \
 } while(0)
 
-#define TUCUBE_CONFIG_GET_REQUIRED(config, moduleName, valueName, valueType, output)                            \
-do {                                                                                                                     \
-    json_t* moduleConfig;                                                                                                \
-    if((moduleConfig = json_object_get(json_object_get(json_object_get((config)->json, moduleName)), "config")) != NULL) \
-        *(output) = json_##valueType##_value(moduleConfig, valueName);                                                 \
-    else                                                                                                                 \
+#define TUCUBE_CONFIG_GET_REQUIRED(config, moduleName, valueName, valueType, output)                                                  \
+do {                                                                                                                                  \
+    json_t* moduleConfig;                                                                                                             \
+    if((moduleConfig = json_object_get(json_object_get(json_object_get((config)->json, moduleName)), "config")) != NULL)              \
+        *(output) = json_##valueType##_value(moduleConfig, valueName);                                                                \
+    else                                                                                                                              \
         errx(EXIT_FAILURE, "%s: %u: In module %s, configuration argument %s is required", __FILE__, __LINE__, moduleName, valueName); \
 } while(0)
 
