@@ -66,16 +66,26 @@ do {                                                                            
 
 #define TUCUBE_CONFIG_GET_MODULE_PATH(config, moduleName, modulePath)                                        \
 do {                                                                                                         \
-    *(modulePath) = json_string_value(json_object_get(json_object_get((config)->json, moduleName)), "path"); \
+    *(modulePath) = json_string_value(json_object_get(json_object_get((config)->json, moduleName), "path")); \
 } while(0)
+
+#define TUCUBE_CONFIG_GET_NEXT_MODULE_COUNT(config, currentModuleName, output)                   \
+do {                                                                                             \
+    json_t* array = json_object_get(json_object_get((config)->json, currentModuleName), "next"); \
+    if(json_is_array(array))                                                                     \
+        *output = json_array_size(array);                                                        \
+    else                                                                                         \
+        *output = -1;                                                                            \
+} while(0);
 
 #define TUCUBE_CONFIG_FOR_EACH_NEXT_MODULE_BEGIN(config, currentModuleName)                                \
 do {                                                                                                       \
     json_t* nextModuleNames = json_object_get(json_object_get((config)->json, currentModuleName), "next"); \
     if(json_is_array(nextModuleNames)) {                                                                   \
         size_t index;                                                                                      \
-        json_t* nextModuleName;                                                                            \
-        json_array_foreach(nextModuleNames, index, nextModuleName) { 
+        json_t* nextModuleNameJson;                                                                        \
+        json_array_foreach(nextModuleNames, index, nextModuleNameJson) {                                   \
+            const char* nextModuleName = json_string_value(nextModuleNameJson);
 
 #define TUCUBE_CONFIG_FOR_EACH_NEXT_MODULE_END \
         }                                      \
