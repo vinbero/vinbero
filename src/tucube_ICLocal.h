@@ -3,7 +3,7 @@
 
 #include "tucube_Module.h"
 
-#define TUCUBE_ICLOCAL_FUNCTIONS                                                                           \
+#define TUCUBE_ICLOCAL_FUNCTIONS                                                                            \
 int tucube_ICLocal_Init(struct tucube_Module* module, struct tucube_ClData_List* clDataList, void* args[]); \
 int tucube_ICLocal_destroy(struct tucube_Module* module, struct tucube_ClData* clData)
 
