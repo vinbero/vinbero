@@ -64,7 +64,7 @@ static void* tucube_Core_startWorker(void* args) {
 
 
     GENC_ARRAY_LIST_FOR_EACH(core->nextModules, index) {
-        if(core->tucube_IBase_tlInit(GENC_ARRAY_LIST_GET(core->nextModules, index), config, (void*[]){NULL}) == -1)
+        if(GENC_ARRAY_LIST_GET(core->functionPointers, index).tucube_IBase_tlInit(GENC_ARRAY_LIST_GET(core->nextModules, index), config, (void*[]){NULL}) == -1)
             errx(EXIT_FAILURE, "%s: %u: tucube_Module_tlInit() failed", __FILE__, __LINE__);
     }
 
@@ -75,7 +75,7 @@ static void* tucube_Core_startWorker(void* args) {
         errx(EXIT_FAILURE, "%s: %u: pthread_sigmask() failed", __FILE__, __LINE__);
 
     GENC_ARRAY_LIST_FOR_EACH(core->nextModules, index) {
-        if(core->tucube_ITlService_call(GENC_ARRAY_LIST_GET(core->nextModules, index), (void*[]){&core->serverSocket, NULL}) == -1)
+        if(GENC_ARRAY_LIST_GET(core->functionPointers, index).tucube_ITlService_call(GENC_ARRAY_LIST_GET(core->nextModules, index), (void*[]){&core->serverSocket, NULL}) == -1)
             errx(EXIT_FAILURE, "%s: %u: tucube_ITlService_call() failed", __FILE__, __LINE__);
     }
 
@@ -177,7 +177,10 @@ static int tucube_Core_init(struct tucube_Core* core, struct tucube_Config* conf
         errx(EXIT_FAILURE, "%s: %u: tucube_Core_loadFunctionPointers() failed", __FILE__, __LINE__);
 
     GENC_ARRAY_LIST_INIT(&(core->nextModules), 16);
-    if(core->tucube_IBase_init(config, core->nextModules, (void*[]){NULL}) == -1)
+    // TODO: FOREACH LOOP
+    int nextModuleCount;
+    TUCUBE_CONFIG_GET_NEXT_MODULE_COUNT(config, "core", &nextModuleCount);
+    if(GENC_ARRAY_LIST_GET(core->functionPointers, index).tucube_IBase_init(config, GENC_ARRAY_LIST_GET(core->nextModules, index), (void*[]){NULL}) == -1)
         errx(EXIT_FAILURE, "%s: %u: tucube_IBase_init() failed", __FILE__, __LINE__);
 
     if(setgid(core->setGid) == -1)
