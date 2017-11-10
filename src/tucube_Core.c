@@ -47,9 +47,10 @@ static void tucube_Core_registerSignalHandlers() {
 
 static void tucube_Core_pthreadCleanupHandler(void* args) {
     struct tucube_Core* core = args;
-
-    if(core->tucube_IBase_tlDestroy(core->nextModules) == -1)
-        warnx("%s: %u: tucube_Module_tlDestroy() failed", __FILE__, __LINE__);
+    GENC_ARRAY_LIST_FOR_EACH(core->nextModules, index) {
+        if(GENC_ARRAY_LIST_GET(core->functionPointers, index).tucube_IBase_tlDestroy(GENC_ARRAY_LIST_GET(core->nextModules, index)) == -1)
+            warnx("%s: %u: tucube_Module_tlDestroy() failed", __FILE__, __LINE__);
+    }
     pthread_mutex_lock(core->exitMutex);
     core->exit = true;
     pthread_cond_signal(core->exitCond);
@@ -176,12 +177,13 @@ static int tucube_Core_init(struct tucube_Core* core, struct tucube_Config* conf
     if(tucube_Core_loadFunctionPointers(&(core->dlHandles), &(core->functionPointers)) == -1)
         errx(EXIT_FAILURE, "%s: %u: tucube_Core_loadFunctionPointers() failed", __FILE__, __LINE__);
 
-    GENC_ARRAY_LIST_INIT(&(core->nextModules), 16);
-    // TODO: FOREACH LOOP
     int nextModuleCount;
     TUCUBE_CONFIG_GET_NEXT_MODULE_COUNT(config, "core", &nextModuleCount);
-    if(GENC_ARRAY_LIST_GET(core->functionPointers, index).tucube_IBase_init(config, GENC_ARRAY_LIST_GET(core->nextModules, index), (void*[]){NULL}) == -1)
-        errx(EXIT_FAILURE, "%s: %u: tucube_IBase_init() failed", __FILE__, __LINE__);
+    GENC_ARRAY_LIST_INIT(&(core->nextModules), nextModuleCount);
+    for(int index = 0; index < nextModuleCount; ++index) {
+        if(GENC_ARRAY_LIST_GET(core->functionPointers, index).tucube_IBase_init(config, GENC_ARRAY_LIST_GET(core->nextModules, index), (void*[]){NULL}) == -1)
+            errx(EXIT_FAILURE, "%s: %u: tucube_IBase_init() failed", __FILE__, __LINE__);
+    }
 
     if(setgid(core->setGid) == -1)
         err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
