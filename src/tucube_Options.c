@@ -22,8 +22,10 @@ int tucube_Options_process(int argc, char* argv[], struct tucube_Config* config)
 
     json_error_t configError;
     char optionChar;
+    bool isThereAnyOptions = false;
 
     while((optionChar = getopt_long(argc, argv, "hi:f:", options, NULL)) != (char)-1) {
+        isThereAnyOptions = true;
         switch(optionChar) {
         case 'i':
             if(config->json == NULL) {
@@ -43,6 +45,11 @@ int tucube_Options_process(int argc, char* argv[], struct tucube_Config* config)
             exit(EXIT_SUCCESS);
             break;
         }
+    }
+
+    if(!isThereAnyOptions) {
+        tucube_Help_print();
+        exit(EXIT_SUCCESS);
     }
 
     if(config->json == NULL) {
