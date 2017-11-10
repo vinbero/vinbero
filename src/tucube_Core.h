@@ -8,12 +8,12 @@
 #include "tucube_IBase.h"
 #include "tucube_ITlService.h"
 
-struct tucube_Core_FunctionPointersElement {
+struct tucube_Core_FunctionPointers {
     TUCUBE_IBASE_FUNCTION_POINTERS;
     TUCUBE_ITLSERVICE_FUNCTION_POINTERS;
 };
 
-struct tucube_Core_FunctionPointers {
+struct tucube_Core_FunctionPointersList {
     GENC_ARRAY_LIST(struct tucube_Core_FunctionPointersElement);
 };
 
@@ -43,7 +43,7 @@ struct tucube_Core {
     pthread_mutex_t* serverSocketMutex;
 
     struct tucube_Core_DlHandles dlHandles;
-    struct tucube_Core_FunctionPointers functionPointers;
+    struct tucube_Core_FunctionPointersList functionPointersList;
     struct tucube_Core_NextModules nextModules;
 };
 

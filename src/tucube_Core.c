@@ -100,26 +100,26 @@ static int tucube_Core_loadDlHandles(struct tucube_Config* config, struct tucube
     return 0;
 }
 
-static int tucube_Core_loadFunctionPointers(struct tucube_Core_DlHandles* dlHandles, struct tucube_Core_FunctionPointers* functionPointers) {
+static int tucube_Core_loadFunctionPointersList(struct tucube_Core_DlHandles* dlHandles, struct tucube_Core_FunctionPointersList* functionPointersList) {
     GENC_ARRAY_LIST_FOR_EACH(dlHandles, index) {
-        struct tucube_Core_FunctionPoinetersElement functionPointersElement;
-        if((functionPointersElement.tucube_IBase_init = dlsym(GENC_ARRAY_LIST_GET(dlHandles, index), "tucube_IBase_init")) == NULL)
+        struct tucube_Core_FunctionPoineters* functionPointers = &GENC_ARRAY_LIST_GET(functionPointersList, index);
+        struct tucube_Core_DlHandle* dlHandle = &GENC_ARRAY_LIST_GET(dlHandles, index);
+        if((functionPointers->tucube_IBase_init = dlsym(dlHandle, "tucube_IBase_init")) == NULL)
             errx(EXIT_FAILURE, "%s: %u: Unable to find tucube_IBase_init()", __FILE__, __LINE__);
 
-        if((functionPointersElement.tucube_IBase_tlInit = dlsym(GENC_ARRAY_LIST_GET(dlHandles, index), "tucube_IBase_tlInit")) == NULL)
+        if((functionPointers->tucube_IBase_tlInit = dlsym(dlHandle, "tucube_IBase_tlInit")) == NULL)
             errx(EXIT_FAILURE, "%s: %u: Unable to find tucube_IBase_tlInit()", __FILE__, __LINE__);
 
-        if((functionPointersElement.tucube_ITlService_call = dlsym(GENC_ARRAY_LIST_GET(dlHandles, index), "tucube_ITlService_call")) == NULL)
+        if((functionPointers->tucube_ITlService_call = dlsym(dlHandle, "tucube_ITlService_call")) == NULL)
             errx(EXIT_FAILURE, "%s: %u: Unable to find tucube_ITlService_call()", __FILE__, __LINE__);
 
-        if((functionPointersElement.tucube_IBase_tlDestroy = dlsym(GENC_ARRAY_LIST_GET(dlHandles, index), "tucube_IBase_tlDestroy")) == NULL)
+        if((functionPointers->tucube_IBase_tlDestroy = dlsym(dlHandle, "tucube_IBase_tlDestroy")) == NULL)
             errx(EXIT_FAILURE, "%s: %u: Unable to find tucube_IBase_tlDestroy()", __FILE__, __LINE__);
 
-        if((functionPointersElement.tucube_IBase_destroy = dlsym(GENC_ARRAY_LIST_GET(dlHandles, index), "tucube_IBase_destroy")) == NULL)
+        if((functionPointers->tucube_IBase_destroy = dlsym(dlHandle, "tucube_IBase_destroy")) == NULL)
             errx(EXIT_FAILURE, "%s: %u: Unable to find tucube_IBase_destroy()", __FILE__, __LINE__);
-        GENC_ARRAY_LIST_PUSH(functionPointers, functionPointersElement);
+        GENC_ARRAY_LIST_PUSH(functionPointersList, functionPointers);
     }
-
     return 0;
 }
 
@@ -174,14 +174,16 @@ static int tucube_Core_init(struct tucube_Core* core, struct tucube_Config* conf
     if(tucube_Core_loadDlHandles(config, &(core->dlHandles)) == -1)
         errx(EXIT_FAILURE, "%s: %u: tucube_Core_loadDlHandles() failed", __FILE__, __LINE__);
 
-    if(tucube_Core_loadFunctionPointers(&(core->dlHandles), &(core->functionPointers)) == -1)
-        errx(EXIT_FAILURE, "%s: %u: tucube_Core_loadFunctionPointers() failed", __FILE__, __LINE__);
+    if(tucube_Core_loadFunctionPointersList(&core->dlHandles, &core->functionPointersList) == -1)
+        errx(EXIT_FAILURE, "%s: %u: tucube_Core_loadFunctionPointersList() failed", __FILE__, __LINE__);
 
     int nextModuleCount;
     TUCUBE_CONFIG_GET_NEXT_MODULE_COUNT(config, "core", &nextModuleCount);
     GENC_ARRAY_LIST_INIT(&(core->nextModules), nextModuleCount);
     for(int index = 0; index < nextModuleCount; ++index) {
-        if(GENC_ARRAY_LIST_GET(core->functionPointers, index).tucube_IBase_init(config, GENC_ARRAY_LIST_GET(core->nextModules, index), (void*[]){NULL}) == -1)
+        tucube_Core_FunctionPointers* functionPointers = &GENC_ARRAY_LIST_GET(core->functionPointersList, index);
+        tucube_Core_Module* nextModule = &GENC_ARRAY_LIST_GET(core->nextModules, index);
+        if(functionPointers->tucube_IBase_init(config, nextModule, (void*[]){NULL}) == -1)
             errx(EXIT_FAILURE, "%s: %u: tucube_IBase_init() failed", __FILE__, __LINE__);
     }
 
