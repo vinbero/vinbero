@@ -27,7 +27,7 @@ int tucube_Options_process(int argc, char* argv[], struct tucube_Config* config)
         switch(optionChar) {
         case 'i':
             if(config->json == NULL) {
-                if((modulesConfig-> = json_loads(optarg, 0, &configError)) == NULL)
+                if((config->json = json_loads(optarg, 0, &configError)) == NULL)
                     errx(EXIT_FAILURE, "%s: %d: %s", configError.source, configError.line, configError.text);
             }
             break;
