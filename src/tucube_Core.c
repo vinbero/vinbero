@@ -47,8 +47,10 @@ static void tucube_Core_registerSignalHandlers() {
 
 static void tucube_Core_pthreadCleanupHandler(void* args) {
     struct tucube_Core* core = args;
-    GENC_ARRAY_LIST_FOR_EACH(core->nextModules, index) {
-        if(GENC_ARRAY_LIST_GET(core->functionPointers, index).tucube_IBase_tlDestroy(GENC_ARRAY_LIST_GET(core->nextModules, index)) == -1)
+    GENC_ARRAY_LIST_FOR_EACH(&core->nextModules, index) {
+        struct tucube_Core_FunctionPointers* functionPointers = &GENC_ARRAY_LIST_GET(&core->functionPointersList, index);
+        struct tucube_Module* nextModule = GENC_ARRAY_LIST_GET(&core->nextModules, index);
+        if(functionPointers->tucube_IBase_tlDestroy(nextModule) == -1)
             warnx("%s: %u: tucube_Module_tlDestroy() failed", __FILE__, __LINE__);
     }
     pthread_mutex_lock(core->exitMutex);
@@ -64,8 +66,10 @@ static void* tucube_Core_startWorker(void* args) {
     pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
 
 
-    GENC_ARRAY_LIST_FOR_EACH(core->nextModules, index) {
-        if(GENC_ARRAY_LIST_GET(core->functionPointers, index).tucube_IBase_tlInit(GENC_ARRAY_LIST_GET(core->nextModules, index), config, (void*[]){NULL}) == -1)
+    GENC_ARRAY_LIST_FOR_EACH(&core->nextModules, index) {
+        struct tucube_Core_FunctionPointers* functionPointers = &GENC_ARRAY_LIST_GET(&core->functionPointersList, index);
+        struct tucube_Module* nextModule = GENC_ARRAY_LIST_GET(&core->nextModules, index);
+        if(functionPointers->tucube_IBase_tlInit(nextModule, config, (void*[]){NULL}) == -1)
             errx(EXIT_FAILURE, "%s: %u: tucube_Module_tlInit() failed", __FILE__, __LINE__);
     }
 
@@ -75,8 +79,10 @@ static void* tucube_Core_startWorker(void* args) {
     if(pthread_sigmask(SIG_BLOCK, &signalSet, NULL) != 0)
         errx(EXIT_FAILURE, "%s: %u: pthread_sigmask() failed", __FILE__, __LINE__);
 
-    GENC_ARRAY_LIST_FOR_EACH(core->nextModules, index) {
-        if(GENC_ARRAY_LIST_GET(core->functionPointers, index).tucube_ITlService_call(GENC_ARRAY_LIST_GET(core->nextModules, index), (void*[]){&core->serverSocket, NULL}) == -1)
+    GENC_ARRAY_LIST_FOR_EACH(&core->nextModules, index) {
+        struct tucube_Core_FunctionPointers* functionPointers = &GENC_ARRAY_LIST_GET(&core->functionPointersList, index);
+        struct tucube_Module* nextModule = GENC_ARRAY_LIST_GET(&core->nextModules, index);
+        if(functionPointers->tucube_ITlService_call(nextModule, (void*[]){&core->serverSocket, NULL}) == -1)
             errx(EXIT_FAILURE, "%s: %u: tucube_ITlService_call() failed", __FILE__, __LINE__);
     }
 
@@ -102,22 +108,23 @@ static int tucube_Core_loadDlHandles(struct tucube_Config* config, struct tucube
 
 static int tucube_Core_loadFunctionPointersList(struct tucube_Core_DlHandles* dlHandles, struct tucube_Core_FunctionPointersList* functionPointersList) {
     GENC_ARRAY_LIST_FOR_EACH(dlHandles, index) {
-        struct tucube_Core_FunctionPoineters* functionPointers = &GENC_ARRAY_LIST_GET(functionPointersList, index);
-        struct tucube_Core_DlHandle* dlHandle = &GENC_ARRAY_LIST_GET(dlHandles, index);
-        if((functionPointers->tucube_IBase_init = dlsym(dlHandle, "tucube_IBase_init")) == NULL)
+        struct tucube_Core_FunctionPointers functionPointers;
+        void* dlHandle = &GENC_ARRAY_LIST_GET(dlHandles, index);
+        if((functionPointers.tucube_IBase_init = dlsym(dlHandle, "tucube_IBase_init")) == NULL)
             errx(EXIT_FAILURE, "%s: %u: Unable to find tucube_IBase_init()", __FILE__, __LINE__);
 
-        if((functionPointers->tucube_IBase_tlInit = dlsym(dlHandle, "tucube_IBase_tlInit")) == NULL)
+        if((functionPointers.tucube_IBase_tlInit = dlsym(dlHandle, "tucube_IBase_tlInit")) == NULL)
             errx(EXIT_FAILURE, "%s: %u: Unable to find tucube_IBase_tlInit()", __FILE__, __LINE__);
 
-        if((functionPointers->tucube_ITlService_call = dlsym(dlHandle, "tucube_ITlService_call")) == NULL)
+        if((functionPointers.tucube_ITlService_call = dlsym(dlHandle, "tucube_ITlService_call")) == NULL)
             errx(EXIT_FAILURE, "%s: %u: Unable to find tucube_ITlService_call()", __FILE__, __LINE__);
 
-        if((functionPointers->tucube_IBase_tlDestroy = dlsym(dlHandle, "tucube_IBase_tlDestroy")) == NULL)
+        if((functionPointers.tucube_IBase_tlDestroy = dlsym(dlHandle, "tucube_IBase_tlDestroy")) == NULL)
             errx(EXIT_FAILURE, "%s: %u: Unable to find tucube_IBase_tlDestroy()", __FILE__, __LINE__);
 
-        if((functionPointers->tucube_IBase_destroy = dlsym(dlHandle, "tucube_IBase_destroy")) == NULL)
+        if((functionPointers.tucube_IBase_destroy = dlsym(dlHandle, "tucube_IBase_destroy")) == NULL)
             errx(EXIT_FAILURE, "%s: %u: Unable to find tucube_IBase_destroy()", __FILE__, __LINE__);
+
         GENC_ARRAY_LIST_PUSH(functionPointersList, functionPointers);
     }
     return 0;
@@ -179,10 +186,10 @@ static int tucube_Core_init(struct tucube_Core* core, struct tucube_Config* conf
 
     int nextModuleCount;
     TUCUBE_CONFIG_GET_NEXT_MODULE_COUNT(config, "core", &nextModuleCount);
-    GENC_ARRAY_LIST_INIT(&(core->nextModules), nextModuleCount);
+    GENC_ARRAY_LIST_INIT(&core->nextModules, nextModuleCount);
     for(int index = 0; index < nextModuleCount; ++index) {
-        tucube_Core_FunctionPointers* functionPointers = &GENC_ARRAY_LIST_GET(core->functionPointersList, index);
-        tucube_Core_Module* nextModule = &GENC_ARRAY_LIST_GET(core->nextModules, index);
+        struct tucube_Core_FunctionPointers* functionPointers = &GENC_ARRAY_LIST_GET(&core->functionPointersList, index);
+        struct tucube_Module* nextModule = GENC_ARRAY_LIST_GET(&core->nextModules, index);
         if(functionPointers->tucube_IBase_init(config, nextModule, (void*[]){NULL}) == -1)
             errx(EXIT_FAILURE, "%s: %u: tucube_IBase_init() failed", __FILE__, __LINE__);
     }
@@ -259,9 +266,12 @@ int tucube_Core_start(struct tucube_Core* core, struct tucube_Config* config) {
 
     pthread_attr_destroy(&coreThreadAttr);
     free(workerThreads);
-
-    if(core->tucube_IBase_destroy(core->nextModules) == -1)
-        warn("%s: %u", __FILE__, __LINE__);
+    GENC_ARRAY_LIST_FOR_EACH(&core->nextModules, index) {
+        struct tucube_Core_FunctionPointers* functionPointers = &GENC_ARRAY_LIST_GET(&core->functionPointersList, index);
+        struct tucube_Module* nextModule = GENC_ARRAY_LIST_GET(&core->nextModules, index);
+        if(functionPointers->tucube_IBase_destroy(nextModule) == -1)
+           warn("%s: %u", __FILE__, __LINE__);
+    }
 
 //    dlclose(core->dlHandle);
     return 0;

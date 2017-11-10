@@ -14,7 +14,7 @@ struct tucube_Core_FunctionPointers {
 };
 
 struct tucube_Core_FunctionPointersList {
-    GENC_ARRAY_LIST(struct tucube_Core_FunctionPointersElement);
+    GENC_ARRAY_LIST(struct tucube_Core_FunctionPointers);
 };
 
 struct tucube_Core_NextModules {
