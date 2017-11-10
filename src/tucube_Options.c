@@ -1,7 +1,6 @@
 #include <err.h>
 #include <getopt.h>
 #include <stdbool.h>
-#include <stdlib.h>
 #include <string.h>
 #include "tucube_Options.h"
 #include "tucube_Core.h"
@@ -41,21 +40,16 @@ int tucube_Options_process(int argc, char* argv[], struct tucube_Config* config)
             break;
         case 'h':
         default:
-            tucube_Help_print();
-            exit(EXIT_SUCCESS);
+            tucube_Help_printAndExit();
             break;
         }
     }
 
-    if(!isThereAnyOptions) {
-        tucube_Help_print();
-        exit(EXIT_SUCCESS);
-    }
+    if(!isThereAnyOptions)
+        tucube_Help_printAndExit();
 
-    if(config->json == NULL) {
-        tucube_Help_print();
-        exit(EXIT_SUCCESS);
-    }
+    if(config->json == NULL)
+        tucube_Help_printAndExit();
 
     if(tucube_Options_checkConfig(config) == false)
         errx(EXIT_FAILURE, "%s: %u: Invalid config file", __FILE__, __LINE__);
