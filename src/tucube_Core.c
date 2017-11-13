@@ -177,6 +177,12 @@ static int tucube_Core_init(struct tucube_Core* core, struct tucube_Config* conf
     } else
         errx(EXIT_FAILURE, "%s: %u: Unknown protocol %s", __FILE__, __LINE__, core->protocol);
 
+    int nextModuleCount;
+    TUCUBE_CONFIG_GET_NEXT_MODULE_COUNT(config, "core", &nextModuleCount);
+
+    GENC_ARRAY_LIST_INIT(&core->dlHandles, nextModuleCount);
+    GENC_ARRAY_LIST_INIT(&core->functionPointersList, nextModuleCount);
+
     //initModules
     if(tucube_Core_loadDlHandles(config, &(core->dlHandles)) == -1)
         errx(EXIT_FAILURE, "%s: %u: tucube_Core_loadDlHandles() failed", __FILE__, __LINE__);
@@ -184,8 +190,6 @@ static int tucube_Core_init(struct tucube_Core* core, struct tucube_Config* conf
     if(tucube_Core_loadFunctionPointersList(&core->dlHandles, &core->functionPointersList) == -1)
         errx(EXIT_FAILURE, "%s: %u: tucube_Core_loadFunctionPointersList() failed", __FILE__, __LINE__);
 
-    int nextModuleCount;
-    TUCUBE_CONFIG_GET_NEXT_MODULE_COUNT(config, "core", &nextModuleCount);
     GENC_ARRAY_LIST_INIT(&core->nextModules, nextModuleCount);
     for(int index = 0; index < nextModuleCount; ++index) {
         struct tucube_Core_FunctionPointers* functionPointers = &GENC_ARRAY_LIST_GET(&core->functionPointersList, index);
@@ -247,10 +251,8 @@ int tucube_Core_start(struct tucube_Core* core, struct tucube_Config* config) {
         for(size_t index = 0; index != core->workerCount; ++index) {
             pthread_cancel(workerThreads[index]);
             pthread_mutex_lock(core->exitMutex);
-            while(core->exit != true) {
-                pthread_cond_wait(core->exitCond,
-                     core->exitMutex);
-            }
+            while(core->exit != true)
+                pthread_cond_wait(core->exitCond, core->exitMutex);
             pthread_mutex_unlock(core->exitMutex);
             pthread_join(workerThreads[index], NULL);
             core->exit = false;
@@ -261,9 +263,7 @@ int tucube_Core_start(struct tucube_Core* core, struct tucube_Config* config) {
     free(core->exitCond);
     pthread_mutex_destroy(core->exitMutex);
     free(core->exitMutex);
-
     close(core->serverSocket);
-
     pthread_attr_destroy(&coreThreadAttr);
     free(workerThreads);
     GENC_ARRAY_LIST_FOR_EACH(&core->nextModules, index) {
@@ -272,7 +272,6 @@ int tucube_Core_start(struct tucube_Core* core, struct tucube_Config* config) {
         if(functionPointers->tucube_IBase_destroy(nextModule) == -1)
            warn("%s: %u", __FILE__, __LINE__);
     }
-
 //    dlclose(core->dlHandle);
     return 0;
 }
