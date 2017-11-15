@@ -19,6 +19,7 @@ struct tucube_Generics {
 };
 
 struct tucube_Module {
+    const char* name;
     struct tucube_DlHandles dlHandles;
     struct tucube_Generics generics;
     pthread_rwlock_t* rwLock;
