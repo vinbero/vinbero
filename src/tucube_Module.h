@@ -10,18 +10,10 @@ struct tucube_Config {
     json_t* json;
 };
 
-struct tucube_DlHandles {
-    GENC_ARRAY_LIST(void*);
-};
-
-struct tucube_Generics {
-    GENC_ARRAY_LIST(union tucube_Generic);
-};
-
 struct tucube_Module {
     const char* name;
-    struct tucube_DlHandles dlHandles;
-    struct tucube_Generics generics;
+    void* dlHandle;
+    union tucube_Generic generic;
     pthread_rwlock_t* rwLock;
     pthread_key_t* tlModuleKey;
     GENC_TREE_NODE(struct tucube_Module);
@@ -36,10 +28,10 @@ do {                                                                            
         errx(EXIT_FAILURE, "%s: %u: Failed to load next module", __FILE__, __LINE__);                         \
 } while(0)
 
-#define TUCUBE_MODULE_DLSYM(module, modulePointerType, moduleFunction)          \
+#define TUCUBE_MODULE_DLSYM(module, moduleType, moduleFunction)                 \
 do {                                                                            \
     if((GENC_CAST((module)->generic.pointer,                                    \
-         modulePointerType*)->moduleFunction =                                  \
+         moduleType*)->moduleFunction =                                         \
               dlsym((module)->dlHandle, #moduleFunction)) == NULL) {            \
         errx(EXIT_FAILURE,                                                      \
              "%s: %u: Unable to find "#moduleFunction"()", __FILE__, __LINE__); \
