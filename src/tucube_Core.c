@@ -90,21 +90,28 @@ static void* tucube_Core_startWorker(void* args) {
     return NULL;
 }
 
-static int tucube_Core_loadDlHandles(struct tucube_Config* config, struct tucube_Core_DlHandles* dlHandles) {
-    TUCUBE_CONFIG_FOR_EACH_NEXT_MODULE_BEGIN(config, module->name)
-        const char* nextModulePath = NULL;
-        TUCUBE_CONFIG_GET_MODULE_PATH(config, nextModuleName, &nextModulePath);
-        if(nextModulePath == NULL)
-            errx(EXIT_FAILURE, "%s: %u: Unable to find path of next module", __FILE__, __LINE__);
-
-        void* dlHandle;
-        if((dlHandle = dlopen(nextModulePath, RTLD_LAZY | RTLD_GLOBAL)) == NULL)
-            errx(EXIT_FAILURE, "%s: %u: dlopen() failed, possible causes are:\n1. Unable to find next module\n2. The next module didn't linked required shared libraries properly", __FILE__, __LINE__);
-        GENC_ARRAY_LIST_PUSH(dlHandles, dlHandle);
-    TUCUBE_CONFIG_FOR_EACH_NEXT_MODULE_END
+static int tucube_Core_initChildModules(struct tucube_Module* module, struct tucube_Config* config) {
+// TODO: REMOVE JANSSON DEPENDENCY HERE
+    json_t* childModuleNames = json_object_get(json_object_get((config)->json, module->name), "next");
+    if(json_is_array(childModuleNames)) {
+        size_t index;
+        json_t* childModuleNameJson;
+        json_array_foreach(childModuleNames, index, childModuleNameJson) {
+            struct tucube_Module* childModule = GENC_TREE_NODE_GET_CHILD(module, index);
+            GENC_TREE_NODE_INIT(childModule);
+            childModule->name = json_string_value(childModuleNameJson);
+            const char* childModulePath = NULL;
+            TUCUBE_CONFIG_GET_MODULE_PATH(config, childModule->name, &childModulePath);
+            if((childModule->dlHandle = dlopen(childModulePath, RTLD_LAZY | RTLD_GLOBAL)) == NULL)
+                errx(EXIT_FAILURE, "%s: %u: dlopen() failed, possible causes are:\n1. Unable to find next module\n2. The next module didn't linked required shared libraries properly", __FILE__, __LINE__);
+            childModule->tucube_Module_init = dlsym();
+            childModule->tucube_Module_init(childModule, config);
+            tucube_Core_initChildModules(childModule, config);
+        }                                                                                                       \
+    }                                                                                                           \
     return 0;
 }
-
+/*
 static int tucube_Core_loadFunctionPointersList(struct tucube_Core_DlHandles* dlHandles, struct tucube_Core_FunctionPointersList* functionPointersList) {
     GENC_ARRAY_LIST_FOR_EACH(dlHandles, index) {
         struct tucube_Core_FunctionPointers functionPointers;
@@ -127,7 +134,7 @@ static int tucube_Core_loadFunctionPointersList(struct tucube_Core_DlHandles* dl
         GENC_ARRAY_LIST_PUSH(functionPointersList, functionPointers);
     }
     return 0;
-}
+}*/
 
 static int tucube_Core_init(struct tucube_Module* module, struct tucube_Config* config) {
     struct tucube_Core* coreModule = module->generic.pointer;
@@ -180,17 +187,9 @@ static int tucube_Core_init(struct tucube_Module* module, struct tucube_Config* 
     int nextModuleCount;
     TUCUBE_CONFIG_GET_NEXT_MODULE_COUNT(config, module->name, &nextModuleCount);
     GENC_TREE_NODE_INIT_CHILDREN(module, nextModuleCount);
-    GENC_TREE_NODE_FOR_EACH_CHILD(module, index) {
-        struct tucube_Module* childModule = GENC_TREE_NODE_GET_CHILD(module, index);
-        GENC_TREE_NODE_INIT(childModule);
-        const char* nextModulePath = NULL;
-        TUCUBE_CONFIG_GET_MODULE_PATH(config, childModuleName, &childModulePath);
-        childModule->dlHandle = dlopen()
-    }
 
     //initModules
-    if(tucube_Core_loadDlHandles(config, &(coreModule->dlHandles)) == -1)
-        errx(EXIT_FAILURE, "%s: %u: tucube_Core_loadDlHandles() failed", __FILE__, __LINE__);
+    tucube_Core_initChildModules(module, config);
 
     if(tucube_Core_loadFunctionPointersList(&coreModule->dlHandles, &coreModule->functionPointersList) == -1)
         errx(EXIT_FAILURE, "%s: %u: tucube_Core_loadFunctionPointersList() failed", __FILE__, __LINE__);

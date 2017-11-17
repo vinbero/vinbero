@@ -62,7 +62,7 @@ do {                                                                            
     *(modulePath) = json_string_value(json_object_get(json_object_get((config)->json, moduleName), "path")); \
 } while(0)
 
-#define TUCUBE_CONFIG_GET_NEXT_MODULE_COUNT(config, currentModuleName, output)                   \
+#define TUCUBE_CONFIG_GET_CHILD_MODULE_COUNT(config, currentModuleName, output)                  \
 do {                                                                                             \
     json_t* array = json_object_get(json_object_get((config)->json, currentModuleName), "next"); \
     if(json_is_array(array))                                                                     \
@@ -71,18 +71,24 @@ do {                                                                            
         *output = -1;                                                                            \
 } while(0);
 
-#define TUCUBE_CONFIG_FOR_EACH_NEXT_MODULE_BEGIN(config, currentModuleName)                                \
-do {                                                                                                       \
-    json_t* nextModuleNames = json_object_get(json_object_get((config)->json, currentModuleName), "next"); \
-    if(json_is_array(nextModuleNames)) {                                                                   \
-        size_t index;                                                                                      \
-        json_t* nextModuleNameJson;                                                                        \
-        json_array_foreach(nextModuleNames, index, nextModuleNameJson) {                                   \
-            const char* nextModuleName = json_string_value(nextModuleNameJson);
-
-#define TUCUBE_CONFIG_FOR_EACH_NEXT_MODULE_END \
-        }                                      \
-    }                                          \
-} while(0);
+/*
+#define TUCUBE_CONFIG_INIT_CHILD_MODULES(config, currentModule)                                                 \
+do {                                                                                                            \
+    json_t* childModuleNames = json_object_get(json_object_get((config)->json, (currentModule)->name), "next"); \
+    if(json_is_array(childModuleNames)) {                                                                       \
+        size_t index;                                                                                           \
+        json_t* childModuleNameJson;                                                                            \
+        json_array_foreach(childModuleNames, index, childModuleNameJson) {                                      \
+            struct tucube_Module* childModule = GENC_TREE_NODE_GET_CHILD(currentModule, index)                  \
+            GENC_TREE_NODE_INIT(childModule);                                                                   \
+            childModule->name = json_string_value(childModuleNameJson);                                         \
+            const char* childModulePath = NULL;                                                                 \
+        TUCUBE_CONFIG_GET_MODULE_PATH(config, childModule->name, &childModulePath);                             \
+        if((childModule->dlHandle = dlopen(childModulePath, RTLD_LAZY | RTLD_GLOBAL)) == NULL)                  \
+            errx(EXIT_FAILURE, "%s: %u: dlopen() failed, possible causes are:\n1. Unable to find next module\n2. The next module didn't linked required shared libraries properly", __FILE__, __LINE__);                                                                     \
+        }                                                                                                       \
+    }                                                                                                           \
+} while(0)
+*/
 
 #endif
