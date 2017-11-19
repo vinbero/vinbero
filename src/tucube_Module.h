@@ -16,6 +16,10 @@ struct tucube_Module {
     union tucube_Generic generic;
     pthread_rwlock_t* rwLock;
     pthread_key_t* tlModuleKey;
+    int (*tucube_IBase_init)(struct tucube_Config*, struct tucube_Module*, void*[]);
+    int (*tucube_IBase_destroy)(struct tucube_Module*);
+    int (*tucube_IBase_tlInit)(struct tucube_Module*, struct tucube_Config*, void*[]);
+    int (*tucube_IBase_tlDestroy)(struct tucube_Module*);
     GENC_TREE_NODE(struct tucube_Module);
 };
 
@@ -69,7 +73,20 @@ do {                                                                            
         *output = json_array_size(array);                                                        \
     else                                                                                         \
         *output = -1;                                                                            \
-} while(0);
+} while(0)
+
+#define TUCUBE_CONFIG_GET_CHILD_MODULE_NAMES(config, currentModuleName, output)                            \
+do {                                                                                                       \
+    size_t childModuleCount;                                                                               \
+    TUCUBE_CONFIG_GET_CHILD_MODULE_COUNT(config, currentModuleName, &childModuleCount);                    \
+    json_t* childModuleNamesJson = json_object_get(json_object_get((config)->json, module->name), "next"); \
+    if(json_is_array(childModuleNamesJson)) {                                                              \
+        GENC_ARRAY_LIST_REALLOC(output, childModuleCount);                                                    \
+        json_t* childModuleNameJson;                                                                       \
+        json_array_foreach(childModuleNamesJson, index, childModuleNameJson)                               \
+            GENC_ARRAY_LIST_PUSH(output, json_string_value(childModuleNameJson));                          \
+    }                                                                                                      \
+} while(0)
 
 /*
 #define TUCUBE_CONFIG_INIT_CHILD_MODULES(config, currentModule)                                                 \
