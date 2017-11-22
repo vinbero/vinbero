@@ -22,6 +22,10 @@ struct tucube_Module {
     GENC_TREE_NODE(struct tucube_Module);
 };
 
+struct tucube_Module_Names {
+    GENC_ARRAY_LIST(const char*);
+};
+
 #define TUCUBE_MODULE_DLOPEN(config, moduleName, module)                                                      \
 do {                                                                                                          \
     const char* modulePath;                                                                                   \
