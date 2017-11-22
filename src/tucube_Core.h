@@ -5,8 +5,6 @@
 #include <unistd.h>
 #include <jansson.h>
 #include "tucube_Module.h"
-#include "tucube_IBase.h"
-#include "tucube_ITlService.h"
 
 struct tucube_Core {
     const char* protocol;
@@ -24,9 +22,6 @@ struct tucube_Core {
 
     int serverSocket;
     pthread_mutex_t* serverSocketMutex;
-
-    TUCUBE_IBASE_FUNCTION_POINTERS;
-    TUCUBE_ITLSERVICE_FUNCTION_POINTERS;
 };
 
 int tucube_Core_start(struct tucube_Core* core, struct tucube_Config* config);

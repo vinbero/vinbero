@@ -3,7 +3,6 @@
 
 #include <jansson.h>
 #include <pthread.h>
-#include <libgenc/genc_Tree.h>
 #include <libgenc/genc_Generic.h>
 
 struct tucube_Config {
@@ -81,31 +80,11 @@ do {                                                                            
     TUCUBE_CONFIG_GET_CHILD_MODULE_COUNT(config, currentModuleName, &childModuleCount);                    \
     json_t* childModuleNamesJson = json_object_get(json_object_get((config)->json, module->name), "next"); \
     if(json_is_array(childModuleNamesJson)) {                                                              \
-        GENC_ARRAY_LIST_REALLOC(output, childModuleCount);                                                    \
+        GENC_ARRAY_LIST_REALLOC(output, childModuleCount);                                                 \
         json_t* childModuleNameJson;                                                                       \
         json_array_foreach(childModuleNamesJson, index, childModuleNameJson)                               \
             GENC_ARRAY_LIST_PUSH(output, json_string_value(childModuleNameJson));                          \
     }                                                                                                      \
 } while(0)
-
-/*
-#define TUCUBE_CONFIG_INIT_CHILD_MODULES(config, currentModule)                                                 \
-do {                                                                                                            \
-    json_t* childModuleNames = json_object_get(json_object_get((config)->json, (currentModule)->name), "next"); \
-    if(json_is_array(childModuleNames)) {                                                                       \
-        size_t index;                                                                                           \
-        json_t* childModuleNameJson;                                                                            \
-        json_array_foreach(childModuleNames, index, childModuleNameJson) {                                      \
-            struct tucube_Module* childModule = GENC_TREE_NODE_GET_CHILD(currentModule, index)                  \
-            GENC_TREE_NODE_INIT(childModule);                                                                   \
-            childModule->name = json_string_value(childModuleNameJson);                                         \
-            const char* childModulePath = NULL;                                                                 \
-        TUCUBE_CONFIG_GET_MODULE_PATH(config, childModule->name, &childModulePath);                             \
-        if((childModule->dlHandle = dlopen(childModulePath, RTLD_LAZY | RTLD_GLOBAL)) == NULL)                  \
-            errx(EXIT_FAILURE, "%s: %u: dlopen() failed, possible causes are:\n1. Unable to find next module\n2. The next module didn't linked required shared libraries properly", __FILE__, __LINE__);                                                                     \
-        }                                                                                                       \
-    }                                                                                                           \
-} while(0)
-*/
 
 #endif

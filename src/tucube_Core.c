@@ -94,6 +94,65 @@ struct tucube_Core_ChildModuleNames {
     GENC_ARRAY_LIST(const char*);
 };
 
+static int tucube_ITlService_call(struct tucube_Module* module, void* args[]) {
+    return 0;
+}
+
+static int tucube_IBase_init(struct tucube_Module* module, struct tucube_Config* config) {
+    struct tucube_Core* coreModule = module->generic.pointer;
+    if((coreModule->tucube_ITlService_call = 
+    return 0;
+}
+
+static int tucube_IBase_destroy(struct tucube_Module* module) {
+    return 0;
+}
+
+static int tucube_Core_initRootModule(struct tucube_Module* module, struct tucube_Config* config) {
+    struct tucube_Core* coreModule = module->generic.pointer;
+    TUCUBE_CONFIG_GET(config, module->name, "tucube.protocol", string, &coreModule->protocol, "TCP");
+    TUCUBE_CONFIG_GET(config, module->name, "tucube.address", string, &coreModule->address, "0.0.0.0");
+    TUCUBE_CONFIG_GET(config, module->name, "tucube.port", integer, &coreModule->port, 8080);
+    TUCUBE_CONFIG_GET(config, module->name, "tucube.reusePort", integer, &coreModule->reusePort, 0);
+    TUCUBE_CONFIG_GET(config, module->name, "tucube.backlog", integer, &coreModule->backlog, 1024);
+    TUCUBE_CONFIG_GET(config, module->name, "tucube.workerCount", integer, &coreModule->workerCount, 4);
+    TUCUBE_CONFIG_GET(config, module->name, "tucube.setUid", integer, &coreModule->setUid, geteuid());
+    TUCUBE_CONFIG_GET(config, module->name, "tucube.setGid", integer, &coreModule->setGid, getegid());
+    coreModule->exit = false;
+    coreModule->exitMutex = malloc(1 * sizeof(pthread_mutex_t));
+    pthread_mutex_init(coreModule->exitMutex, NULL);
+    coreModule->exitCond = malloc(1 * sizeof(pthread_cond_t));
+    pthread_cond_init(coreModule->exitCond, NULL);
+
+    struct sockaddr_in serverAddressSockAddrIn;
+    memset(serverAddressSockAddrIn.sin_zero, 0, 1 * sizeof(serverAddressSockAddrIn.sin_zero));
+    serverAddressSockAddrIn.sin_family = AF_INET; 
+
+    inet_aton(coreModule->address, &serverAddressSockAddrIn.sin_addr);
+    serverAddressSockAddrIn.sin_port = htons(coreModule->port);
+
+    if(strcmp(coreModule->protocol, "TCP") == 0) {
+        if((coreModule->serverSocket = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) == -1)
+            err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
+        if(setsockopt(coreModule->serverSocket, SOL_SOCKET, SO_REUSEADDR, &(const int){1}, sizeof(int)) == -1)
+            err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
+        if(setsockopt(coreModule->serverSocket, SOL_SOCKET, SO_REUSEPORT, &coreModule->reusePort, sizeof(int)) == -1)
+            warn("%s: %u", __FILE__, __LINE__);
+        if(bind(coreModule->serverSocket, (struct sockaddr*)&serverAddressSockAddrIn, sizeof(struct sockaddr)) == -1)
+            err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
+        if(listen(coreModule->serverSocket, coreModule->backlog) == -1)
+            err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
+    } else if(strcmp(coreModule->protocol, "UDP") == 0) {
+        if((coreModule->serverSocket = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP)) == -1)
+            err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
+        if(bind(coreModule->serverSocket, (struct sockaddr*)&serverAddressSockAddrIn, sizeof(struct sockaddr)) == -1)
+            err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
+    } else
+        errx(EXIT_FAILURE, "%s: %u: Unknown protocol %s", __FILE__, __LINE__, coreModule->protocol);
+
+    return 0;
+}
+
 static int tucube_Core_initChildModules(struct tucube_Module* module, struct tucube_Config* config) {
     struct tucube_Core_ChildModuleNames childModuleNames;
     GENC_ARRAY_LIST_INIT(childModuleNames);
@@ -133,73 +192,13 @@ static int tucube_Core_destroyChildModules(struct tucube_Module* module) {
     return 0;
 }
 
-static int tucube_IBase_init(struct tucube_Module* module, struct tucube_Config* config) {
-    struct tucube_Core* coreModule = module->generic.pointer;
-    if((coreModule->tucube_ITlService_call = dlsym(dlHandle, "tucube_ITlService_call")) == NULL)
-        errx(EXIT_FAILURE, "%s: %u: Unable to find tucube_ITlService_call()", __FILE__, __LINE__);
-    return 0;
-}
-
-static int tucube_IBase_destroy(struct tucube_Module* module) {
-    return 0;
-}
-
 static int tucube_Core_init(struct tucube_Module* module, struct tucube_Config* config) {
-    struct tucube_Core* coreModule = module->generic.pointer;
-    TUCUBE_CONFIG_GET(config, module->name, "tucube.protocol", string, &coreModule->protocol, "TCP");
-    TUCUBE_CONFIG_GET(config, module->name, "tucube.address", string, &coreModule->address, "0.0.0.0");
-    TUCUBE_CONFIG_GET(config, module->name, "tucube.port", integer, &coreModule->port, 8080);
-    TUCUBE_CONFIG_GET(config, module->name, "tucube.reusePort", integer, &coreModule->reusePort, 0);
-    TUCUBE_CONFIG_GET(config, module->name, "tucube.backlog", integer, &coreModule->backlog, 1024);
-    TUCUBE_CONFIG_GET(config, module->name, "tucube.workerCount", integer, &coreModule->workerCount, 4);
-    TUCUBE_CONFIG_GET(config, module->name, "tucube.setUid", integer, &coreModule->setUid, geteuid());
-    TUCUBE_CONFIG_GET(config, module->name, "tucube.setGid", integer, &coreModule->setGid, getegid());
-/*
-    GENC_LIST_FOR_EACH(moduleConfigList, struct tucube_Module_Config, moduleConfig)
-        json_object_set_new(json_array_get(moduleConfig->json, 1), "tucube.workerCount", json_integer(coreModule->workerCount));
-    TODO: REPLACE THIS
-*/
-
-    coreModule->exit = false;
-    coreModule->exitMutex = malloc(1 * sizeof(pthread_mutex_t));
-    pthread_mutex_init(coreModule->exitMutex, NULL);
-    coreModule->exitCond = malloc(1 * sizeof(pthread_cond_t));
-    pthread_cond_init(coreModule->exitCond, NULL);
-
-    struct sockaddr_in serverAddressSockAddrIn;
-    memset(serverAddressSockAddrIn.sin_zero, 0, 1 * sizeof(serverAddressSockAddrIn.sin_zero));
-    serverAddressSockAddrIn.sin_family = AF_INET; 
-
-    inet_aton(coreModule->address, &serverAddressSockAddrIn.sin_addr);
-    serverAddressSockAddrIn.sin_port = htons(coreModule->port);
-
-    if(strcmp(coreModule->protocol, "TCP") == 0) {
-        if((coreModule->serverSocket = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) == -1)
-            err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
-        if(setsockopt(coreModule->serverSocket, SOL_SOCKET, SO_REUSEADDR, &(const int){1}, sizeof(int)) == -1)
-            err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
-        if(setsockopt(coreModule->serverSocket, SOL_SOCKET, SO_REUSEPORT, &coreModule->reusePort, sizeof(int)) == -1)
-            warn("%s: %u", __FILE__, __LINE__);
-        if(bind(coreModule->serverSocket, (struct sockaddr*)&serverAddressSockAddrIn, sizeof(struct sockaddr)) == -1)
-            err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
-        if(listen(coreModule->serverSocket, coreModule->backlog) == -1)
-            err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
-    } else if(strcmp(coreModule->protocol, "UDP") == 0) {
-        if((coreModule->serverSocket = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP)) == -1)
-            err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
-        if(bind(coreModule->serverSocket, (struct sockaddr*)&serverAddressSockAddrIn, sizeof(struct sockaddr)) == -1)
-            err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
-    } else
-        errx(EXIT_FAILURE, "%s: %u: Unknown protocol %s", __FILE__, __LINE__, coreModule->protocol);
-
+    tucube_Core_initRootModule(module, config);
     tucube_Core_initChildModules(module, config);
-
     if(setgid(coreModule->setGid) == -1)
         err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
-
     if(setuid(coreModule->setUid) == -1)
         err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
-
     return 0;
 }
 
