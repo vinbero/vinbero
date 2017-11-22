@@ -66,7 +66,6 @@ static void* tucube_Core_startWorker(void* args) {
     pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
 
     GENC_ARRAY_LIST_FOR_EACH(&coreModule->childModules, index) {
-        struct tucube_Core_FunctionPointers* functionPointers = &GENC_ARRAY_LIST_GET(&coreModule->functionPointersList, index);
         struct tucube_Module* childModule = GENC_ARRAY_LIST_GET(&coreModule->childModules, index);
         if(functionPointers->tucube_IBase_tlInit(childModule, config, (void*[]){NULL}) == -1)
             errx(EXIT_FAILURE, "%s: %u: tucube_Module_tlInit() failed", __FILE__, __LINE__);
@@ -79,7 +78,6 @@ static void* tucube_Core_startWorker(void* args) {
         errx(EXIT_FAILURE, "%s: %u: pthread_sigmask() failed", __FILE__, __LINE__);
 
     GENC_ARRAY_LIST_FOR_EACH(&coreModule->childModules, index) {
-        struct tucube_Core_FunctionPointers* functionPointers = &GENC_ARRAY_LIST_GET(&coreModule->functionPointersList, index);
         struct tucube_Module* childModule = GENC_ARRAY_LIST_GET(&coreModule->childModules, index);
         if(functionPointers->tucube_ITlService_call(childModule, (void*[]){&coreModule->serverSocket, NULL}) == -1)
             errx(EXIT_FAILURE, "%s: %u: tucube_ITlService_call() failed", __FILE__, __LINE__);
@@ -94,21 +92,7 @@ struct tucube_Core_ChildModuleNames {
     GENC_ARRAY_LIST(const char*);
 };
 
-static int tucube_ITlService_call(struct tucube_Module* module, void* args[]) {
-    return 0;
-}
-
-static int tucube_IBase_init(struct tucube_Module* module, struct tucube_Config* config) {
-    struct tucube_Core* coreModule = module->generic.pointer;
-    if((coreModule->tucube_ITlService_call = 
-    return 0;
-}
-
-static int tucube_IBase_destroy(struct tucube_Module* module) {
-    return 0;
-}
-
-static int tucube_Core_initRootModule(struct tucube_Module* module, struct tucube_Config* config) {
+static int tucube_Core_initCoreModule(struct tucube_Module* module, struct tucube_Config* config) {
     struct tucube_Core* coreModule = module->generic.pointer;
     TUCUBE_CONFIG_GET(config, module->name, "tucube.protocol", string, &coreModule->protocol, "TCP");
     TUCUBE_CONFIG_GET(config, module->name, "tucube.address", string, &coreModule->address, "0.0.0.0");
@@ -154,7 +138,7 @@ static int tucube_Core_initRootModule(struct tucube_Module* module, struct tucub
 }
 
 static int tucube_Core_initChildModules(struct tucube_Module* module, struct tucube_Config* config) {
-    struct tucube_Core_ChildModuleNames childModuleNames;
+    struct tucube_Module_Names childModuleNames;
     GENC_ARRAY_LIST_INIT(childModuleNames);
     TUCUBE_CONFIG_GET_CHILD_MODULE_NAMES(config, module->name, &childModuleNames);
     size_t childModuleCount = GENC_ARRAY_LIST_SIZE(childModuleNames);
@@ -193,7 +177,7 @@ static int tucube_Core_destroyChildModules(struct tucube_Module* module) {
 }
 
 static int tucube_Core_init(struct tucube_Module* module, struct tucube_Config* config) {
-    tucube_Core_initRootModule(module, config);
+    tucube_Core_initCoreModule(module, config);
     tucube_Core_initChildModules(module, config);
     if(setgid(coreModule->setGid) == -1)
         err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
