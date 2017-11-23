@@ -46,11 +46,10 @@ static void tucube_Core_registerSignalHandlers() {
 }
 
 static void tucube_Core_pthreadCleanupHandler(void* args) {
-    struct tucube_Core* core = args;
-    GENC_ARRAY_LIST_FOR_EACH(&coreModule->childModules, index) {
-        struct tucube_Core_FunctionPointers* functionPointers = &GENC_ARRAY_LIST_GET(&coreModule->functionPointersList, index);
-        struct tucube_Module* childModule = GENC_ARRAY_LIST_GET(&coreModule->childModules, index);
-        if(functionPointers->tucube_IBase_tlDestroy(childModule) == -1)
+    struct tucube_Core* coreModule = args;
+    GENC_TREE_NODE_FOR_EACH_CHILD(coreModule, index) {
+        struct tucube_Module* childModule = GENC_TREE_NODE_GET_CHILD(core, index);
+        if(childModule->tucube_IBase_tlDestroy(childModule) == -1)
             warnx("%s: %u: tucube_Module_tlDestroy() failed", __FILE__, __LINE__);
     }
     pthread_mutex_lock(coreModule->exitMutex);
@@ -60,14 +59,14 @@ static void tucube_Core_pthreadCleanupHandler(void* args) {
 }
 
 static void* tucube_Core_startWorker(void* args) {
-    struct tucube_Core* core = ((void**)args)[0];
+    struct tucube_Core* coreModule = ((void**)args)[0];
     struct tucube_Config* config = ((void**)args)[1];
-    pthread_cleanup_push(tucube_Core_pthreadCleanupHandler, core);
+    pthread_cleanup_push(tucube_Core_pthreadCleanupHandler, coreModule);
     pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
 
-    GENC_ARRAY_LIST_FOR_EACH(&coreModule->childModules, index) {
-        struct tucube_Module* childModule = GENC_ARRAY_LIST_GET(&coreModule->childModules, index);
-        if(functionPointers->tucube_IBase_tlInit(childModule, config, (void*[]){NULL}) == -1)
+    GENC_GENC_TREE_NODE_FOR_EACH_CHILD(coreModule, index) {
+        struct tucube_Module* childModule = GENC_TREE_NODE_GET_CHILD(coreModule, index);
+        if(childModule->tucube_IBase_tlInit(childModule, config, (void*[]){NULL}) == -1)
             errx(EXIT_FAILURE, "%s: %u: tucube_Module_tlInit() failed", __FILE__, __LINE__);
     }
 
@@ -77,8 +76,8 @@ static void* tucube_Core_startWorker(void* args) {
     if(pthread_sigmask(SIG_BLOCK, &signalSet, NULL) != 0)
         errx(EXIT_FAILURE, "%s: %u: pthread_sigmask() failed", __FILE__, __LINE__);
 
-    GENC_ARRAY_LIST_FOR_EACH(&coreModule->childModules, index) {
-        struct tucube_Module* childModule = GENC_ARRAY_LIST_GET(&coreModule->childModules, index);
+    GENC_TREE_NODE_FOR_EACH_CHILD(coreModule, index) {
+        struct tucube_Module* childModule = GENC_TREE_NODE_GET_CHILD(coreModule, index);
         if(functionPointers->tucube_ITlService_call(childModule, (void*[]){&coreModule->serverSocket, NULL}) == -1)
             errx(EXIT_FAILURE, "%s: %u: tucube_ITlService_call() failed", __FILE__, __LINE__);
     }
@@ -203,9 +202,8 @@ int tucube_Core_start(struct tucube_Module* module, struct tucube_Config* config
 
         atexit(tucube_Core_exitHandler);
 
-        void* workerArgs[2] = {module, config};
         for(size_t index = 0; index != coreModule->workerCount; ++index) {
-           if(pthread_create(workerThreads + index, &coreThreadAttr, tucube_Core_startWorker, workerArgs) != 0)
+           if(pthread_create(workerThreads + index, &coreThreadAttr, tucube_Core_startWorker, (void*[]){module, config}) != 0)
                 err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
         }
 
