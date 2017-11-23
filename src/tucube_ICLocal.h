@@ -11,8 +11,8 @@ int tucube_ICLocal_destroy(struct tucube_Module* module, struct tucube_ClData* c
 int (*tucube_ICLocal_init)(struct tucube_Module*, struct tucube_ClData*, void*[]); \
 int (*tucube_ICLocal_destroy)(struct tucube_Module*, struct tucube_ClData*)
 
-#define TUCUBE_ICLOCAL_DLSYM(module, modulePointerType)                \
-TUCUBE_MODULE_DLSYM(module, modulePointerType, tucube_ICLocal_init);   \
-TUCUBE_MODULE_DLSYM(module, modulePointerType, tucube_ICLocal_destroy)
+#define TUCUBE_ICLOCAL_DLSYM(module, localModuleType)                \
+TUCUBE_MODULE_DLSYM(module, localModuleType, tucube_ICLocal_init);   \
+TUCUBE_MODULE_DLSYM(module, localModuleType, tucube_ICLocal_destroy)
 
 #endif

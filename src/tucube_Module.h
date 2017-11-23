@@ -37,10 +37,10 @@ do {                                                                            
         errx(EXIT_FAILURE, "%s: %u: Failed to load next module", __FILE__, __LINE__);                         \
 } while(0)
 
-#define TUCUBE_MODULE_DLSYM(module, moduleType, moduleFunction)                 \
+#define TUCUBE_MODULE_DLSYM(module, localModuleType, moduleFunction)            \
 do {                                                                            \
     if((GENC_CAST((module)->generic.pointer,                                    \
-         moduleType*)->moduleFunction =                                         \
+         localModuleType*)->moduleFunction =                                    \
               dlsym((module)->dlHandle, #moduleFunction)) == NULL) {            \
         errx(EXIT_FAILURE,                                                      \
              "%s: %u: Unable to find "#moduleFunction"()", __FILE__, __LINE__); \
