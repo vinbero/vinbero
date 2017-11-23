@@ -10,7 +10,7 @@ int tucube_IClService_call(struct tucube_Module* module, struct tucube_ClData* c
 #define TUCUBE_ICLSERVICE_FUNCTION_POINTERS \
 int (*tucube_IClService_call)(struct tucube_Module*, struct tucube_ClData*, void*[])
 
-#define TUCUBE_ICLSERVICE_DLSYM(module, modulePointerType) \
-TUCUBE_MODULE_DLSYM(module, modulePointerType, tucube_IClService_call)
+#define TUCUBE_ICLSERVICE_DLSYM(module, localModuleType) \
+TUCUBE_MODULE_DLSYM(module, localModuleType, tucube_IClService_call)
 
 #endif
