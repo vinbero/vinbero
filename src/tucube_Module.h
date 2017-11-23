@@ -17,7 +17,7 @@ struct tucube_Module {
     union genc_Generic generic;
     pthread_rwlock_t* rwLock;
     pthread_key_t* tlModuleKey;
-    int (*tucube_IBase_init)(struct tucube_Config*, struct tucube_Module*, void*[]);
+    int (*tucube_IBase_init)(struct tucube_Module*, struct tucube_Config*, void*[]);
     int (*tucube_IBase_destroy)(struct tucube_Module*);
     int (*tucube_IBase_tlInit)(struct tucube_Module*, struct tucube_Config*, void*[]);
     int (*tucube_IBase_tlDestroy)(struct tucube_Module*);
@@ -88,6 +88,7 @@ do {                                                                            
     if(json_is_array(childModuleNamesJson)) {                                                              \
         GENC_ARRAY_LIST_REALLOC(output, childModuleCount);                                                 \
         json_t* childModuleNameJson;                                                                       \
+        size_t index;                                                                                      \
         json_array_foreach(childModuleNamesJson, index, childModuleNameJson)                               \
             GENC_ARRAY_LIST_PUSH(output, json_string_value(childModuleNameJson));                          \
     }                                                                                                      \

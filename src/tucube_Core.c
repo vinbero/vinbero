@@ -46,9 +46,10 @@ static void tucube_Core_registerSignalHandlers() {
 }
 
 static void tucube_Core_pthreadCleanupHandler(void* args) {
-    struct tucube_Core* coreModule = args;
-    GENC_TREE_NODE_FOR_EACH_CHILD(coreModule, index) {
-        struct tucube_Module* childModule = GENC_TREE_NODE_GET_CHILD(core, index);
+    struct tucube_Module* module = args;
+    struct tucube_Core* coreModule = module->generic.pointer;
+    GENC_TREE_NODE_FOR_EACH_CHILD(module, index) {
+        struct tucube_Module* childModule = &GENC_TREE_NODE_GET_CHILD(module, index);
         if(childModule->tucube_IBase_tlDestroy(childModule) == -1)
             warnx("%s: %u: tucube_Module_tlDestroy() failed", __FILE__, __LINE__);
     }
@@ -59,31 +60,28 @@ static void tucube_Core_pthreadCleanupHandler(void* args) {
 }
 
 static void* tucube_Core_startWorker(void* args) {
-    struct tucube_Core* coreModule = ((void**)args)[0];
+    struct tucube_Module* module = ((void**)args)[0];
+    struct tucube_Core* coreModule = module->generic.pointer;
     struct tucube_Config* config = ((void**)args)[1];
-    pthread_cleanup_push(tucube_Core_pthreadCleanupHandler, coreModule);
+    pthread_cleanup_push(tucube_Core_pthreadCleanupHandler, module);
     pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
-
-    GENC_GENC_TREE_NODE_FOR_EACH_CHILD(coreModule, index) {
-        struct tucube_Module* childModule = GENC_TREE_NODE_GET_CHILD(coreModule, index);
+    GENC_TREE_NODE_FOR_EACH_CHILD(module, index) {
+        struct tucube_Module* childModule = &GENC_TREE_NODE_GET_CHILD(module, index);
         if(childModule->tucube_IBase_tlInit(childModule, config, (void*[]){NULL}) == -1)
             errx(EXIT_FAILURE, "%s: %u: tucube_Module_tlInit() failed", __FILE__, __LINE__);
     }
-
     sigset_t signalSet;
     sigemptyset(&signalSet);
     sigaddset(&signalSet, SIGINT);
     if(pthread_sigmask(SIG_BLOCK, &signalSet, NULL) != 0)
         errx(EXIT_FAILURE, "%s: %u: pthread_sigmask() failed", __FILE__, __LINE__);
-
-    GENC_TREE_NODE_FOR_EACH_CHILD(coreModule, index) {
-        struct tucube_Module* childModule = GENC_TREE_NODE_GET_CHILD(coreModule, index);
-        if(functionPointers->tucube_ITlService_call(childModule, (void*[]){&coreModule->serverSocket, NULL}) == -1)
+    GENC_TREE_NODE_FOR_EACH_CHILD(module, index) {
+        struct tucube_Module* childModule = &GENC_TREE_NODE_GET_CHILD(module, index);
+        
+        if(childLocalModule->tucube_ITlService_call(childModule, (void*[]){&coreModule->serverSocket, NULL}) == -1)
             errx(EXIT_FAILURE, "%s: %u: tucube_ITlService_call() failed", __FILE__, __LINE__);
     }
-
     pthread_cleanup_pop(1);
-
     return NULL;
 }
 
@@ -138,14 +136,14 @@ static int tucube_Core_initCoreModule(struct tucube_Module* module, struct tucub
 
 static int tucube_Core_initChildModules(struct tucube_Module* module, struct tucube_Config* config) {
     struct tucube_Module_Names childModuleNames;
-    GENC_ARRAY_LIST_INIT(childModuleNames);
+    GENC_ARRAY_LIST_INIT(&childModuleNames);
     TUCUBE_CONFIG_GET_CHILD_MODULE_NAMES(config, module->name, &childModuleNames);
-    size_t childModuleCount = GENC_ARRAY_LIST_SIZE(childModuleNames);
+    size_t childModuleCount = GENC_ARRAY_LIST_SIZE(&childModuleNames);
     GENC_TREE_NODE_INIT_CHILDREN(module, childModuleCount);
-    GENC_ARRAY_LIST_FOR_EACH(childModuleNames, index) {
-        struct tucube_Module* childModule = GENC_TREE_NODE_GET_CHILD(module, index);
+    GENC_ARRAY_LIST_FOR_EACH(&childModuleNames, index) {
+        struct tucube_Module* childModule = &GENC_TREE_NODE_GET_CHILD(module, index);
         GENC_TREE_NODE_INIT(childModule);
-        childModule->name = GENC_ARRAY_LIST_GET(childModuleNames, index);
+        childModule->name = GENC_ARRAY_LIST_GET(&childModuleNames, index);
         const char* childModulePath = NULL;
         TUCUBE_CONFIG_GET_MODULE_PATH(config, childModule->name, &childModulePath);
         if((childModule->dlHandle = dlopen(childModulePath, RTLD_LAZY | RTLD_GLOBAL)) == NULL)
@@ -158,16 +156,16 @@ static int tucube_Core_initChildModules(struct tucube_Module* module, struct tuc
             errx(EXIT_FAILURE, "%s: %u: Unable to find tucube_IBase_tlDestroy()", __FILE__, __LINE__);
         if((childModule->tucube_IBase_destroy = dlsym(module->dlHandle, "tucube_IBase_destroy")) == NULL)
             errx(EXIT_FAILURE, "%s: %u: Unable to find tucube_IBase_destroy()", __FILE__, __LINE__);
-        childModule->tucube_IBase_init(childModule, config);
+        childModule->tucube_IBase_init(childModule, config, (void*[]){NULL});
         tucube_Core_initChildModules(childModule, config);
     }
-    GENC_ARRAY_LIST_FREE(childModuleNames);
+    GENC_ARRAY_LIST_FREE(&childModuleNames);
     return 0;
 }
 
 static int tucube_Core_destroyChildModules(struct tucube_Module* module) {
-    GENC_TREE_FOR_EACH_CHILD(module, index) {
-        struct tucube_Module* childModule = GENC_TREE_NODE_GET_CHILD(module, index);
+    GENC_TREE_NODE_FOR_EACH_CHILD(module, index) {
+        struct tucube_Module* childModule = &GENC_TREE_NODE_GET_CHILD(module, index);
         if(childModule->tucube_IBase_destroy(childModule) == -1)
            warn("%s: %u", __FILE__, __LINE__);
         tucube_Core_destroyChildModules(childModule);
@@ -176,6 +174,7 @@ static int tucube_Core_destroyChildModules(struct tucube_Module* module) {
 }
 
 static int tucube_Core_init(struct tucube_Module* module, struct tucube_Config* config) {
+    struct tucube_Core* coreModule = module->generic.pointer;
     tucube_Core_initCoreModule(module, config);
     tucube_Core_initChildModules(module, config);
     if(setgid(coreModule->setGid) == -1)
@@ -186,6 +185,7 @@ static int tucube_Core_init(struct tucube_Module* module, struct tucube_Config* 
 }
 
 int tucube_Core_start(struct tucube_Module* module, struct tucube_Config* config) {
+    struct tucube_Core* coreModule = module->generic.pointer;
     tucube_Core_init(module, config);
     tucube_Core_registerSignalHandlers();
     pthread_t* workerThreads;
