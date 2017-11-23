@@ -77,8 +77,10 @@ static void* tucube_Core_startWorker(void* args) {
         errx(EXIT_FAILURE, "%s: %u: pthread_sigmask() failed", __FILE__, __LINE__);
     GENC_TREE_NODE_FOR_EACH_CHILD(module, index) {
         struct tucube_Module* childModule = &GENC_TREE_NODE_GET_CHILD(module, index);
-        
-        if(childLocalModule->tucube_ITlService_call(childModule, (void*[]){&coreModule->serverSocket, NULL}) == -1)
+        int (*pointer_tucube_ITlService_call)(struct tucube_Module*, void** args);
+        if((pointer_tucube_ITlService_call = dlsym(module->dlHandle, "tucube_ITlService_call")) == NULL)
+            errx(EXIT_FAILURE, "%s: %u: Unable to find tucube_ITlService_call()", __FILE__, __LINE__);
+        if(pointer_tucube_ITlService_call(childModule, (void*[]){&coreModule->serverSocket, NULL}) == -1)
             errx(EXIT_FAILURE, "%s: %u: tucube_ITlService_call() failed", __FILE__, __LINE__);
     }
     pthread_cleanup_pop(1);
