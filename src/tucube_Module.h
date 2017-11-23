@@ -4,6 +4,8 @@
 #include <jansson.h>
 #include <pthread.h>
 #include <libgenc/genc_Generic.h>
+#include <libgenc/genc_Tree.h>
+#include <libgenc/genc_ArrayList.h>
 
 struct tucube_Config {
     json_t* json;
