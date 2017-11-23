@@ -14,7 +14,7 @@ struct tucube_Config {
 struct tucube_Module {
     const char* name;
     void* dlHandle;
-    union tucube_Generic generic;
+    union genc_Generic generic;
     pthread_rwlock_t* rwLock;
     pthread_key_t* tlModuleKey;
     int (*tucube_IBase_init)(struct tucube_Config*, struct tucube_Module*, void*[]);
