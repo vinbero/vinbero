@@ -24,6 +24,6 @@ struct tucube_Core {
     pthread_mutex_t* serverSocketMutex;
 };
 
-int tucube_Core_start(struct tucube_Core* core, struct tucube_Config* config);
+int tucube_Core_start(struct tucube_Module* module, struct tucube_Config* config);
 
 #endif

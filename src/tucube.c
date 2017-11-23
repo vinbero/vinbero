@@ -13,6 +13,6 @@ int main(int argc, char* argv[]) {
     tucube_Options_process(argc, argv, &config);
     tucube_Core_start(&module, &config);
     json_decref(config.json);
-    free(module->generic.pointer);
+    free(module.generic.pointer);
     return 0;
 }
