@@ -14,7 +14,8 @@ struct tucube_Config {
 struct tucube_Module {
     const char* name;
     void* dlHandle;
-    union genc_Generic generic;
+    union genc_Generic localModule;
+    union genc_Generic interface;
     pthread_rwlock_t* rwLock;
     pthread_key_t* tlModuleKey;
     int (*tucube_IBase_init)(struct tucube_Module*, struct tucube_Config*, void*[]);
@@ -39,7 +40,7 @@ do {                                                                            
 
 #define TUCUBE_MODULE_DLSYM(module, localModuleType, moduleFunction)            \
 do {                                                                            \
-    if((GENC_CAST((module)->generic.pointer,                                    \
+    if((GENC_CAST((module)->localModule.pointer,                                \
          localModuleType*)->moduleFunction =                                    \
               dlsym((module)->dlHandle, #moduleFunction)) == NULL) {            \
         errx(EXIT_FAILURE,                                                      \
