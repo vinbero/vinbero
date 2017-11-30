@@ -47,7 +47,7 @@ static void tucube_Core_registerSignalHandlers() {
 
 static void tucube_Core_pthreadCleanupHandler(void* args) {
     struct tucube_Module* module = args;
-    struct tucube_Core* coreModule = module->generic.pointer;
+    struct tucube_Core* coreModule = module->localModule.pointer;
     GENC_TREE_NODE_FOR_EACH_CHILD(module, index) {
         struct tucube_Module* childModule = &GENC_TREE_NODE_GET_CHILD(module, index);
         if(childModule->tucube_IBase_tlDestroy(childModule) == -1)
@@ -61,7 +61,7 @@ static void tucube_Core_pthreadCleanupHandler(void* args) {
 
 static void* tucube_Core_startWorker(void* args) {
     struct tucube_Module* module = ((void**)args)[0];
-    struct tucube_Core* coreModule = module->generic.pointer;
+    struct tucube_Core* coreModule = module->localModule.pointer;
     struct tucube_Config* config = ((void**)args)[1];
     pthread_cleanup_push(tucube_Core_pthreadCleanupHandler, module);
     pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
@@ -92,7 +92,7 @@ struct tucube_Core_ChildModuleNames {
 };
 
 static int tucube_Core_initCoreModule(struct tucube_Module* module, struct tucube_Config* config) {
-    struct tucube_Core* coreModule = module->generic.pointer;
+    struct tucube_Core* coreModule = module->localModule.pointer;
     TUCUBE_CONFIG_GET(config, module->name, "tucube.protocol", string, &coreModule->protocol, "TCP");
     TUCUBE_CONFIG_GET(config, module->name, "tucube.address", string, &coreModule->address, "0.0.0.0");
     TUCUBE_CONFIG_GET(config, module->name, "tucube.port", integer, &coreModule->port, 8080);
@@ -176,7 +176,7 @@ static int tucube_Core_destroyChildModules(struct tucube_Module* module) {
 }
 
 static int tucube_Core_init(struct tucube_Module* module, struct tucube_Config* config) {
-    struct tucube_Core* coreModule = module->generic.pointer;
+    struct tucube_Core* coreModule = module->localModule.pointer;
     tucube_Core_initCoreModule(module, config);
     tucube_Core_initChildModules(module, config);
     if(setgid(coreModule->setGid) == -1)
@@ -187,7 +187,7 @@ static int tucube_Core_init(struct tucube_Module* module, struct tucube_Config* 
 }
 
 int tucube_Core_start(struct tucube_Module* module, struct tucube_Config* config) {
-    struct tucube_Core* coreModule = module->generic.pointer;
+    struct tucube_Core* coreModule = module->localModule.pointer;
     tucube_Core_init(module, config);
     tucube_Core_registerSignalHandlers();
     pthread_t* workerThreads;
