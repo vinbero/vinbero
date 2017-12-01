@@ -3,3 +3,4 @@
 모듈의 이름을 지을 때는 의존하는 상위 모듈들의 이름을 포함한다. 단 너무 당연 경우는 포함하지 않는다 tucube_epoll_http 는 tucube_tcp_epoll에 의존한다, http가 tcp에 의존하는 것은 너무나도 당연한 사실이기에 tcp를 포함하지 않았다.
 prepare base module object from the parent;
 tucube_Module_Config doesn't have to be tree or list.. A single object is enough to find the config of a current module
+Use dlsym() only for tucube_IModule_init(), Use function pointer assignment at child module instead

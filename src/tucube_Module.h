@@ -6,6 +6,7 @@
 #include <libgenc/genc_Generic.h>
 #include <libgenc/genc_Tree.h>
 #include <libgenc/genc_ArrayList.h>
+#include "tucube_IModule.h"
 
 struct tucube_Config {
     json_t* json;
@@ -15,13 +16,10 @@ struct tucube_Module {
     const char* name;
     void* dlHandle;
     union genc_Generic localModule;
-    union genc_Generic interface;
+    void* interface;
     pthread_rwlock_t* rwLock;
     pthread_key_t* tlModuleKey;
-    int (*tucube_IBase_init)(struct tucube_Module*, struct tucube_Config*, void*[]);
-    int (*tucube_IBase_destroy)(struct tucube_Module*);
-    int (*tucube_IBase_tlInit)(struct tucube_Module*, struct tucube_Config*, void*[]);
-    int (*tucube_IBase_tlDestroy)(struct tucube_Module*);
+    TUCUBE_IMODULE_FUNCTION_POINTERS;
     GENC_TREE_NODE(struct tucube_Module);
 };
 

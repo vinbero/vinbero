@@ -24,6 +24,10 @@ struct tucube_Core {
     pthread_mutex_t* serverSocketMutex;
 };
 
+struct tucube_Core_Interface {
+    TUCUBE_ITLSERVICE_FUNTION_POINTERS; 
+};
+
 int tucube_Core_start(struct tucube_Module* module, struct tucube_Config* config);
 
 #endif
