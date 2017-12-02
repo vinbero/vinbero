@@ -140,6 +140,7 @@ static int tucube_Core_preInitChildModules(struct tucube_Module* module, struct 
     size_t childModuleCount = GENC_ARRAY_LIST_SIZE(&childModuleNames);
     GENC_TREE_NODE_INIT_CHILDREN(module, childModuleCount);
     GENC_ARRAY_LIST_FOR_EACH(&childModuleNames, index) {
+        GENC_TREE_NODE_ADD_EMPTY_CHILD(module);
         struct tucube_Module* childModule = &GENC_TREE_NODE_GET_CHILD(module, index);
         GENC_TREE_NODE_INIT(childModule);
         childModule->name = GENC_ARRAY_LIST_GET(&childModuleNames, index);
