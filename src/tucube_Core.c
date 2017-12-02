@@ -133,7 +133,7 @@ static int tucube_Core_initLocalModule(struct tucube_Module* module, struct tucu
     return 0;
 }
 
-static int tucube_Core_initChildModules(struct tucube_Module* module, struct tucube_Config* config) {
+static int tucube_Core_preInitChildModules(struct tucube_Module* module, struct tucube_Config* config) {
     struct tucube_Module_Names childModuleNames;
     GENC_ARRAY_LIST_INIT(&childModuleNames);
     TUCUBE_CONFIG_GET_CHILD_MODULE_NAMES(config, module->name, &childModuleNames);
@@ -147,9 +147,7 @@ static int tucube_Core_initChildModules(struct tucube_Module* module, struct tuc
         TUCUBE_CONFIG_GET_MODULE_PATH(config, childModule->name, &childModulePath);
         if((childModule->dlHandle = dlopen(childModulePath, RTLD_LAZY | RTLD_GLOBAL)) == NULL)
             errx(EXIT_FAILURE, "%s: %u: dlopen() failed, possible causes are:\n1. Unable to find next module\n2. The next module didn't linked required shared libraries properly", __FILE__, __LINE__);
-
         childModule->interface = malloc(1 * sizeof(struct tucube_Core_Interface)); // free() needed
-
         if((childModule->tucube_IModule_init = dlsym(module->dlHandle, "tucube_IModule_init")) == NULL)
             errx(EXIT_FAILURE, "%s: %u: Unable to find tucube_IModule_init()", __FILE__, __LINE__);
         if((childModule->tucube_IModule_tlInit = dlsym(module->dlHandle, "tucube_IModule_tlInit")) == NULL)
@@ -158,10 +156,18 @@ static int tucube_Core_initChildModules(struct tucube_Module* module, struct tuc
             errx(EXIT_FAILURE, "%s: %u: Unable to find tucube_IModule_tlDestroy()", __FILE__, __LINE__);
         if((childModule->tucube_IModule_destroy = dlsym(module->dlHandle, "tucube_IModule_destroy")) == NULL)
             errx(EXIT_FAILURE, "%s: %u: Unable to find tucube_IModule_destroy()", __FILE__, __LINE__);
+        tucube_Core_preInitChildModules(childModule, config);
+    }
+    GENC_ARRAY_LIST_FREE(&childModuleNames);
+    return 0;
+}
+
+static int tucube_Core_initChildModules(struct tucube_Module* module, struct tucube_Config* config) {
+    GENC_TREE_NODE_FOR_EACH_CHILD(module, index) {
+        struct tucube_Module* childModule = &GENC_TREE_NODE_GET_CHILD(module, index);
         childModule->tucube_IModule_init(childModule, config, (void*[]){NULL});
         tucube_Core_initChildModules(childModule, config);
     }
-    GENC_ARRAY_LIST_FREE(&childModuleNames);
     return 0;
 }
 
@@ -178,6 +184,7 @@ static int tucube_Core_destroyChildModules(struct tucube_Module* module) {
 static int tucube_Core_init(struct tucube_Module* module, struct tucube_Config* config) {
     struct tucube_Core* localModule = module->localModule.pointer;
     tucube_Core_initLocalModule(module, config);
+    tucube_Core_preInitChildModules(module, config);
     tucube_Core_initChildModules(module, config);
     if(setgid(localModule->setGid) == -1)
         err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
