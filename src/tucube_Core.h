@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include <jansson.h>
 #include "tucube_Module.h"
+#include "tucube_ITlService.h"
 
 struct tucube_Core {
     const char* protocol;
@@ -25,7 +26,7 @@ struct tucube_Core {
 };
 
 struct tucube_Core_Interface {
-    TUCUBE_ITLSERVICE_FUNTION_POINTERS; 
+    TUCUBE_ITLSERVICE_FUNCTION_POINTERS; 
 };
 
 int tucube_Core_start(struct tucube_Module* module, struct tucube_Config* config);
