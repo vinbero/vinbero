@@ -78,10 +78,10 @@ static void* tucube_Core_startWorker(void* args) {
         errx(EXIT_FAILURE, "%s: %u: pthread_sigmask() failed", __FILE__, __LINE__);
     GENC_TREE_NODE_FOR_EACH_CHILD(module, index) {
         struct tucube_Module* childModule = &GENC_TREE_NODE_GET_CHILD(module, index);
-//        childModule->moduleInterface = malloc(1 * struct tucube_Core_Interface); // free() needed
-        if((childModule->moduleInterface->tucube_ITlService_call = dlsym(module->dlHandle, "tucube_ITlService_call")) == NULL)
+        struct tucube_Core_Interface* moduleInterface = childModule->interface;
+        if((moduleInterface->tucube_ITlService_call = dlsym(module->dlHandle, "tucube_ITlService_call")) == NULL)
             errx(EXIT_FAILURE, "%s: %u: Unable to find tucube_ITlService_call()", __FILE__, __LINE__);
-        if(childModule->moduleInterface->tucube_ITlService_call(childModule, (void*[]){&localModule->serverSocket, NULL}) == -1)
+        if(moduleInterface->tucube_ITlService_call(childModule, (void*[]){&localModule->serverSocket, NULL}) == -1)
             errx(EXIT_FAILURE, "%s: %u: tucube_ITlService_call() failed", __FILE__, __LINE__);
     }
     pthread_cleanup_pop(1);
@@ -147,6 +147,9 @@ static int tucube_Core_initChildModules(struct tucube_Module* module, struct tuc
         TUCUBE_CONFIG_GET_MODULE_PATH(config, childModule->name, &childModulePath);
         if((childModule->dlHandle = dlopen(childModulePath, RTLD_LAZY | RTLD_GLOBAL)) == NULL)
             errx(EXIT_FAILURE, "%s: %u: dlopen() failed, possible causes are:\n1. Unable to find next module\n2. The next module didn't linked required shared libraries properly", __FILE__, __LINE__);
+
+        childModule->interface = malloc(1 * sizeof(struct tucube_Core_Interface)); // free() needed
+
         if((childModule->tucube_IModule_init = dlsym(module->dlHandle, "tucube_IModule_init")) == NULL)
             errx(EXIT_FAILURE, "%s: %u: Unable to find tucube_IModule_init()", __FILE__, __LINE__);
         if((childModule->tucube_IModule_tlInit = dlsym(module->dlHandle, "tucube_IModule_tlInit")) == NULL)
