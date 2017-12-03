@@ -6,7 +6,7 @@
 
 struct tucube_ClData {
     union genc_Generic generic;
-    GENC_TREE_NODE(struct tucube_ClData);
+    GENC_TREE_NODE(struct tucube_ClData, struct tucube_ClData*);
 };
 
 #endif
