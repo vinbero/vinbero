@@ -84,7 +84,7 @@ warnx("%s: %u: %s", __FILE__, __LINE__, __FUNCTION__);
     GENC_TREE_NODE_FOR_EACH_CHILD(module, index) {
         struct tucube_Module* childModule = &GENC_TREE_NODE_GET_CHILD(module, index);
         struct tucube_Core_Interface* moduleInterface = childModule->interface;
-        if((moduleInterface->tucube_ITlService_call = dlsym(module->dlHandle, "tucube_ITlService_call")) == NULL)
+        if((moduleInterface->tucube_ITlService_call = dlsym(childModule->dlHandle, "tucube_ITlService_call")) == NULL)
             errx(EXIT_FAILURE, "%s: %u: Unable to find tucube_ITlService_call()", __FILE__, __LINE__);
         if(moduleInterface->tucube_ITlService_call(childModule, (void*[]){&localModule->serverSocket, NULL}) == -1)
             errx(EXIT_FAILURE, "%s: %u: tucube_ITlService_call() failed", __FILE__, __LINE__);
