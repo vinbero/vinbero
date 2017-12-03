@@ -143,6 +143,7 @@ static int tucube_Core_preInitChildModules(struct tucube_Module* module, struct 
         GENC_TREE_NODE_ADD_EMPTY_CHILD(module);
         struct tucube_Module* childModule = &GENC_TREE_NODE_GET_CHILD(module, index);
         GENC_TREE_NODE_INIT(childModule);
+        GENC_TREE_NODE_SET_PARENT(childModule, module);
         childModule->name = GENC_ARRAY_LIST_GET(&childModuleNames, index);
         const char* childModulePath = NULL;
         TUCUBE_CONFIG_GET_MODULE_PATH(config, childModule->name, &childModulePath);
