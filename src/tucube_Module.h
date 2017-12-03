@@ -20,7 +20,7 @@ struct tucube_Module {
     pthread_rwlock_t* rwLock;
     pthread_key_t* tlModuleKey;
     TUCUBE_IMODULE_FUNCTION_POINTERS;
-    GENC_TREE_NODE(struct tucube_Module);
+    GENC_TREE_NODE(struct tucube_Module, struct tucube_Module*);
 };
 
 struct tucube_Module_Names {
