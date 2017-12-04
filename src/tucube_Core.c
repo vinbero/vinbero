@@ -234,7 +234,6 @@ warnx("%s: %u: %s", __FILE__, __LINE__, __FUNCTION__);
            if(pthread_create(workerThreads + index, &coreThreadAttr, tucube_Core_startWorker, (void*[]){module, config}) != 0)
                 err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
         }
-
         pthread_mutex_lock(localModule->exitMutex);
         while(localModule->exit != true) {
             pthread_cond_wait(localModule->exitCond,
