@@ -104,12 +104,16 @@ warnx("%s: %u: %s", __FILE__, __LINE__, __FUNCTION__);
     TUCUBE_CONFIG_GET(config, module->name, "tucube.workerCount", integer, &localModule->workerCount, 4);
     TUCUBE_CONFIG_GET(config, module->name, "tucube.setUid", integer, &localModule->setUid, geteuid());
     TUCUBE_CONFIG_GET(config, module->name, "tucube.setGid", integer, &localModule->setGid, getegid());
+
+/*  DO THIS IN THREADING MODULE
     localModule->exit = false;
     localModule->exitMutex = malloc(1 * sizeof(pthread_mutex_t));
     pthread_mutex_init(localModule->exitMutex, NULL);
     localModule->exitCond = malloc(1 * sizeof(pthread_cond_t));
     pthread_cond_init(localModule->exitCond, NULL);
+*/
 
+/*  DO THIS IN SOCKET MODULE
     struct sockaddr_in serverAddressSockAddrIn;
     memset(serverAddressSockAddrIn.sin_zero, 0, 1 * sizeof(serverAddressSockAddrIn.sin_zero));
     serverAddressSockAddrIn.sin_family = AF_INET; 
@@ -135,6 +139,7 @@ warnx("%s: %u: %s", __FILE__, __LINE__, __FUNCTION__);
             err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
     } else
         errx(EXIT_FAILURE, "%s: %u: Unknown protocol %s", __FILE__, __LINE__, localModule->protocol);
+*/
     return 0;
 }
 
@@ -209,6 +214,7 @@ int tucube_Core_start(struct tucube_Module* module, struct tucube_Config* config
 warnx("%s: %u: %s", __FILE__, __LINE__, __FUNCTION__);
     struct tucube_Core* localModule = module->localModule.pointer;
     tucube_Core_init(module, config);
+/*  DO THIS IN THREADING MODULE
     tucube_Core_registerSignalHandlers();
     pthread_t* workerThreads;
     pthread_attr_t coreThreadAttr;
@@ -265,6 +271,7 @@ warnx("%s: %u: %s", __FILE__, __LINE__, __FUNCTION__);
     close(localModule->serverSocket);
     pthread_attr_destroy(&coreThreadAttr);
     free(workerThreads);
+*/
 //    dlclose(localModule->dlHandle);
     return 0;
 }
