@@ -6,7 +6,7 @@
 int main(int argc, char* argv[]) {
     struct tucube_Module module;
     GENC_TREE_NODE_INIT(&module);
-    module.name = "core";
+    module.id = "core";
     module.localModule.pointer = malloc(1 * sizeof(struct tucube_Core));
     module.interface = malloc(1 * sizeof(struct tucube_Core_Interface));
     struct tucube_Config config;
