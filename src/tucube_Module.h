@@ -13,7 +13,8 @@ struct tucube_Config {
 };
 
 struct tucube_Module {
-    const char* name;
+    const char* id;
+//    const char* name;
     void* dlHandle;
     union genc_Generic localModule;
     void* interface;
@@ -23,15 +24,15 @@ struct tucube_Module {
     GENC_TREE_NODE(struct tucube_Module, struct tucube_Module*);
 };
 
-struct tucube_Module_Names {
+struct tucube_Module_Ids {
     GENC_ARRAY_LIST(const char*);
 };
 
-#define TUCUBE_MODULE_DLOPEN(config, moduleName, module)                                                      \
+#define TUCUBE_MODULE_DLOPEN(config, moduleId, module)                                                      \
 do {                                                                                                          \
     const char* modulePath;                                                                                   \
-    if((modulePath = json_string_value(json_object_get(json_object_get(config, moduleName), "path")) == NULL) \
-        errx(EXIT_FAILURE, "%s: %u: Unable to find path of module %s", __FILE__, __LINE__, moduleName);       \
+    if((modulePath = json_string_value(json_object_get(json_object_get(config, moduleId), "path")) == NULL) \
+        errx(EXIT_FAILURE, "%s: %u: Unable to find path of module %s", __FILE__, __LINE__, moduleId);       \
     if(((module)->dlHandle = dlopen(modulePath, RTLD_LAZY | RTLD_GLOBAL)) == NULL)                            \
         errx(EXIT_FAILURE, "%s: %u: Failed to load next module", __FILE__, __LINE__);                         \
 } while(0)
@@ -47,27 +48,27 @@ do {                                                                            
 }                                                                               \
 while(0)
 
-#define TUCUBE_CONFIG_GET(config, moduleName, valueName, valueType, output, defaultValue)                                         \
+#define TUCUBE_CONFIG_GET(config, moduleId, valueName, valueType, output, defaultValue)                                         \
 do {                                                                                                                              \
     json_t* jsonOutput;                                                                                                           \
-    if((jsonOutput = json_object_get(json_object_get(json_object_get((config)->json, moduleName), "config"), valueName)) != NULL) \
+    if((jsonOutput = json_object_get(json_object_get(json_object_get((config)->json, moduleId), "config"), valueName)) != NULL) \
         *(output) = json_##valueType##_value(jsonOutput);                                                                         \
     else                                                                                                                          \
         *(output) = defaultValue;                                                                                                 \
 } while(0)
 
-#define TUCUBE_CONFIG_GET_REQUIRED(config, moduleName, valueName, valueType, output)                                                  \
+#define TUCUBE_CONFIG_GET_REQUIRED(config, moduleId, valueName, valueType, output)                                                  \
 do {                                                                                                                                  \
     json_t* moduleConfig;                                                                                                             \
-    if((moduleConfig = json_object_get(json_object_get(json_object_get((config)->json, moduleName)), "config")) != NULL)              \
+    if((moduleConfig = json_object_get(json_object_get(json_object_get((config)->json, moduleId)), "config")) != NULL)              \
         *(output) = json_##valueType##_value(moduleConfig, valueName);                                                                \
     else                                                                                                                              \
-        errx(EXIT_FAILURE, "%s: %u: In module %s, configuration argument %s is required", __FILE__, __LINE__, moduleName, valueName); \
+        errx(EXIT_FAILURE, "%s: %u: In module %s, configuration argument %s is required", __FILE__, __LINE__, moduleId, valueName); \
 } while(0)
 
-#define TUCUBE_CONFIG_GET_MODULE_PATH(config, moduleName, modulePath)                                        \
+#define TUCUBE_CONFIG_GET_MODULE_PATH(config, moduleId, modulePath)                                        \
 do {                                                                                                         \
-    *(modulePath) = json_string_value(json_object_get(json_object_get((config)->json, moduleName), "path")); \
+    *(modulePath) = json_string_value(json_object_get(json_object_get((config)->json, moduleId), "path")); \
 } while(0)
 
 #define TUCUBE_CONFIG_GET_CHILD_MODULE_COUNT(config, currentModuleName, output)                  \
@@ -79,16 +80,16 @@ do {                                                                            
         *output = -1;                                                                            \
 } while(0)
 
-#define TUCUBE_CONFIG_GET_CHILD_MODULE_NAMES(config, currentModuleName, output)                            \
+#define TUCUBE_CONFIG_GET_CHILD_MODULE_IDS(config, currentModuleName, output)                            \
 do {                                                                                                       \
     size_t childModuleCount;                                                                               \
     TUCUBE_CONFIG_GET_CHILD_MODULE_COUNT(config, currentModuleName, &childModuleCount);                    \
-    json_t* childModuleNamesJson = json_object_get(json_object_get((config)->json, module->name), "next"); \
-    if(json_is_array(childModuleNamesJson)) {                                                              \
+    json_t* childModuleIdsJson = json_object_get(json_object_get((config)->json, module->id), "next"); \
+    if(json_is_array(childModuleIdsJson)) {                                                              \
         GENC_ARRAY_LIST_REALLOC(output, childModuleCount);                                                 \
         json_t* childModuleNameJson;                                                                       \
         size_t index;                                                                                      \
-        json_array_foreach(childModuleNamesJson, index, childModuleNameJson)                               \
+        json_array_foreach(childModuleIdsJson, index, childModuleNameJson)                               \
             GENC_ARRAY_LIST_PUSH(output, json_string_value(childModuleNameJson));                          \
     }                                                                                                      \
 } while(0)
