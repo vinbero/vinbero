@@ -96,14 +96,8 @@ warnx("%s: %u: %s", __FILE__, __LINE__, __FUNCTION__);
 static int tucube_Core_initLocalModule(struct tucube_Module* module, struct tucube_Config* config) {
 warnx("%s: %u: %s", __FILE__, __LINE__, __FUNCTION__);
     struct tucube_Core* localModule = module->localModule.pointer;
-    TUCUBE_CONFIG_GET(config, module->name, "tucube.protocol", string, &localModule->protocol, "TCP");
-    TUCUBE_CONFIG_GET(config, module->name, "tucube.address", string, &localModule->address, "0.0.0.0");
-    TUCUBE_CONFIG_GET(config, module->name, "tucube.port", integer, &localModule->port, 8080);
-    TUCUBE_CONFIG_GET(config, module->name, "tucube.reusePort", integer, &localModule->reusePort, 0);
-    TUCUBE_CONFIG_GET(config, module->name, "tucube.backlog", integer, &localModule->backlog, 1024);
-    TUCUBE_CONFIG_GET(config, module->name, "tucube.workerCount", integer, &localModule->workerCount, 4);
-    TUCUBE_CONFIG_GET(config, module->name, "tucube.setUid", integer, &localModule->setUid, geteuid());
-    TUCUBE_CONFIG_GET(config, module->name, "tucube.setGid", integer, &localModule->setGid, getegid());
+    TUCUBE_CONFIG_GET(config, module->id, "tucube.setUid", integer, &localModule->setUid, geteuid());
+    TUCUBE_CONFIG_GET(config, module->id, "tucube.setGid", integer, &localModule->setGid, getegid());
 
 /*  DO THIS IN THREADING MODULE
     localModule->exit = false;
