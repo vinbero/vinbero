@@ -96,14 +96,14 @@ warnx("%s: %u: %s", __FILE__, __LINE__, __FUNCTION__);
 static int tucube_Core_initLocalModule(struct tucube_Module* module, struct tucube_Config* config) {
 warnx("%s: %u: %s", __FILE__, __LINE__, __FUNCTION__);
     struct tucube_Core* localModule = module->localModule.pointer;
-    TUCUBE_CONFIG_GET(config, module->name, "tucube.protocol", string, &localModule->protocol, "TCP");
-    TUCUBE_CONFIG_GET(config, module->name, "tucube.address", string, &localModule->address, "0.0.0.0");
-    TUCUBE_CONFIG_GET(config, module->name, "tucube.port", integer, &localModule->port, 8080);
-    TUCUBE_CONFIG_GET(config, module->name, "tucube.reusePort", integer, &localModule->reusePort, 0);
-    TUCUBE_CONFIG_GET(config, module->name, "tucube.backlog", integer, &localModule->backlog, 1024);
-    TUCUBE_CONFIG_GET(config, module->name, "tucube.workerCount", integer, &localModule->workerCount, 4);
-    TUCUBE_CONFIG_GET(config, module->name, "tucube.setUid", integer, &localModule->setUid, geteuid());
-    TUCUBE_CONFIG_GET(config, module->name, "tucube.setGid", integer, &localModule->setGid, getegid());
+    TUCUBE_CONFIG_GET(config, module->id, "tucube.protocol", string, &localModule->protocol, "TCP");
+    TUCUBE_CONFIG_GET(config, module->id, "tucube.address", string, &localModule->address, "0.0.0.0");
+    TUCUBE_CONFIG_GET(config, module->id, "tucube.port", integer, &localModule->port, 8080);
+    TUCUBE_CONFIG_GET(config, module->id, "tucube.reusePort", integer, &localModule->reusePort, 0);
+    TUCUBE_CONFIG_GET(config, module->id, "tucube.backlog", integer, &localModule->backlog, 1024);
+    TUCUBE_CONFIG_GET(config, module->id, "tucube.workerCount", integer, &localModule->workerCount, 4);
+    TUCUBE_CONFIG_GET(config, module->id, "tucube.setUid", integer, &localModule->setUid, geteuid());
+    TUCUBE_CONFIG_GET(config, module->id, "tucube.setGid", integer, &localModule->setGid, getegid());
     localModule->exit = false;
     localModule->exitMutex = malloc(1 * sizeof(pthread_mutex_t));
     pthread_mutex_init(localModule->exitMutex, NULL);
@@ -140,19 +140,19 @@ warnx("%s: %u: %s", __FILE__, __LINE__, __FUNCTION__);
 
 static int tucube_Core_preInitChildModules(struct tucube_Module* module, struct tucube_Config* config) {
 warnx("%s: %u: %s", __FILE__, __LINE__, __FUNCTION__);
-    struct tucube_Module_Names childModuleNames;
-    GENC_ARRAY_LIST_INIT(&childModuleNames);
-    TUCUBE_CONFIG_GET_CHILD_MODULE_NAMES(config, module->name, &childModuleNames);
-    size_t childModuleCount = GENC_ARRAY_LIST_SIZE(&childModuleNames);
+    struct tucube_Module_Ids childModuleIds;
+    GENC_ARRAY_LIST_INIT(&childModuleIds);
+    TUCUBE_CONFIG_GET_CHILD_MODULE_IDS(config, module->id, &childModuleIds);
+    size_t childModuleCount = GENC_ARRAY_LIST_SIZE(&childModuleIds);
     GENC_TREE_NODE_INIT_CHILDREN(module, childModuleCount);
-    GENC_ARRAY_LIST_FOR_EACH(&childModuleNames, index) {
+    GENC_ARRAY_LIST_FOR_EACH(&childModuleIds, index) {
         GENC_TREE_NODE_ADD_EMPTY_CHILD(module);
         struct tucube_Module* childModule = &GENC_TREE_NODE_GET_CHILD(module, index);
         GENC_TREE_NODE_INIT(childModule);
         GENC_TREE_NODE_SET_PARENT(childModule, module);
-        childModule->name = GENC_ARRAY_LIST_GET(&childModuleNames, index);
+        childModule->id = GENC_ARRAY_LIST_GET(&childModuleIds, index);
         const char* childModulePath = NULL;
-        TUCUBE_CONFIG_GET_MODULE_PATH(config, childModule->name, &childModulePath);
+        TUCUBE_CONFIG_GET_MODULE_PATH(config, childModule->id, &childModulePath);
         if((childModule->dlHandle = dlopen(childModulePath, RTLD_LAZY | RTLD_GLOBAL)) == NULL)
             errx(EXIT_FAILURE, "%s: %u: dlopen() failed, possible causes are:\n1. Unable to find next module\n2. The next module didn't linked required shared libraries properly", __FILE__, __LINE__);
         childModule->interface = malloc(1 * sizeof(struct tucube_Core_Interface)); // free() needed
@@ -167,7 +167,7 @@ warnx("%s: %u: %s", __FILE__, __LINE__, __FUNCTION__);
 
         tucube_Core_preInitChildModules(childModule, config);
     }
-    GENC_ARRAY_LIST_FREE(&childModuleNames);
+    GENC_ARRAY_LIST_FREE(&childModuleIds);
     return 0;
 }
 
