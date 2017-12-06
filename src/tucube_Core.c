@@ -91,7 +91,6 @@ warnx("%s: %u: %s", __FILE__, __LINE__, __FUNCTION__);
         if(moduleInterface->tucube_ICore_service(childModule, (void*[]){NULL}) == -1)
             errx(EXIT_FAILURE, "%s: %u: tucube_ICore_service() failed", __FILE__, __LINE__);
     }
-
 //    dlclose(localModule->dlHandle);
     return 0;
 }
