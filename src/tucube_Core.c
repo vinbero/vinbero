@@ -1,5 +1,6 @@
 #include <dlfcn.h>
 #include <err.h>
+#include <pthread.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -7,6 +8,38 @@
 #include <unistd.h>
 #include <libgenc/genc_ArrayList.h>
 #include "tucube_Core.h"
+
+static pthread_key_t tucube_Core_tlKey;
+
+static void tucube_Core_sigIntHandler(int signal_number) {
+    exit(EXIT_FAILURE);
+}
+
+static void tucube_Core_exitHandler() {
+    if(syscall(SYS_gettid) == getpid()) {
+        jmp_buf* jumpBuffer = pthread_getspecific(tucube_Core_tlKey);
+        if(jumpBuffer != NULL)
+            longjmp(*jumpBuffer, 1);
+    }
+}
+
+static void tucube_Core_registerSignalHandlers() {
+    struct sigaction signalAction;
+    signalAction.sa_handler = tucube_Core_sigIntHandler;
+    signalAction.sa_flags = SA_RESTART;
+    if(sigfillset(&signalAction.sa_mask) == -1)
+        err(EXIT_FAILURE, "%s, %u", __FILE__, __LINE__);
+    if(sigaction(SIGINT, &signalAction, NULL) == -1)
+        err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
+
+    signalAction.sa_handler = SIG_IGN;
+    signalAction.sa_flags = SA_RESTART;
+    if(sigfillset(&signalAction.sa_mask) == -1)
+        err(EXIT_FAILURE, "%s, %u", __FILE__, __LINE__);
+    if(sigaction(SIGPIPE, &signalAction, NULL) == -1)
+        err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
+}
+
 
 static int tucube_Core_initLocalModule(struct tucube_Module* module, struct tucube_Config* config) {
 warnx("%s: %u: %s", __FILE__, __LINE__, __FUNCTION__);
@@ -75,6 +108,7 @@ warnx("%s: %u: %s", __FILE__, __LINE__, __FUNCTION__);
         err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
     if(setuid(localModule->setUid) == -1)
         err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
+    
     return 0;
 }
 
@@ -82,19 +116,29 @@ int tucube_Core_start(struct tucube_Module* module, struct tucube_Config* config
 warnx("%s: %u: %s", __FILE__, __LINE__, __FUNCTION__);
     struct tucube_Core* localModule = module->localModule.pointer;
     tucube_Core_init(module, config);
-    GENC_TREE_NODE_FOR_EACH_CHILD(module, index) {
-        struct tucube_Module* childModule = &GENC_TREE_NODE_GET_CHILD(module, index);
-        struct tucube_Core_Interface* moduleInterface = childModule->interface;
-        if((moduleInterface->tucube_ICore_service = dlsym(childModule->dlHandle, "tucube_ICore_service")) == NULL)
-            errx(EXIT_FAILURE, "%s: %u: Unable to find tucube_ICore_service()", __FILE__, __LINE__);
-        if(moduleInterface->tucube_ICore_service(childModule, (void*[]){NULL}) == -1)
-            errx(EXIT_FAILURE, "%s: %u: tucube_ICore_service() failed", __FILE__, __LINE__);
+    tucube_Core_registerSignalHandlers();
+    jmp_buf* jumpBuffer = malloc(1 * sizeof(jmp_buf));
+    if(setjmp(*jumpBuffer) == 0) {
+        pthread_key_create(&tucube_Core_tlKey, NULL);
+        pthread_setspecific(tucube_Core_tlKey, jumpBuffer);
+        GENC_TREE_NODE_FOR_EACH_CHILD(module, index) {
+            struct tucube_Module* childModule = &GENC_TREE_NODE_GET_CHILD(module, index);
+            struct tucube_Core_Interface* moduleInterface = childModule->interface;
+            if((moduleInterface->tucube_ICore_service = dlsym(childModule->dlHandle, "tucube_ICore_service")) == NULL)
+                errx(EXIT_FAILURE, "%s: %u: Unable to find tucube_ICore_service()", __FILE__, __LINE__);
+            if(moduleInterface->tucube_ICore_service(childModule, (void*[]){NULL}) == -1)
+                errx(EXIT_FAILURE, "%s: %u: tucube_ICore_service() failed", __FILE__, __LINE__);
+        }
+        GENC_TREE_NODE_FOR_EACH_CHILD(module, index) {
+            struct tucube_Module* childModule = &GENC_TREE_NODE_GET_CHILD(module, index);
+            free(childModule->interface);
+        }
+        tucube_Core_destroyChildModules(module);
     }
-    GENC_TREE_NODE_FOR_EACH_CHILD(module, index) {
-        struct tucube_Module* childModule = &GENC_TREE_NODE_GET_CHILD(module, index);
-        free(childModule->interface);
-    }
-    tucube_Core_destroyChildModules(module);
+    free(jumpBuffer);
+    pthread_key_delete(tucube_Core_tlKey);
+
+
 //    dlclose(localModule->dlHandle);
     return 0;
 }
