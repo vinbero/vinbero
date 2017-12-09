@@ -1,10 +1,13 @@
 #include <dlfcn.h>
 #include <err.h>
 #include <pthread.h>
+#include <setjmp.h>
+#include <signal.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/syscall.h>
 #include <unistd.h>
 #include <libgenc/genc_ArrayList.h>
 #include "tucube_Core.h"
@@ -12,10 +15,12 @@
 static pthread_key_t tucube_Core_tlKey;
 
 static void tucube_Core_sigIntHandler(int signal_number) {
+warnx("%s: %u: %s", __FILE__, __LINE__, __FUNCTION__);
     exit(EXIT_FAILURE);
 }
 
 static void tucube_Core_exitHandler() {
+warnx("%s: %u: %s", __FILE__, __LINE__, __FUNCTION__);
     if(syscall(SYS_gettid) == getpid()) {
         jmp_buf* jumpBuffer = pthread_getspecific(tucube_Core_tlKey);
         if(jumpBuffer != NULL)
@@ -24,6 +29,7 @@ static void tucube_Core_exitHandler() {
 }
 
 static void tucube_Core_registerSignalHandlers() {
+warnx("%s: %u: %s", __FILE__, __LINE__, __FUNCTION__);
     struct sigaction signalAction;
     signalAction.sa_handler = tucube_Core_sigIntHandler;
     signalAction.sa_flags = SA_RESTART;
@@ -56,6 +62,7 @@ warnx("%s: %u: %s", __FILE__, __LINE__, __FUNCTION__);
     TUCUBE_CONFIG_GET_CHILD_MODULE_IDS(config, module->id, &childModuleIds);
     size_t childModuleCount = GENC_ARRAY_LIST_SIZE(&childModuleIds);
     GENC_TREE_NODE_INIT_CHILDREN(module, childModuleCount);
+    GENC_TREE_NODE_ZERO_CHILDREN(module);
     GENC_ARRAY_LIST_FOR_EACH(&childModuleIds, index) {
         GENC_TREE_NODE_ADD_EMPTY_CHILD(module);
         struct tucube_Module* childModule = &GENC_TREE_NODE_GET_CHILD(module, index);
@@ -66,8 +73,8 @@ warnx("%s: %u: %s", __FILE__, __LINE__, __FUNCTION__);
         TUCUBE_CONFIG_GET_MODULE_PATH(config, childModule->id, &childModulePath);
         if((childModule->dlHandle = dlopen(childModulePath, RTLD_LAZY | RTLD_GLOBAL)) == NULL)
             errx(EXIT_FAILURE, "%s: %u: dlopen() failed, possible causes are:\n1. Unable to find next module\n2. The next module didn't linked required shared libraries properly", __FILE__, __LINE__);
-        childModule->interface = malloc(1 * sizeof(struct tucube_Core_Interface)); // free() needed
-        if((childModule->tucube_IModule_init = dlsym(childModule->dlHandle, "tucube_IModule_init")) == NULL)
+        childModule->interface = malloc(1 * sizeof(struct tucube_Core_Interface)); // An interface should be a struct consisting of function pointers only.
+         if((childModule->tucube_IModule_init = dlsym(childModule->dlHandle, "tucube_IModule_init")) == NULL)
             errx(EXIT_FAILURE, "%s: %u: Unable to find tucube_IModule_init()", __FILE__, __LINE__);
         if((childModule->tucube_IModule_destroy = dlsym(childModule->dlHandle, "tucube_IModule_destroy")) == NULL)
             errx(EXIT_FAILURE, "%s: %u: Unable to find tucube_IModule_destroy()", __FILE__, __LINE__);
@@ -91,10 +98,11 @@ static int tucube_Core_destroyChildModules(struct tucube_Module* module) {
 warnx("%s: %u: %s", __FILE__, __LINE__, __FUNCTION__);
     GENC_TREE_NODE_FOR_EACH_CHILD(module, index) {
         struct tucube_Module* childModule = &GENC_TREE_NODE_GET_CHILD(module, index);
-        if(childModule->tucube_IModule_destroy(childModule) == -1)
-           warn("%s: %u", __FILE__, __LINE__);
         tucube_Core_destroyChildModules(childModule);
     }
+    if(module->tucube_IModule_destroy != NULL && module->tucube_IModule_destroy(module) == -1) // should fix this later
+       warn("%s: %u", __FILE__, __LINE__);
+    GENC_TREE_NODE_FREE_CHILDREN(module);
     return 0;
 }
 
@@ -117,6 +125,7 @@ warnx("%s: %u: %s", __FILE__, __LINE__, __FUNCTION__);
     struct tucube_Core* localModule = module->localModule.pointer;
     tucube_Core_init(module, config);
     tucube_Core_registerSignalHandlers();
+    atexit(tucube_Core_exitHandler);
     jmp_buf* jumpBuffer = malloc(1 * sizeof(jmp_buf));
     if(setjmp(*jumpBuffer) == 0) {
         pthread_key_create(&tucube_Core_tlKey, NULL);
@@ -129,15 +138,14 @@ warnx("%s: %u: %s", __FILE__, __LINE__, __FUNCTION__);
             if(moduleInterface->tucube_ICore_service(childModule, (void*[]){NULL}) == -1)
                 errx(EXIT_FAILURE, "%s: %u: tucube_ICore_service() failed", __FILE__, __LINE__);
         }
-        GENC_TREE_NODE_FOR_EACH_CHILD(module, index) {
-            struct tucube_Module* childModule = &GENC_TREE_NODE_GET_CHILD(module, index);
-            free(childModule->interface);
-        }
-        tucube_Core_destroyChildModules(module);
     }
     free(jumpBuffer);
     pthread_key_delete(tucube_Core_tlKey);
-
+    GENC_TREE_NODE_FOR_EACH_CHILD(module, index) {
+        struct tucube_Module* childModule = &GENC_TREE_NODE_GET_CHILD(module, index);
+        free(childModule->interface);
+    }
+    tucube_Core_destroyChildModules(module);
 
 //    dlclose(localModule->dlHandle);
     return 0;
