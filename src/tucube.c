@@ -1,10 +1,12 @@
 #include <jansson.h>
 #include <libgenc/genc_Tree.h>
+#include <string.h>
 #include "tucube_Core.h"
 #include "tucube_Options.h"
 
 int main(int argc, char* argv[]) {
     struct tucube_Module module;
+    memset(&module, 0, sizeof(struct tucube_Module));
     GENC_TREE_NODE_INIT(&module);
     module.id = "core";
     module.localModule.pointer = malloc(1 * sizeof(struct tucube_Core));
