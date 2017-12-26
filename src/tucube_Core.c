@@ -60,6 +60,7 @@ warnx("%s: %u: %s", __FILE__, __LINE__, __FUNCTION__);
     struct tucube_Module_Ids childModuleIds;
     GENC_ARRAY_LIST_INIT(&childModuleIds);
     TUCUBE_CONFIG_GET_CHILD_MODULE_IDS(config, module->id, &childModuleIds);
+    // check if 
     size_t childModuleCount = GENC_ARRAY_LIST_SIZE(&childModuleIds);
     GENC_TREE_NODE_INIT_CHILDREN(module, childModuleCount);
     GENC_TREE_NODE_ZERO_CHILDREN(module);
@@ -88,8 +89,10 @@ static int tucube_Core_initChildModules(struct tucube_Module* module, struct tuc
 warnx("%s: %u: %s", __FILE__, __LINE__, __FUNCTION__);
     GENC_TREE_NODE_FOR_EACH_CHILD(module, index) {
         struct tucube_Module* childModule = &GENC_TREE_NODE_GET_CHILD(module, index);
-        childModule->tucube_IModule_init(childModule, config, (void*[]){NULL});
-        tucube_Core_initChildModules(childModule, config);
+        if(childModule->tucube_IModule_init(childModule, config, (void*[]){NULL}) == -1)
+            return -1;
+        if(tucube_Core_initChildModules(childModule, config) == -1)
+            return -1;
     }
     return 0;
 }
@@ -111,7 +114,8 @@ warnx("%s: %u: %s", __FILE__, __LINE__, __FUNCTION__);
     struct tucube_Core* localModule = module->localModule.pointer;
     tucube_Core_initLocalModule(module, config);
     tucube_Core_preInitChildModules(module, config);
-    tucube_Core_initChildModules(module, config);
+    if(tucube_Core_initChildModules(module, config) == -1);
+        errx(EXIT_FAILURE, "%s: %u: tucube_Core_initChildModules() failed", __FILE__, __LINE__);
     if(setgid(localModule->setGid) == -1)
         err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
     if(setuid(localModule->setUid) == -1)
