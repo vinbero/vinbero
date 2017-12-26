@@ -37,7 +37,6 @@ warnx("%s: %u: %s", __FILE__, __LINE__, __FUNCTION__);
         err(EXIT_FAILURE, "%s, %u", __FILE__, __LINE__);
     if(sigaction(SIGINT, &signalAction, NULL) == -1)
         err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
-
     signalAction.sa_handler = SIG_IGN;
     signalAction.sa_flags = SA_RESTART;
     if(sigfillset(&signalAction.sa_mask) == -1)
@@ -46,6 +45,23 @@ warnx("%s: %u: %s", __FILE__, __LINE__, __FUNCTION__);
         err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
 }
 
+static int tucube_Core_checkConfig(struct tucube_Config* config, const char* moduleId) {
+    int errorVariable;
+    TUCUBE_CONFIG_CHECK(config, moduleId, &errorVariable);
+    if(errorVariable == 1)
+        return -1;
+    struct tucube_Module_Ids childModuleIds;
+    GENC_ARRAY_LIST_INIT(&childModuleIds);
+    TUCUBE_CONFIG_GET_CHILD_MODULE_IDS(config, moduleId, &childModuleIds);
+    GENC_ARRAY_LIST_FOR_EACH(&childModuleIds, index) {
+        if(tucube_Core_checkConfig(config, GENC_ARRAY_LIST_GET(&childModuleIds, index)) == -1) {
+            GENC_ARRAY_LIST_FREE(&childModuleIds);
+            return -1;
+        }
+    }
+    GENC_ARRAY_LIST_FREE(&childModuleIds);
+    return 0;
+}
 
 static int tucube_Core_initLocalModule(struct tucube_Module* module, struct tucube_Config* config) {
 warnx("%s: %u: %s", __FILE__, __LINE__, __FUNCTION__);
@@ -112,15 +128,18 @@ warnx("%s: %u: %s", __FILE__, __LINE__, __FUNCTION__);
 static int tucube_Core_init(struct tucube_Module* module, struct tucube_Config* config) {
 warnx("%s: %u: %s", __FILE__, __LINE__, __FUNCTION__);
     struct tucube_Core* localModule = module->localModule.pointer;
-    tucube_Core_initLocalModule(module, config);
-    tucube_Core_preInitChildModules(module, config);
-    if(tucube_Core_initChildModules(module, config) == -1);
+    if(tucube_Core_checkConfig(config, module->id) == -1)
+        errx(EXIT_FAILURE, "%s: %u: tucube_Core_checkConfig() failed", __FILE__, __LINE__);
+    if(tucube_Core_initLocalModule(module, config) == -1)
+        errx(EXIT_FAILURE, "%s: %u: tucube_Core_initLocalModule() failed", __FILE__, __LINE__);
+    if(tucube_Core_preInitChildModules(module, config) == -1) 
+        errx(EXIT_FAILURE, "%s: %u: tucube_Core_preInitChildModules() failed", __FILE__, __LINE__);
+    if(tucube_Core_initChildModules(module, config) == -1)
         errx(EXIT_FAILURE, "%s: %u: tucube_Core_initChildModules() failed", __FILE__, __LINE__);
     if(setgid(localModule->setGid) == -1)
         err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
     if(setuid(localModule->setUid) == -1)
         err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
-    
     return 0;
 }
 
