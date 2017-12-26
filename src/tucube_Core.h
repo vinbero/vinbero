@@ -5,7 +5,7 @@
 #include <unistd.h>
 #include <jansson.h>
 #include "tucube_Module.h"
-#include "tucube_ICore.h"
+#include "tucube_IBasic.h"
 
 struct tucube_Core {
     uid_t setUid;
@@ -13,7 +13,7 @@ struct tucube_Core {
 };
 
 struct tucube_Core_Interface {
-    TUCUBE_ICORE_FUNCTION_POINTERS; 
+    TUCUBE_IBASIC_FUNCTION_POINTERS; 
 };
 
 int tucube_Core_start(struct tucube_Module* module, struct tucube_Config* config);
