@@ -109,7 +109,8 @@ warnx("%s: %u: %s", __FILE__, __LINE__, __FUNCTION__);
             warnx("%s: %u: Unable to find tucube_IModule_rDestroy()", __FILE__, __LINE__);
             return -1;
         }
-        tucube_Core_preInitChildModules(childModule, config);
+        if(tucube_Core_preInitChildModules(childModule, config) == -1)
+            return -1;
     }
     GENC_ARRAY_LIST_FREE(&childModuleIds);
     return 0;
