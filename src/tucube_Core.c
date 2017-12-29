@@ -148,7 +148,6 @@ warnx("%s: %u: %s", __FILE__, __LINE__, __FUNCTION__);
         struct tucube_Module* childModule = &GENC_TREE_NODE_GET_CHILD(module, index);
         tucube_Core_destroyChildModules(childModule);
     }
-    GENC_TREE_NODE_FREE_CHILDREN(module);
     return 0;
 }
 
@@ -211,6 +210,7 @@ warnx("%s: %u: %s", __FILE__, __LINE__, __FUNCTION__);
     }
     tucube_Core_destroyChildModules(module);
     tucube_Core_rDestroyChildModules(module);
+
 //    dlclose(localModule->dlHandle);
     return 0;
 }
