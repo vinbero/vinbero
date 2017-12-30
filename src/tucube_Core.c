@@ -195,10 +195,10 @@ warnx("%s: %u: %s", __FILE__, __LINE__, __FUNCTION__);
         pthread_setspecific(tucube_Core_tlKey, jumpBuffer);
         GENC_TREE_NODE_FOR_EACH_CHILD(module, index) {
             struct tucube_Module* childModule = &GENC_TREE_NODE_GET_CHILD(module, index);
-            struct tucube_Core_Interface* moduleInterface = childModule->interface;
-            if((moduleInterface->tucube_IBasic_service = dlsym(childModule->dlHandle, "tucube_IBasic_service")) == NULL)
+            struct tucube_Core_Interface* childInterface = childModule->interface;
+            if((childInterface->tucube_IBasic_service = dlsym(childModule->dlHandle, "tucube_IBasic_service")) == NULL)
                 errx(EXIT_FAILURE, "%s: %u: Unable to find tucube_IBasic_service()", __FILE__, __LINE__);
-            if(moduleInterface->tucube_IBasic_service(childModule, (void*[]){NULL}) == -1)
+            if(childInterface->tucube_IBasic_service(childModule, (void*[]){NULL}) == -1)
                 errx(EXIT_FAILURE, "%s: %u: tucube_IBasic_service() failed", __FILE__, __LINE__);
         }
     }
