@@ -142,11 +142,14 @@ warnx("%s: %u: %s", __FILE__, __LINE__, __FUNCTION__);
 
 static int tucube_Core_destroyChildModules(struct tucube_Module* module) {
 warnx("%s: %u: %s", __FILE__, __LINE__, __FUNCTION__);
-    if(module->tucube_IModule_destroy != NULL && module->tucube_IModule_destroy(module) == -1) // should fix this later
+    if(module->tucube_IModule_destroy != NULL && module->tucube_IModule_destroy(module) == -1) { // should fix this later
         warn("%s: %u", __FILE__, __LINE__);
+        return -1;
+    }
     GENC_TREE_NODE_FOR_EACH_CHILD(module, index) {
         struct tucube_Module* childModule = &GENC_TREE_NODE_GET_CHILD(module, index);
-        tucube_Core_destroyChildModules(childModule);
+        if(tucube_Core_destroyChildModules(childModule) == -1)
+            return -1;
     }
     return 0;
 }
@@ -170,12 +173,16 @@ warnx("%s: %u: %s", __FILE__, __LINE__, __FUNCTION__);
         errx(EXIT_FAILURE, "%s: %u: tucube_Core_checkConfig() failed", __FILE__, __LINE__);
     if(tucube_Core_initLocalModule(module, config) == -1)
         errx(EXIT_FAILURE, "%s: %u: tucube_Core_initLocalModule() failed", __FILE__, __LINE__);
-    if(tucube_Core_preInitChildModules(module, config) == -1) 
+    if(tucube_Core_preInitChildModules(module, config) == -1) {
         errx(EXIT_FAILURE, "%s: %u: tucube_Core_preInitChildModules() failed", __FILE__, __LINE__);
-    if(tucube_Core_initChildModules(module, config) == -1)
+        // destroy child modules
+    }
+    if(tucube_Core_initChildModules(module, config) == -1) {
         errx(EXIT_FAILURE, "%s: %u: tucube_Core_initChildModules() failed", __FILE__, __LINE__);
-    if(tucube_Core_rInitChildModules(module, config) == -1)
+    }
+    if(tucube_Core_rInitChildModules(module, config) == -1) {
         errx(EXIT_FAILURE, "%s: %u: tucube_Core_initChildModules() failed", __FILE__, __LINE__);
+    }
     if(setgid(localModule->setGid) == -1)
         err(EXIT_FAILURE, "%s: %u", __FILE__, __LINE__);
     if(setuid(localModule->setUid) == -1)
