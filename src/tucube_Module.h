@@ -28,6 +28,11 @@ struct tucube_Module_Ids {
     GENC_ARRAY_LIST(const char*);
 };
 
+#define TUCUBE_FUNC_ERROR -2
+#define TUCUBE_FUNC_EXCEPTION -1
+#define TUCUBE_FUNC_SUCCESS 0
+#define TUCUBE_FUNC_CONTINUE 1
+
 #define TUCUBE_MODULE_DLOPEN(config, moduleId, module, errorVariable)                                       \
 do {                                                                                                        \
     const char* modulePath;                                                                                 \
