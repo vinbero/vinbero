@@ -14,7 +14,8 @@ struct tucube_Config {
 
 struct tucube_Module {
     const char* id;
-//    const char* name;
+    const char* name;
+    const char* version;
     void* dlHandle;
     union genc_Generic localModule;
     void* interface;
