@@ -71,17 +71,20 @@ do {                                                                            
         *errorVariable = 1;                                                          \
 } while(0)
 
-#define TUCUBE_CONFIG_GET(config, module, valueName, valueType, output, defaultValue)                                                        \
-do {                                                                                                                                         \
-    json_t* outputJson;                                                                                                                      \
-    for(struct tucube_Module* currentModule = module;                                                                                        \
-        GENC_TREE_NODE_PARENT(currentModule) != NULL;                                                                                        \
-        currentModule = GENC_TREE_NODE_PARENT(currentModule)) {                                                                              \
-        if((outputJson = json_object_get(json_object_get(json_object_get((config)->json, currentModule->id), "config"), valueName)) != NULL) \
-            *(output) = json_##valueType##_value(outputJson);                                                                                \
-    }                                                                                                                                        \
-    if(outputJson == NULL)                                                                                                                   \
-        *(output) = defaultValue;                                                                                                            \
+#define TUCUBE_CONFIG_GET(config, module, valueName, valueType, output, defaultValue)                                                          \
+do {                                                                                                                                           \
+    bool valueFound = false;                                                                                                                   \
+    json_t* outputJson;                                                                                                                        \
+    for(struct tucube_Module* currentModule = module;                                                                                          \
+        GENC_TREE_NODE_PARENT(currentModule) != NULL;                                                                                          \
+        currentModule = GENC_TREE_NODE_PARENT(currentModule)) {                                                                                \
+        if((outputJson = json_object_get(json_object_get(json_object_get((config)->json, currentModule->id), "config"), valueName)) != NULL) { \
+            *(output) = json_##valueType##_value(outputJson);                                                                                  \
+            valueFound = true;                                                                                                                 \
+        }                                                                                                                                      \
+    }                                                                                                                                          \
+    if(valueFound == false)                                                                                                                    \
+        *(output) = defaultValue;                                                                                                              \
 } while(0)
 
 #define TUCUBE_CONFIG_GET_REQUIRED(config, moduleId, valueName, valueType, output, errorVariable)                                 \
