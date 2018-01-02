@@ -34,41 +34,47 @@ struct tucube_Module_Ids {
 #define TUCUBE_FUNC_SUCCESS 0
 #define TUCUBE_FUNC_CONTINUE 1
 
-#define TUCUBE_MODULE_DLOPEN(config, moduleId, module, errorVariable)                                       \
-do {                                                                                                        \
-    const char* modulePath;                                                                                 \
-    if((modulePath = json_string_value(json_object_get(json_object_get(config, moduleId), "path")) == NULL) \
-        *errorVariable = 1;                                                                                 \
-    if(((module)->dlHandle = dlopen(modulePath, RTLD_LAZY | RTLD_GLOBAL)) == NULL)                          \
-        *errorVariable = 1;                                                                                 \
-    *errorVariable = 0;                                                                                     \
+#define TUCUBE_MODULE_DLOPEN(config, module, errorVariable)                                                       \
+do {                                                                                                              \
+    const char* modulePath;                                                                                       \
+    if((modulePath = json_string_value(json_object_get(json_object_get(config, (module)->id), "path")) == NULL) { \
+        warnx("%s: %u: dlopen() failed, possible causes are:\n                                                    \
+               1. Unable to find next module\n                                                                    \
+               2. The next module didn't linked required shared libraries properly", __FILE__, __LINE__);         \
+        *errorVariable = 1;                                                                                       \
+    } else if(((module)->dlHandle = dlopen(modulePath, RTLD_LAZY | RTLD_GLOBAL)) == NULL) {                       \
+        warnx("%s: %u: dlopen() failed, possible causes are:\n                                                    \
+               1. Unable to find next module\n                                                                    \
+               2. The next module didn't linked required shared libraries properly", __FILE__, __LINE__);         \
+        *errorVariable = 1;                                                                                       \
+    } else                                                                                                        \
+        *errorVariable = 0;                                                                                       \
 } while(0)
-/*
-#define TUCUBE_MODULE_DLSYM(pointer, localModuleType, moduleFunction, errorVariable) \
-do {                                                                                 \
-    if((GENC_CAST((pointer),                                                         \
-         localModuleType*)->moduleFunction =                                         \
-              dlsym((module)->dlHandle, #moduleFunction)) == NULL) {                 \
-        *errorVariable = 1;                                                          \
-    }                                                                                \
-    *errorVariable = 0;                                                              \
-}                                                                                    \
+
+#define TUCUBE_MODULE_DLSYM(interface, dlHandle, functionName, errorVariable)      \
+do {                                                                               \
+    if(((interface)->functionName = dlsym(dlHandle, #functionName)) == NULL) {     \
+        warnx("%s: %u: %s: Unable to find %s", #functionName, __FILE__, __LINE__); \
+        *errorVariable = 1;                                                        \
+    } else                                                                         \
+        *errorVariable = 0;                                                        \
+}                                                                                  \
 while(0)
-*/
-#define TUCUBE_CONFIG_CHECK(config, moduleId, errorVariable)                         \
-do {                                                                                 \
-    json_t* moduleJson;                                                              \
-    json_t* moduleConfigJson;                                                        \
-    json_t* moduleChildrenJson;                                                      \
-    if((moduleJson = json_object_get((config)->json, moduleId)) != NULL              \
-       && json_is_object(moduleJson)                                                 \
-       && (moduleConfigJson = json_object_get(moduleJson, "config")) != NULL         \
-       && json_is_object(moduleConfigJson)                                           \
-       && (moduleChildrenJson = json_object_get(moduleJson, "next")) != NULL         \
-       && json_is_array(moduleChildrenJson)) {                                       \
-        *errorVariable = 0;                                                          \
-    } else                                                                           \
-        *errorVariable = 1;                                                          \
+
+#define TUCUBE_CONFIG_CHECK(config, moduleId, errorVariable)                 \
+do {                                                                         \
+    json_t* moduleJson;                                                      \
+    json_t* moduleConfigJson;                                                \
+    json_t* moduleChildrenJson;                                              \
+    if((moduleJson = json_object_get((config)->json, moduleId)) != NULL      \
+       && json_is_object(moduleJson)                                         \
+       && (moduleConfigJson = json_object_get(moduleJson, "config")) != NULL \
+       && json_is_object(moduleConfigJson)                                   \
+       && (moduleChildrenJson = json_object_get(moduleJson, "next")) != NULL \
+       && json_is_array(moduleChildrenJson)) {                               \
+        *errorVariable = 0;                                                  \
+    } else                                                                   \
+        *errorVariable = 1;                                                  \
 } while(0)
 
 #define TUCUBE_CONFIG_GET(config, module, valueName, valueType, output, defaultValue)                                                          \
@@ -88,16 +94,16 @@ do {                                                                            
         *(output) = defaultValue;                                                                                                              \
 } while(0)
 
-#define TUCUBE_CONFIG_GET_REQUIRED(config, moduleId, valueName, valueType, output, errorVariable)                                              \
+#define TUCUBE_CONFIG_GET_REQUIRED(config, module, valueName, valueType, output, errorVariable)                                                \
 do {                                                                                                                                           \
-    *errorVariable = 1;                                                                                                                        \
+    *(errorVariable) = 1;                                                                                                                      \
     json_t* outputJson;                                                                                                                        \
     for(struct tucube_Module* currentModule = module;                                                                                          \
         GENC_TREE_NODE_PARENT(currentModule) != NULL;                                                                                          \
         currentModule = GENC_TREE_NODE_PARENT(currentModule)) {                                                                                \
         if((outputJson = json_object_get(json_object_get(json_object_get((config)->json, currentModule->id), "config"), valueName)) != NULL) { \
             *(output) = json_##valueType##_value(outputJson);                                                                                  \
-            *errorVariable = 0;                                                                                                                \
+            *(errorVariable = 0);                                                                                                              \
             break;                                                                                                                             \
         }                                                                                                                                      \
     }                                                                                                                                          \

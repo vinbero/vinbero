@@ -89,11 +89,17 @@ warnx("%s: %u: %s", __FILE__, __LINE__, __FUNCTION__);
         const char* childModulePath;
         TUCUBE_CONFIG_GET_MODULE_PATH(config, childModule->id, &childModulePath);
         if((childModule->dlHandle = dlopen(childModulePath, RTLD_LAZY | RTLD_GLOBAL)) == NULL) {
-            warnx("%s: %u: dlopen() failed, possible causes are:\n1. Unable to find next module\n2. The next module didn't linked required shared libraries properly", __FILE__, __LINE__);
             GENC_ARRAY_LIST_FREE(&childModuleIds);
             return -1;
         }
         childModule->interface = malloc(1 * sizeof(struct tucube_Core_Interface)); // An interface should be a struct consisting of function pointers only.
+        int errorVariable;
+        TUCUBE_MODULE_DLSYM(childModule, childModule->dlHandle, tucube_IModule_init, &errorVariable);
+        TUCUBE_MODULE_DLSYM(childModule, childModule->dlHandle, tucube_IModule_rInit, &errorVariable);
+        TUCUBE_MODULE_DLSYM(childModule, childModule->dlHandle, tucube_IModule_destroy, &errorVariable);
+        TUCUBE_MODULE_DLSYM(childModule, childModule->dlHandle, tucube_IModule_rDestroy, &errorVariable);
+
+/*
         if((childModule->tucube_IModule_init = dlsym(childModule->dlHandle, "tucube_IModule_init")) == NULL) {
             warnx("%s: %u: Unable to find tucube_IModule_init()", __FILE__, __LINE__);
             GENC_ARRAY_LIST_FREE(&childModuleIds);
@@ -114,6 +120,7 @@ warnx("%s: %u: %s", __FILE__, __LINE__, __FUNCTION__);
             GENC_ARRAY_LIST_FREE(&childModuleIds);
             return -1;
         }
+*/
         if(tucube_Core_preInitChildModules(childModule, config) == -1) {
             GENC_ARRAY_LIST_FREE(&childModuleIds);
             return -1;
