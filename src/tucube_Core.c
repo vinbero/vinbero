@@ -66,8 +66,8 @@ static int tucube_Core_checkConfig(struct tucube_Config* config, const char* mod
 static int tucube_Core_initLocalModule(struct tucube_Module* module, struct tucube_Config* config) {
 warnx("%s: %u: %s", __FILE__, __LINE__, __FUNCTION__);
     struct tucube_Core* localModule = module->localModule.pointer;
-    TUCUBE_CONFIG_GET(config, module->id, "tucube.setUid", integer, &localModule->setUid, geteuid());
-    TUCUBE_CONFIG_GET(config, module->id, "tucube.setGid", integer, &localModule->setGid, getegid());
+    TUCUBE_CONFIG_GET(config, module, "tucube.setUid", integer, &localModule->setUid, geteuid());
+    TUCUBE_CONFIG_GET(config, module, "tucube.setGid", integer, &localModule->setGid, getegid());
     return 0;
 }
 
