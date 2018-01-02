@@ -43,18 +43,18 @@ do {                                                                            
         *errorVariable = 1;                                                                                 \
     *errorVariable = 0;                                                                                     \
 } while(0)
-
-#define TUCUBE_MODULE_DLSYM(module, localModuleType, moduleFunction, errorVariable) \
-do {                                                                                \
-    if((GENC_CAST((module)->localModule.pointer,                                    \
-         localModuleType*)->moduleFunction =                                        \
-              dlsym((module)->dlHandle, #moduleFunction)) == NULL) {                \
-        *errorVariable = 1;                                                         \
-    }                                                                               \
-    *errorVariable = 0;                                                             \
-}                                                                                   \
+/*
+#define TUCUBE_MODULE_DLSYM(pointer, localModuleType, moduleFunction, errorVariable) \
+do {                                                                                 \
+    if((GENC_CAST((pointer),                                                         \
+         localModuleType*)->moduleFunction =                                         \
+              dlsym((module)->dlHandle, #moduleFunction)) == NULL) {                 \
+        *errorVariable = 1;                                                          \
+    }                                                                                \
+    *errorVariable = 0;                                                              \
+}                                                                                    \
 while(0)
-
+*/
 #define TUCUBE_CONFIG_CHECK(config, moduleId, errorVariable)                         \
 do {                                                                                 \
     json_t* moduleJson;                                                              \
