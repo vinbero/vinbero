@@ -37,7 +37,7 @@ struct tucube_Module_Ids {
 #define TUCUBE_MODULE_DLOPEN(config, module, errorVariable)                                                       \
 do {                                                                                                              \
     const char* modulePath;                                                                                       \
-    if((modulePath = json_string_value(json_object_get(json_object_get(config, (module)->id), "path")) == NULL) { \
+    if((modulePath = json_string_value(json_object_get(json_object_get((config)->json, (module)->id), "path"))) == NULL) { \
         warnx("%s: %u: dlopen() failed, possible causes are:\n                                                    \
                1. Unable to find next module\n                                                                    \
                2. The next module didn't linked required shared libraries properly", __FILE__, __LINE__);         \
