@@ -86,18 +86,29 @@ warnx("%s: %u: %s", __FILE__, __LINE__, __FUNCTION__);
         GENC_TREE_NODE_INIT(childModule);
         GENC_TREE_NODE_SET_PARENT(childModule, module);
         childModule->id = GENC_ARRAY_LIST_GET(&childModuleIds, index);
+        childModule->interface = malloc(1 * sizeof(struct tucube_Core_Interface)); // An interface should be a struct consisting of function pointers only.
+/*
         const char* childModulePath;
         TUCUBE_CONFIG_GET_MODULE_PATH(config, childModule->id, &childModulePath);
         if((childModule->dlHandle = dlopen(childModulePath, RTLD_LAZY | RTLD_GLOBAL)) == NULL) {
             GENC_ARRAY_LIST_FREE(&childModuleIds);
             return -1;
         }
-        childModule->interface = malloc(1 * sizeof(struct tucube_Core_Interface)); // An interface should be a struct consisting of function pointers only.
+*/
         int errorVariable;
+        TUCUBE_MODULE_DLOPEN(config, childModule, &errorVariable);
+        if(errorVariable == 1) {
+            GENC_ARRAY_LIST_FREE(&childModuleIds);
+            return -1;
+        }
         TUCUBE_MODULE_DLSYM(childModule, childModule->dlHandle, tucube_IModule_init, &errorVariable);
         TUCUBE_MODULE_DLSYM(childModule, childModule->dlHandle, tucube_IModule_rInit, &errorVariable);
         TUCUBE_MODULE_DLSYM(childModule, childModule->dlHandle, tucube_IModule_destroy, &errorVariable);
         TUCUBE_MODULE_DLSYM(childModule, childModule->dlHandle, tucube_IModule_rDestroy, &errorVariable);
+        if(errorVariable == 1) {
+            GENC_ARRAY_LIST_FREE(&childModuleIds);
+            return -1;
+        }
 
 /*
         if((childModule->tucube_IModule_init = dlsym(childModule->dlHandle, "tucube_IModule_init")) == NULL) {
