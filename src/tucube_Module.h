@@ -103,7 +103,7 @@ do {                                                                            
         currentModule = GENC_TREE_NODE_PARENT(currentModule)) {                                                                                \
         if((outputJson = json_object_get(json_object_get(json_object_get((config)->json, currentModule->id), "config"), valueName)) != NULL) { \
             *(output) = json_##valueType##_value(outputJson);                                                                                  \
-            *(errorVariable = 0);                                                                                                              \
+            *(errorVariable) = 0;                                                                                                              \
             break;                                                                                                                             \
         }                                                                                                                                      \
     }                                                                                                                                          \

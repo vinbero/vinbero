@@ -46,6 +46,7 @@ warnx("%s: %u: %s", __FILE__, __LINE__, __FUNCTION__);
 }
 
 static int tucube_Core_checkConfig(struct tucube_Config* config, const char* moduleId) {
+warnx("%s: %u: %s", __FILE__, __LINE__, __FUNCTION__);
     int errorVariable;
     TUCUBE_CONFIG_CHECK(config, moduleId, &errorVariable);
     if(errorVariable == 1)
@@ -87,14 +88,6 @@ warnx("%s: %u: %s", __FILE__, __LINE__, __FUNCTION__);
         GENC_TREE_NODE_SET_PARENT(childModule, module);
         childModule->id = GENC_ARRAY_LIST_GET(&childModuleIds, index);
         childModule->interface = malloc(1 * sizeof(struct tucube_Core_Interface)); // An interface should be a struct consisting of function pointers only.
-/*
-        const char* childModulePath;
-        TUCUBE_CONFIG_GET_MODULE_PATH(config, childModule->id, &childModulePath);
-        if((childModule->dlHandle = dlopen(childModulePath, RTLD_LAZY | RTLD_GLOBAL)) == NULL) {
-            GENC_ARRAY_LIST_FREE(&childModuleIds);
-            return -1;
-        }
-*/
         int errorVariable;
         TUCUBE_MODULE_DLOPEN(config, childModule, &errorVariable);
         if(errorVariable == 1) {
@@ -110,28 +103,6 @@ warnx("%s: %u: %s", __FILE__, __LINE__, __FUNCTION__);
             return -1;
         }
 
-/*
-        if((childModule->tucube_IModule_init = dlsym(childModule->dlHandle, "tucube_IModule_init")) == NULL) {
-            warnx("%s: %u: Unable to find tucube_IModule_init()", __FILE__, __LINE__);
-            GENC_ARRAY_LIST_FREE(&childModuleIds);
-            return -1;
-        }
-        if((childModule->tucube_IModule_rInit = dlsym(childModule->dlHandle, "tucube_IModule_rInit")) == NULL) {
-            warnx("%s: %u: Unable to find tucube_IModule_rInit()", __FILE__, __LINE__);
-            GENC_ARRAY_LIST_FREE(&childModuleIds);
-            return -1;
-        }
-        if((childModule->tucube_IModule_destroy = dlsym(childModule->dlHandle, "tucube_IModule_destroy")) == NULL) {
-            warnx("%s: %u: Unable to find tucube_IModule_destroy()", __FILE__, __LINE__);
-            GENC_ARRAY_LIST_FREE(&childModuleIds);
-            return -1;
-        }
-        if((childModule->tucube_IModule_rDestroy = dlsym(childModule->dlHandle, "tucube_IModule_rDestroy")) == NULL) {
-            warnx("%s: %u: Unable to find tucube_IModule_rDestroy()", __FILE__, __LINE__);
-            GENC_ARRAY_LIST_FREE(&childModuleIds);
-            return -1;
-        }
-*/
         if(tucube_Core_preInitChildModules(childModule, config) == -1) {
             GENC_ARRAY_LIST_FREE(&childModuleIds);
             return -1;
