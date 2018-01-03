@@ -95,14 +95,25 @@ warnx("%s: %u: %s", __FILE__, __LINE__, __FUNCTION__);
             return -1;
         }
         TUCUBE_MODULE_DLSYM(childModule, childModule->dlHandle, tucube_IModule_init, &errorVariable);
+        if(errorVariable == 1) {
+            GENC_ARRAY_LIST_FREE(&childModuleIds);
+            return -1;
+        }
         TUCUBE_MODULE_DLSYM(childModule, childModule->dlHandle, tucube_IModule_rInit, &errorVariable);
+        if(errorVariable == 1) {
+            GENC_ARRAY_LIST_FREE(&childModuleIds);
+            return -1;
+        }
         TUCUBE_MODULE_DLSYM(childModule, childModule->dlHandle, tucube_IModule_destroy, &errorVariable);
+        if(errorVariable == 1) {
+            GENC_ARRAY_LIST_FREE(&childModuleIds);
+            return -1;
+        }
         TUCUBE_MODULE_DLSYM(childModule, childModule->dlHandle, tucube_IModule_rDestroy, &errorVariable);
         if(errorVariable == 1) {
             GENC_ARRAY_LIST_FREE(&childModuleIds);
             return -1;
         }
-
         if(tucube_Core_preInitChildModules(childModule, config) == -1) {
             GENC_ARRAY_LIST_FREE(&childModuleIds);
             return -1;
