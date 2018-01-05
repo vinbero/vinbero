@@ -4,7 +4,7 @@
 #include "tucube_Module.h"
 
 #define TUCUBE_ICLOCAL_FUNCTIONS                                                                   \
-int tucube_ICLocal_Init(struct tucube_Module* module, struct tucube_ClData* clData, void* args[]); \
+int tucube_ICLocal_init(struct tucube_Module* module, struct tucube_ClData* clData, void* args[]); \
 int tucube_ICLocal_destroy(struct tucube_Module* module, struct tucube_ClData* clData)
 
 #define TUCUBE_ICLOCAL_FUNCTION_POINTERS                                           \
