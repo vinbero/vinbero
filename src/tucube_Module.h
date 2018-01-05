@@ -51,14 +51,14 @@ do {                                                                            
         *errorVariable = 0;                                                                                       \
 } while(0)
 
-#define TUCUBE_MODULE_DLSYM(interface, dlHandle, functionName, errorVariable)      \
-do {                                                                               \
-    if(((interface)->functionName = dlsym(dlHandle, #functionName)) == NULL) {     \
-        warnx("%s: %u: %s: Unable to find %s", #functionName, __FILE__, __LINE__); \
-        *errorVariable = 1;                                                        \
-    } else                                                                         \
-        *errorVariable = 0;                                                        \
-}                                                                                  \
+#define TUCUBE_MODULE_DLSYM(interface, dlHandle, functionName, errorVariable)                    \
+do {                                                                                             \
+    if(((interface)->functionName = dlsym(dlHandle, #functionName)) == NULL) {                   \
+        warnx("%s: %u: %s: Unable to find %s", __FILE__, __LINE__, __FUNCTION__, #functionName); \
+        *errorVariable = 1;                                                                      \
+    } else                                                                                       \
+        *errorVariable = 0;                                                                      \
+}                                                                                                \
 while(0)
 
 #define TUCUBE_CONFIG_CHECK(config, moduleId, errorVariable)                 \
