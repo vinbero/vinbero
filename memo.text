@@ -4,3 +4,5 @@
 prepare base module object from the parent;
 tucube_Module_Config doesn't have to be tree or list.. A single object is enough to find the config of a current module
 Use dlsym() only for tucube_IModule_init(), Use function pointer assignment at child module instead
+
+How about using conan.io for distributing modules
