@@ -13,7 +13,7 @@ int (*tucube_ITlService_call)(struct tucube_Module*, void*[])
 #define TUCUBE_ITLSERVICE_DLSYM(interface, dlHandle, errorVariable)                  \
 do {                                                                                 \
     TUCUBE_MODULE_DLSYM(interface, dlHandle, tucube_ITlService_call, errorVariable); \
-    if(errorVariable == 1) break;                                                    \
+    if(*errorVariable == 1) break;                                                   \
 } while(0)
 
 #endif

@@ -14,9 +14,9 @@ int (*tucube_ICLocal_destroy)(struct tucube_Module*, struct tucube_ClData*)
 #define TUCUBE_ICLOCAL_DLSYM(interface, dlHandle, errorVariable)                     \
 do {                                                                                 \
     TUCUBE_MODULE_DLSYM(interface, dlHandle, tucube_ICLocal_init, errorVariable);    \
-    if(errorVariable == 1) break;                                                    \
+    if(*errorVariable == 1) break;                                                   \
     TUCUBE_MODULE_DLSYM(interface, dlHandle, tucube_ICLocal_destroy, errorVariable); \
-    if(errorVariable == 1) break;                                                    \
+    if(*errorVariable == 1) break;                                                   \
 } while(0)
 
 #endif
