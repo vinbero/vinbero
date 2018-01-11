@@ -12,7 +12,7 @@ int (*tucube_IBasic_service)(struct tucube_Module*, void*[])
 #define TUCUBE_IBASIC_DLSYM(interface, dlHandle, errorVariable)                     \
 do {                                                                                \
     TUCUBE_MODULE_DLSYM(interface, dlHandle, tucube_IBasic_service, errorVariable); \
-    if(errorVariable == 1) break;                                                   \
+    if(*errorVariable == 1) break;                                                  \
 } while(0)
 
 #endif
