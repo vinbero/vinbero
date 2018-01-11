@@ -10,7 +10,10 @@ int tucube_ITlService_call(struct tucube_Module* module, void* args[])
 #define TUCUBE_ITLSERVICE_FUNCTION_POINTERS \
 int (*tucube_ITlService_call)(struct tucube_Module*, void*[])
 
-#define TUCUBE_ITLSERVICE_DLSYM(module, localModuleType) \
-TUCUBE_MODULE_DLSYM(module, localModuleType, tucube_ITlService_call)
+#define TUCUBE_ITLSERVICE_DLSYM(interface, dlHandle, errorVariable)                  \
+do {                                                                                 \
+    TUCUBE_MODULE_DLSYM(interface, dlHandle, tucube_ITlService_call, errorVariable); \
+    if(errorVariable == 1) break;                                                    \
+} while(0)
 
 #endif

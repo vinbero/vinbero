@@ -9,7 +9,10 @@ int tucube_IBasic_service(struct tucube_Module* module, void* args[])
 #define TUCUBE_IBASIC_FUNCTION_POINTERS \
 int (*tucube_IBasic_service)(struct tucube_Module*, void*[])
 
-#define TUCUBE_IBASIC_DLSYM(module, localModuleType) \
-TUCUBE_MODULE_DLSYM(module, localModuleType, tucube_IBasic_service)
+#define TUCUBE_IBASIC_DLSYM(interface, dlHandle, errorVariable)                     \
+do {                                                                                \
+    TUCUBE_MODULE_DLSYM(interface, dlHandle, tucube_IBasic_service, errorVariable); \
+    if(errorVariable == 1) break;                                                   \
+} while(0)
 
 #endif
