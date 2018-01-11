@@ -15,4 +15,16 @@ int (*tucube_ITLocal_rInit)(struct tucube_Module*, struct tucube_Config*, void*[
 int (*tucube_ITLocal_destroy)(struct tucube_Module*);                               \
 int (*tucube_ITLocal_rDestroy)(struct tucube_Module*)
 
+#define TUCUBE_ITLOCAL_DLSYM(interface, dlHandle, errorVariable)                      \
+do {                                                                                  \
+    TUCUBE_MODULE_DLSYM(interface, dlHandle, tucube_ITLocal_init, errorVariable);     \
+    if(errorVariable == 1) break;                                                     \
+    TUCUBE_MODULE_DLSYM(interface, dlHandle, tucube_ITLocal_rInit, errorVariable);    \
+    if(errorVariable == 1) break;                                                     \
+    TUCUBE_MODULE_DLSYM(interface, dlHandle, tucube_ITLocal_destroy, errorVariable);  \
+    if(errorVariable == 1) break;                                                     \
+    TUCUBE_MODULE_DLSYM(interface, dlHandle, tucube_ITLocal_rDestroy, errorVariable); \
+    if(errorVariable == 1) break;                                                     \
+} while(0)
+
 #endif
