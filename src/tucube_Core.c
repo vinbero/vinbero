@@ -89,7 +89,6 @@ warnx("%s: %u: %s", __FILE__, __LINE__, __FUNCTION__);
         GENC_TREE_NODE_INIT(childModule);
         GENC_TREE_NODE_SET_PARENT(childModule, module);
         childModule->id = GENC_ARRAY_LIST_GET(&childModuleIds, index);
-        childModule->interface = malloc(1 * sizeof(struct tucube_Core_Interface)); // An interface should be a struct consisting of function pointers only.
         int errorVariable;
         do {
             TUCUBE_MODULE_DLOPEN(config, childModule, &errorVariable);
@@ -225,6 +224,7 @@ warnx("%s: %u: %s", __FILE__, __LINE__, __FUNCTION__);
         pthread_setspecific(tucube_Core_tlKey, jumpBuffer);
         GENC_TREE_NODE_FOR_EACH_CHILD(module, index) {
             struct tucube_Module* childModule = &GENC_TREE_NODE_GET_CHILD(module, index);
+            childModule->interface = malloc(1 * sizeof(struct tucube_Core_Interface));
             struct tucube_Core_Interface* childInterface = childModule->interface;
             if((childInterface->tucube_IBasic_service = dlsym(childModule->dlHandle, "tucube_IBasic_service")) == NULL)
                 errx(EXIT_FAILURE, "%s: %u: Unable to find tucube_IBasic_service()", __FILE__, __LINE__);
