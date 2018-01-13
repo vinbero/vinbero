@@ -49,8 +49,10 @@ static int tucube_Core_checkConfig(struct tucube_Config* config, const char* mod
 warnx("%s: %u: %s", __FILE__, __LINE__, __FUNCTION__);
     int errorVariable;
     TUCUBE_CONFIG_CHECK(config, moduleId, &errorVariable);
-    if(errorVariable == 1)
+    if(errorVariable == 1) {
+        warnx("%s: %u: %s module %s has wrong config or doesn't exist", __FILE__, __LINE__, __FUNCTION__, moduleId);
         return -1;
+    }
     struct tucube_Module_Ids childModuleIds;
     GENC_ARRAY_LIST_INIT(&childModuleIds);
     TUCUBE_CONFIG_GET_CHILD_MODULE_IDS(config, moduleId, &childModuleIds);
@@ -91,15 +93,30 @@ warnx("%s: %u: %s", __FILE__, __LINE__, __FUNCTION__);
         int errorVariable;
         do {
             TUCUBE_MODULE_DLOPEN(config, childModule, &errorVariable);
-            if(errorVariable == 1) break;
+            if(errorVariable == 1) {
+                warnx("%s: %u: %s: dlopen() failed for module %s", __FILE__, __LINE__, __FUNCTION__, childModule->id);
+                break;
+            }
             TUCUBE_MODULE_DLSYM(childModule, childModule->dlHandle, tucube_IModule_init, &errorVariable);
-            if(errorVariable == 1) break;
+            if(errorVariable == 1) {
+                warnx("%s: %u: %s: dlsym() failed for tucube_IModule_init at module %s", __FILE__, __LINE__, __FUNCTION__, childModule->id);
+                break;
+            }
             TUCUBE_MODULE_DLSYM(childModule, childModule->dlHandle, tucube_IModule_rInit, &errorVariable);
-            if(errorVariable == 1) break;
+            if(errorVariable == 1) {
+                warnx("%s: %u: %s: dlsym() failed for tucube_IModule_rInit at module %s", __FILE__, __LINE__, __FUNCTION__, childModule->id);
+                break;
+            }
             TUCUBE_MODULE_DLSYM(childModule, childModule->dlHandle, tucube_IModule_destroy, &errorVariable);
-            if(errorVariable == 1) break;
+            if(errorVariable == 1) {
+                warnx("%s: %u: %s: dlsym() failed for tucube_IModule_destroy at module %s", __FILE__, __LINE__, __FUNCTION__, childModule->id);
+                break;
+            }
             TUCUBE_MODULE_DLSYM(childModule, childModule->dlHandle, tucube_IModule_rDestroy, &errorVariable);
-            if(errorVariable == 1) break;
+            if(errorVariable == 1) {
+                warnx("%s: %u: %s: dlsym() failed for tucube_IModule_rDestroy at module %s", __FILE__, __LINE__, __FUNCTION__, childModule->id);
+                break;
+            }
         } while(false);
         if(errorVariable == 1) {
             GENC_ARRAY_LIST_FREE(&childModuleIds);
