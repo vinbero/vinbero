@@ -27,4 +27,14 @@ do {                                                                            
     if(*errorVariable == 1) break;                                                    \
 } while(0)
 
+/*
+#define TUCUBE_ITLOCAL_INIT_CHILDREN(module, childInterfaceType, config, args) \
+GENC_TREE_NODE_FOR_EACH_CHILD(module, index) { \
+    struct tucube_Module* childModule = &GENC_TREE_NODE_GET_CHILD(module, index) \
+    childInterfaceType* childInterface = childModule->interface; \
+    if(childInterface->tucube_ITLocal_init(childModule, config, args) == -1) \
+        *errorVariable = 1; \
+}
+*/
+
 #endif
