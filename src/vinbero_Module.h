@@ -1,18 +1,18 @@
-#ifndef _TUCUBE_MODULE_H
-#define _TUCUBE_MODULE_H
+#ifndef _VINBERO_MODULE_H
+#define _VINBERO_MODULE_H
 
 #include <jansson.h>
 #include <pthread.h>
 #include <libgenc/genc_Generic.h>
 #include <libgenc/genc_Tree.h>
 #include <libgenc/genc_ArrayList.h>
-#include "tucube_IModule.h"
+#include "vinbero_IModule.h"
 
-struct tucube_Config {
+struct vinbero_Config {
     json_t* json;
 };
 
-struct tucube_Module {
+struct vinbero_Module {
     const char* id;
     const char* name;
     const char* version;
@@ -21,20 +21,20 @@ struct tucube_Module {
     void* interface;
     pthread_rwlock_t* rwLock;
     pthread_key_t* tlModuleKey;
-    TUCUBE_IMODULE_FUNCTION_POINTERS;
-    GENC_TREE_NODE(struct tucube_Module, struct tucube_Module*);
+    VINBERO_IMODULE_FUNCTION_POINTERS;
+    GENC_TREE_NODE(struct vinbero_Module, struct vinbero_Module*);
 };
 
-struct tucube_Module_Ids {
+struct vinbero_Module_Ids {
     GENC_ARRAY_LIST(const char*);
 };
 
-#define TUCUBE_FUNC_ERROR -2
-#define TUCUBE_FUNC_EXCEPTION -1
-#define TUCUBE_FUNC_SUCCESS 0
-#define TUCUBE_FUNC_CONTINUE 1
+#define VINBERO_FUNC_ERROR -2
+#define VINBERO_FUNC_EXCEPTION -1
+#define VINBERO_FUNC_SUCCESS 0
+#define VINBERO_FUNC_CONTINUE 1
 
-#define TUCUBE_MODULE_DLOPEN(config, module, errorVariable)                                                       \
+#define VINBERO_MODULE_DLOPEN(config, module, errorVariable)                                                       \
 do {                                                                                                              \
     const char* modulePath;                                                                                       \
     if((modulePath = json_string_value(json_object_get(json_object_get((config)->json, (module)->id), "path"))) == NULL) { \
@@ -51,7 +51,7 @@ do {                                                                            
         *errorVariable = 0;                                                                                       \
 } while(0)
 
-#define TUCUBE_MODULE_DLSYM(interface, dlHandle, functionName, errorVariable) \
+#define VINBERO_MODULE_DLSYM(interface, dlHandle, functionName, errorVariable) \
 do {                                                                          \
     if(((interface)->functionName = dlsym(dlHandle, #functionName)) == NULL)  \
         *errorVariable = 1;                                                   \
@@ -60,7 +60,7 @@ do {                                                                          \
 }                                                                             \
 while(0)
 
-#define TUCUBE_CONFIG_CHECK(config, moduleId, errorVariable)                 \
+#define VINBERO_CONFIG_CHECK(config, moduleId, errorVariable)                 \
 do {                                                                         \
     json_t* moduleJson;                                                      \
     json_t* moduleConfigJson;                                                \
@@ -76,11 +76,11 @@ do {                                                                         \
         *errorVariable = 1;                                                  \
 } while(0)
 
-#define TUCUBE_CONFIG_GET(config, module, valueName, valueType, output, defaultValue)                                                          \
+#define VINBERO_CONFIG_GET(config, module, valueName, valueType, output, defaultValue)                                                          \
 do {                                                                                                                                           \
     bool valueFound = false;                                                                                                                   \
     json_t* outputJson;                                                                                                                        \
-    for(struct tucube_Module* currentModule = module;                                                                                          \
+    for(struct vinbero_Module* currentModule = module;                                                                                          \
         GENC_TREE_NODE_PARENT(currentModule) != NULL;                                                                                          \
         currentModule = GENC_TREE_NODE_PARENT(currentModule)) {                                                                                \
         if((outputJson = json_object_get(json_object_get(json_object_get((config)->json, currentModule->id), "config"), valueName)) != NULL) { \
@@ -93,11 +93,11 @@ do {                                                                            
         *(output) = defaultValue;                                                                                                              \
 } while(0)
 
-#define TUCUBE_CONFIG_GET_REQUIRED(config, module, valueName, valueType, output, errorVariable)                                                \
+#define VINBERO_CONFIG_GET_REQUIRED(config, module, valueName, valueType, output, errorVariable)                                                \
 do {                                                                                                                                           \
     *(errorVariable) = 1;                                                                                                                      \
     json_t* outputJson;                                                                                                                        \
-    for(struct tucube_Module* currentModule = module;                                                                                          \
+    for(struct vinbero_Module* currentModule = module;                                                                                          \
         GENC_TREE_NODE_PARENT(currentModule) != NULL;                                                                                          \
         currentModule = GENC_TREE_NODE_PARENT(currentModule)) {                                                                                \
         if((outputJson = json_object_get(json_object_get(json_object_get((config)->json, currentModule->id), "config"), valueName)) != NULL) { \
@@ -108,12 +108,12 @@ do {                                                                            
     }                                                                                                                                          \
 } while(0)
 
-#define TUCUBE_CONFIG_GET_MODULE_PATH(config, moduleId, modulePath)                                        \
+#define VINBERO_CONFIG_GET_MODULE_PATH(config, moduleId, modulePath)                                        \
 do {                                                                                                       \
     *(modulePath) = json_string_value(json_object_get(json_object_get((config)->json, moduleId), "path")); \
 } while(0)
 
-#define TUCUBE_CONFIG_GET_CHILD_MODULE_COUNT(config, moduleId, output)                  \
+#define VINBERO_CONFIG_GET_CHILD_MODULE_COUNT(config, moduleId, output)                  \
 do {                                                                                    \
     json_t* array = json_object_get(json_object_get((config)->json, moduleId), "next"); \
     if(json_is_array(array))                                                            \
@@ -122,10 +122,10 @@ do {                                                                            
         *output = -1;                                                                   \
 } while(0)
 
-#define TUCUBE_CONFIG_GET_CHILD_MODULE_IDS(config, moduleId, output)                                 \
+#define VINBERO_CONFIG_GET_CHILD_MODULE_IDS(config, moduleId, output)                                 \
 do {                                                                                                 \
     size_t childModuleCount;                                                                         \
-    TUCUBE_CONFIG_GET_CHILD_MODULE_COUNT(config, moduleId, &childModuleCount);                       \
+    VINBERO_CONFIG_GET_CHILD_MODULE_COUNT(config, moduleId, &childModuleCount);                       \
     json_t* childModuleIdsJson = json_object_get(json_object_get((config)->json, moduleId), "next"); \
     GENC_ARRAY_LIST_REALLOC(output, childModuleCount);                                               \
     json_t* childModuleIdJson;                                                                       \
