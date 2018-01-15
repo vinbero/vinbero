@@ -1,9 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "tucube_Help.h"
+#include "vinbero_Help.h"
 
-void tucube_Help_print() {
-    puts("Usage: tucube [OPTION]...");
+void vinbero_Help_print() {
+    puts("Usage: vinbero [OPTION]...");
     puts("A Modular TCP/UDP Server.");
     puts("Options:");
     puts("  -h --help                Print this help message.");
@@ -11,7 +11,7 @@ void tucube_Help_print() {
     puts("  -f --config-file         JSON-based config file.");
 }
 
-void tucube_Help_printAndExit() {
-    tucube_Help_print();
+void vinbero_Help_printAndExit() {
+    vinbero_Help_print();
     exit(EXIT_SUCCESS);
 }

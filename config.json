@@ -1,12 +1,12 @@
 [
-    {"tucube.workerCount": 4, "tucube.protocol": "TCP"},
-    ["/usr/local/lib/tucube/tucube_tcp_epoll.so", {}],
-    ["/usr/local/lib/tucube/tucube_epoll_http.so", {}], 
+    {"vinbero.workerCount": 4, "vinbero.protocol": "TCP"},
+    ["/usr/local/lib/vinbero/vinbero_tcp_epoll.so", {}],
+    ["/usr/local/lib/vinbero/vinbero_epoll_http.so", {}], 
     [
-        "/usr/local/lib/tucube/tucube_http_lua.so",
+        "/usr/local/lib/vinbero/vinbero_http_lua.so",
         {
-            "tucube_http_lua.scriptFile": "/usr/share/lua/5.3/cublog.lua",
-            "tucube_http_lua.scriptArg": {
+            "vinbero_http_lua.scriptFile": "/usr/share/lua/5.3/cublog.lua",
+            "vinbero_http_lua.scriptArg": {
                 "database": "cublog.db",
                 "admin.id": "admin",
                 "admin.password": "password",

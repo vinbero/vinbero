@@ -1,7 +1,7 @@
 set(CMAKE_INSTALL_RPATH "/usr/local/lib")
-add_executable(tucube tucube.c tucube_Core.c tucube_Help.c tucube_Options.c)
-set_target_properties(tucube PROPERTIES PUBLIC_HEADER "tucube_Module.h;tucube_ClData.h;tucube_IModule.h;tucube_ICLocal.h;tucube_IClService.h;tucube_ITlService.h;tucube_Args.h;tucube_ITLocal.h;tucube_IBasic.h")
-target_link_libraries(tucube dl pthread jansson gaio)
-install(TARGETS tucube 
+add_executable(vinbero vinbero.c vinbero_Core.c vinbero_Help.c vinbero_Options.c)
+set_target_properties(vinbero PROPERTIES PUBLIC_HEADER "vinbero_Module.h;vinbero_ClData.h;vinbero_IModule.h;vinbero_ICLocal.h;vinbero_IClService.h;vinbero_ITlService.h;vinbero_Args.h;vinbero_ITLocal.h;vinbero_IBasic.h")
+target_link_libraries(vinbero dl pthread jansson gaio)
+install(TARGETS vinbero 
         RUNTIME DESTINATION bin
-	PUBLIC_HEADER DESTINATION include/tucube)
+	PUBLIC_HEADER DESTINATION include/vinbero)

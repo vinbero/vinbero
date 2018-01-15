@@ -2,15 +2,15 @@
 #include <getopt.h>
 #include <stdbool.h>
 #include <string.h>
-#include "tucube_Options.h"
-#include "tucube_Core.h"
-#include "tucube_Help.h"
+#include "vinbero_Options.h"
+#include "vinbero_Core.h"
+#include "vinbero_Help.h"
 
-bool tucube_Options_checkConfig(struct tucube_Config* config) {
+bool vinbero_Options_checkConfig(struct vinbero_Config* config) {
     return true;
 }
 
-int tucube_Options_process(int argc, char* argv[], struct tucube_Config* config) {
+int vinbero_Options_process(int argc, char* argv[], struct vinbero_Config* config) {
 
     struct option options[] = {
         {"help", no_argument, NULL, 'h'},
@@ -40,18 +40,18 @@ int tucube_Options_process(int argc, char* argv[], struct tucube_Config* config)
             break;
         case 'h':
         default:
-            tucube_Help_printAndExit();
+            vinbero_Help_printAndExit();
             break;
         }
     }
 
     if(!isThereAnyOptions)
-        tucube_Help_printAndExit();
+        vinbero_Help_printAndExit();
 
     if(config->json == NULL)
-        tucube_Help_printAndExit();
+        vinbero_Help_printAndExit();
 
-    if(tucube_Options_checkConfig(config) == false)
+    if(vinbero_Options_checkConfig(config) == false)
         errx(EXIT_FAILURE, "%s: %u: Invalid config file", __FILE__, __LINE__);
 
     return 0;
