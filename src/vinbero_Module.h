@@ -8,8 +8,18 @@
 #include <libgenc/genc_ArrayList.h>
 #include "vinbero_IModule.h"
 
+struct vinbero_Config;
+struct vinbero_Interface;
+struct vinbero_Module;
+
 struct vinbero_Config {
     json_t* json;
+};
+
+struct vinbero_Interface {
+    void* localInterface;
+    struct vinbero_Module* module;
+    GENC_TREE_NODE(struct vinbero_Interface, struct vinbero_Interface*);
 };
 
 struct vinbero_Module {
@@ -18,7 +28,8 @@ struct vinbero_Module {
     const char* version;
     void* dlHandle;
     union genc_Generic localModule;
-    void* interface;
+    //void* interface;
+    struct vinbero_Interface interface;
     pthread_rwlock_t* rwLock;
     pthread_key_t* tlModuleKey;
     VINBERO_IMODULE_FUNCTION_POINTERS;
