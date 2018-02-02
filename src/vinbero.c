@@ -8,6 +8,7 @@ int main(int argc, char* argv[]) {
     struct vinbero_Module module;
     memset(&module, 0, sizeof(struct vinbero_Module));
     GENC_TREE_NODE_INIT(&module);
+    GENC_TREE_NODE_INIT(&module.interface);
     module.id = "core";
     module.localModule.pointer = malloc(1 * sizeof(struct vinbero_Core));
     module.interface = malloc(1 * sizeof(struct vinbero_Core_Interface));

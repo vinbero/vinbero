@@ -88,6 +88,7 @@ warnx("%s: %u: %s", __FILE__, __LINE__, __FUNCTION__);
         struct vinbero_Module* childModule = &GENC_TREE_NODE_GET_CHILD(module, index);
         GENC_TREE_NODE_INIT(childModule);
         GENC_TREE_NODE_SET_PARENT(childModule, module);
+        GENC_TREE_NODE_INIT(&childModule->interface);
         childModule->id = GENC_ARRAY_LIST_GET(&childModuleIds, index);
         int errorVariable;
         do {
@@ -222,6 +223,7 @@ warnx("%s: %u: %s", __FILE__, __LINE__, __FUNCTION__);
     if(setjmp(*jumpBuffer) == 0) {
         pthread_key_create(&vinbero_Core_tlKey, NULL);
         pthread_setspecific(vinbero_Core_tlKey, jumpBuffer);
+/*
         GENC_TREE_NODE_FOR_EACH_CHILD(module, index) {
             struct vinbero_Module* childModule = &GENC_TREE_NODE_GET_CHILD(module, index);
             childModule->interface = malloc(1 * sizeof(struct vinbero_Core_Interface));
@@ -229,6 +231,15 @@ warnx("%s: %u: %s", __FILE__, __LINE__, __FUNCTION__);
             if((childInterface->vinbero_IBasic_service = dlsym(childModule->dlHandle, "vinbero_IBasic_service")) == NULL)
                 errx(EXIT_FAILURE, "%s: %u: Unable to find vinbero_IBasic_service()", __FILE__, __LINE__);
             if(childInterface->vinbero_IBasic_service(childModule, (void*[]){NULL}) == -1)
+                errx(EXIT_FAILURE, "%s: %u: vinbero_IBasic_service() failed", __FILE__, __LINE__);
+        }
+*/
+        GENC_TREE_NODE_FOR_EACH_CHILD(module->interface, index) {
+            struct vinbero_Interface* childInterface = &GENC_TREE_NODE_GET_CHILD(module->interface, index);
+            struct vinbero_Core_Interface* childLocalInterface = childInterface->localInterface;
+            if((childLocalInterface->vinbero_IBasic_service = dlsym(childInterface->module->dlHandle, "vinbero_IBasic_service")) == NULL)
+                errx(EXIT_FAILURE, "%s: %u: Unable to find vinbero_IBasic_service()", __FILE__, __LINE__);
+            if(childLocalInterface->vinbero_IBasic_service(childModule, (void*[]){NULL} == -1)
                 errx(EXIT_FAILURE, "%s: %u: vinbero_IBasic_service() failed", __FILE__, __LINE__);
         }
     }
