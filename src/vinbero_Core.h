@@ -13,6 +13,7 @@ struct vinbero_Core {
 };
 
 struct vinbero_Core_Interface {
+    VINBERO_IMODULE_FUNCTION_POINTERS;
     VINBERO_IBASIC_FUNCTION_POINTERS; 
 };
 
