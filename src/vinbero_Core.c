@@ -74,12 +74,11 @@ warnx("%s: %u: %s", __FILE__, __LINE__, __FUNCTION__);
     return 0;
 }
 
-static int vinbero_Core_preInitChildModules(struct vinbero_Module* module, struct vinbero_Config* config) {
+static int vinbero_Core_buildModuleTree(struct vinbero_Module* module, struct vinbero_Config* config) {
 warnx("%s: %u: %s", __FILE__, __LINE__, __FUNCTION__);
     struct vinbero_Module_Ids childModuleIds;
     GENC_ARRAY_LIST_INIT(&childModuleIds);
     VINBERO_CONFIG_GET_CHILD_MODULE_IDS(config, module->id, &childModuleIds);
-    // check if 
     size_t childModuleCount = GENC_ARRAY_LIST_SIZE(&childModuleIds);
     GENC_TREE_NODE_INIT_CHILDREN(module, childModuleCount);
     GENC_TREE_NODE_ZERO_CHILDREN(module);
@@ -89,7 +88,9 @@ warnx("%s: %u: %s", __FILE__, __LINE__, __FUNCTION__);
         GENC_TREE_NODE_INIT(childModule);
         GENC_TREE_NODE_SET_PARENT(childModule, module);
         GENC_TREE_NODE_INIT(&childModule->interface);
+        childModule->interface.module = NULL;
         childModule->id = GENC_ARRAY_LIST_GET(&childModuleIds, index);
+/*
         int errorVariable;
         do {
             VINBERO_MODULE_DLOPEN(config, childModule, &errorVariable);
@@ -97,22 +98,22 @@ warnx("%s: %u: %s", __FILE__, __LINE__, __FUNCTION__);
                 warnx("%s: %u: %s: dlopen() failed for module %s", __FILE__, __LINE__, __FUNCTION__, childModule->id);
                 break;
             }
-            VINBERO_MODULE_DLSYM(childModule, childModule->dlHandle, vinbero_IModule_init, &errorVariable);
+            VINBERO_MODULE_DLSYM(childLocalInterface, childModule->dlHandle, vinbero_IModule_init, &errorVariable);
             if(errorVariable == 1) {
                 warnx("%s: %u: %s: dlsym() failed for vinbero_IModule_init at module %s", __FILE__, __LINE__, __FUNCTION__, childModule->id);
                 break;
             }
-            VINBERO_MODULE_DLSYM(childModule, childModule->dlHandle, vinbero_IModule_rInit, &errorVariable);
+            VINBERO_MODULE_DLSYM(childLocalInterface, childModule->dlHandle, vinbero_IModule_rInit, &errorVariable);
             if(errorVariable == 1) {
                 warnx("%s: %u: %s: dlsym() failed for vinbero_IModule_rInit at module %s", __FILE__, __LINE__, __FUNCTION__, childModule->id);
                 break;
             }
-            VINBERO_MODULE_DLSYM(childModule, childModule->dlHandle, vinbero_IModule_destroy, &errorVariable);
+            VINBERO_MODULE_DLSYM(childLocalInterface, childModule->dlHandle, vinbero_IModule_destroy, &errorVariable);
             if(errorVariable == 1) {
                 warnx("%s: %u: %s: dlsym() failed for vinbero_IModule_destroy at module %s", __FILE__, __LINE__, __FUNCTION__, childModule->id);
                 break;
             }
-            VINBERO_MODULE_DLSYM(childModule, childModule->dlHandle, vinbero_IModule_rDestroy, &errorVariable);
+            VINBERO_MODULE_DLSYM(childLocalInterface, childModule->dlHandle, vinbero_IModule_rDestroy, &errorVariable);
             if(errorVariable == 1) {
                 warnx("%s: %u: %s: dlsym() failed for vinbero_IModule_rDestroy at module %s", __FILE__, __LINE__, __FUNCTION__, childModule->id);
                 break;
@@ -122,13 +123,19 @@ warnx("%s: %u: %s", __FILE__, __LINE__, __FUNCTION__);
             GENC_ARRAY_LIST_FREE(&childModuleIds);
             return -1;
         }
-        if(vinbero_Core_preInitChildModules(childModule, config) == -1) {
+*/
+        if(vinbero_Core_buildModuleTree(childModule, config) == -1) {
             GENC_ARRAY_LIST_FREE(&childModuleIds);
             return -1;
         }
     }
     GENC_ARRAY_LIST_FREE(&childModuleIds);
     return 0;
+}
+
+static int vinbero_Core_preInitChildModules(struct vinbero_Module* module, struct vinbero_Config* config) {
+    GENC_TREE_NODE_INIT_CHILDREN(module->interface, GENC_TREE_NODE_CHILD_COUNT(module));
+    //.. and push empty children(isn't it stupid?)
 }
 
 static int vinbero_Core_initChildModules(struct vinbero_Module* module, struct vinbero_Config* config) {
@@ -196,8 +203,8 @@ warnx("%s: %u: %s", __FILE__, __LINE__, __FUNCTION__);
         errx(EXIT_FAILURE, "%s: %u: vinbero_Core_checkConfig() failed", __FILE__, __LINE__);
     if(vinbero_Core_initLocalModule(module, config) == -1)
         errx(EXIT_FAILURE, "%s: %u: vinbero_Core_initLocalModule() failed", __FILE__, __LINE__);
-    if(vinbero_Core_preInitChildModules(module, config) == -1) {
-        errx(EXIT_FAILURE, "%s: %u: vinbero_Core_preInitChildModules() failed", __FILE__, __LINE__);
+    if(vinbero_Core_buildModuleTree(module, config) == -1) {
+        errx(EXIT_FAILURE, "%s: %u: vinbero_Core_buildModuleTree() failed", __FILE__, __LINE__);
         // destroy child modules
     }
     if(vinbero_Core_initChildModules(module, config) == -1) {

@@ -32,7 +32,6 @@ struct vinbero_Module {
     struct vinbero_Interface interface;
     pthread_rwlock_t* rwLock;
     pthread_key_t* tlModuleKey;
-    VINBERO_IMODULE_FUNCTION_POINTERS;
     GENC_TREE_NODE(struct vinbero_Module, struct vinbero_Module*);
 };
 
