@@ -14,6 +14,16 @@
 
 static pthread_key_t vinbero_Core_tlKey;
 
+struct vinbero_Core {
+    uid_t setUid;
+    gid_t setGid;
+};
+
+struct vinbero_Core_Interface {
+    VINBERO_IMODULE_FUNCTION_POINTERS;
+    VINBERO_IBASIC_FUNCTION_POINTERS; 
+};
+
 static void vinbero_Core_sigIntHandler(int signal_number) {
 warnx("%s: %u: %s", __FILE__, __LINE__, __FUNCTION__);
     exit(EXIT_FAILURE);
@@ -80,8 +90,6 @@ warnx("%s: %u: %s", __FILE__, __LINE__, __FUNCTION__);
     GENC_ARRAY_LIST_INIT(&childModuleIds);
     VINBERO_CONFIG_GET_CHILD_MODULE_IDS(config, module->id, &childModuleIds);
     size_t childModuleCount = GENC_ARRAY_LIST_SIZE(&childModuleIds);
-    GENC_TREE_NODE_INIT_CHILDREN(module, childModuleCount);
-    GENC_TREE_NODE_ZERO_CHILDREN(module);
     GENC_ARRAY_LIST_FOR_EACH(&childModuleIds, index) {
         GENC_TREE_NODE_ADD_EMPTY_CHILD(module);
         struct vinbero_Module* childModule = &GENC_TREE_NODE_GET_CHILD(module, index);
@@ -134,8 +142,7 @@ warnx("%s: %u: %s", __FILE__, __LINE__, __FUNCTION__);
 }
 
 static int vinbero_Core_preInitChildModules(struct vinbero_Module* module, struct vinbero_Config* config) {
-    GENC_TREE_NODE_INIT_CHILDREN(module->interface, GENC_TREE_NODE_CHILD_COUNT(module));
-    //.. and push empty children(isn't it stupid?)
+    GENC_TREE_NODE_INIT3(module->interface, GENC_TREE_NODE_CHILD_COUNT(module));
 }
 
 static int vinbero_Core_initChildModules(struct vinbero_Module* module, struct vinbero_Config* config) {
@@ -196,8 +203,16 @@ warnx("%s: %u: %s", __FILE__, __LINE__, __FUNCTION__);
     return 0;
 }
 
-static int vinbero_Core_init(struct vinbero_Module* module, struct vinbero_Config* config) {
+static int vinbero_Core_initCoreModule(struct vinbero_Module** module, struct vinbero_Config* config) {
 warnx("%s: %u: %s", __FILE__, __LINE__, __FUNCTION__);
+
+    *module = malloc(1 * sizeof(struct vinbero_Module));
+    GENC_TREE_NODE_INIT(*module);
+    GENC_TREE_NODE_INIT(&(*module)->interface);
+    (*module)->id = "core";
+    (*module)->localModule.pointer = malloc(1 * sizeof(struct vinbero_Core));
+    (*module)->interface.localInterface = malloc(1 * sizeof(struct vinbero_Core_Interface));
+
     struct vinbero_Core* localModule = module->localModule.pointer;
     if(vinbero_Core_checkConfig(config, module->id) == -1)
         errx(EXIT_FAILURE, "%s: %u: vinbero_Core_checkConfig() failed", __FILE__, __LINE__);
@@ -220,10 +235,11 @@ warnx("%s: %u: %s", __FILE__, __LINE__, __FUNCTION__);
     return 0;
 }
 
-int vinbero_Core_start(struct vinbero_Module* module, struct vinbero_Config* config) {
+int vinbero_Core_start(struct vinbero_Config* config) {
 warnx("%s: %u: %s", __FILE__, __LINE__, __FUNCTION__);
+    struct vinbero_Module* module;
+    vinbero_Core_initCoreModule(&module, config);
     struct vinbero_Core* localModule = module->localModule.pointer;
-    vinbero_Core_init(module, config);
     vinbero_Core_registerSignalHandlers();
     atexit(vinbero_Core_exitHandler);
     jmp_buf* jumpBuffer = malloc(1 * sizeof(jmp_buf));
