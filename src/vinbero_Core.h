@@ -3,6 +3,6 @@
 
 #include "vinbero_Module.h"
 
-int vinbero_Core_start(struct vinbero_Module* module, struct vinbero_Config* config);
+int vinbero_Core_start(struct vinbero_Config* config);
 
 #endif
