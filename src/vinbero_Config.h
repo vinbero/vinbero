@@ -9,7 +9,7 @@ struct vinbero_Config {
     json_t* json;
 };
 
-#define VINBERO_CONFIG_CHECK(config, moduleId, errorVariable)                 \
+#define VINBERO_CONFIG_CHECK(config, moduleId, errorVariable)                \
 do {                                                                         \
     json_t* moduleJson;                                                      \
     json_t* moduleConfigJson;                                                \
@@ -25,11 +25,11 @@ do {                                                                         \
         *errorVariable = 1;                                                  \
 } while(0)
 
-#define VINBERO_CONFIG_GET(config, module, valueName, valueType, output, defaultValue)                                                          \
+#define VINBERO_CONFIG_GET(config, module, valueName, valueType, output, defaultValue)                                                         \
 do {                                                                                                                                           \
     bool valueFound = false;                                                                                                                   \
     json_t* outputJson;                                                                                                                        \
-    for(struct vinbero_Module* currentModule = module;                                                                                          \
+    for(struct vinbero_Module* currentModule = module;                                                                                         \
         GENC_TREE_NODE_PARENT(currentModule) != NULL;                                                                                          \
         currentModule = GENC_TREE_NODE_PARENT(currentModule)) {                                                                                \
         if((outputJson = json_object_get(json_object_get(json_object_get((config)->json, currentModule->id), "config"), valueName)) != NULL) { \
@@ -42,11 +42,11 @@ do {                                                                            
         *(output) = defaultValue;                                                                                                              \
 } while(0)
 
-#define VINBERO_CONFIG_GET_REQUIRED(config, module, valueName, valueType, output, errorVariable)                                                \
+#define VINBERO_CONFIG_GET_REQUIRED(config, module, valueName, valueType, output, errorVariable)                                               \
 do {                                                                                                                                           \
     *(errorVariable) = 1;                                                                                                                      \
     json_t* outputJson;                                                                                                                        \
-    for(struct vinbero_Module* currentModule = module;                                                                                          \
+    for(struct vinbero_Module* currentModule = module;                                                                                         \
         GENC_TREE_NODE_PARENT(currentModule) != NULL;                                                                                          \
         currentModule = GENC_TREE_NODE_PARENT(currentModule)) {                                                                                \
         if((outputJson = json_object_get(json_object_get(json_object_get((config)->json, currentModule->id), "config"), valueName)) != NULL) { \
@@ -57,12 +57,12 @@ do {                                                                            
     }                                                                                                                                          \
 } while(0)
 
-#define VINBERO_CONFIG_GET_MODULE_PATH(config, moduleId, modulePath)                                        \
+#define VINBERO_CONFIG_GET_MODULE_PATH(config, moduleId, modulePath)                                       \
 do {                                                                                                       \
     *(modulePath) = json_string_value(json_object_get(json_object_get((config)->json, moduleId), "path")); \
 } while(0)
 
-#define VINBERO_CONFIG_GET_CHILD_MODULE_COUNT(config, moduleId, output)                  \
+#define VINBERO_CONFIG_GET_CHILD_MODULE_COUNT(config, moduleId, output)                 \
 do {                                                                                    \
     json_t* array = json_object_get(json_object_get((config)->json, moduleId), "next"); \
     if(json_is_array(array))                                                            \
@@ -71,10 +71,10 @@ do {                                                                            
         *output = -1;                                                                   \
 } while(0)
 
-#define VINBERO_CONFIG_GET_CHILD_MODULE_IDS(config, moduleId, output)                                 \
+#define VINBERO_CONFIG_GET_CHILD_MODULE_IDS(config, moduleId, output)                                \
 do {                                                                                                 \
     size_t childModuleCount;                                                                         \
-    VINBERO_CONFIG_GET_CHILD_MODULE_COUNT(config, moduleId, &childModuleCount);                       \
+    VINBERO_CONFIG_GET_CHILD_MODULE_COUNT(config, moduleId, &childModuleCount);                      \
     json_t* childModuleIdsJson = json_object_get(json_object_get((config)->json, moduleId), "next"); \
     GENC_ARRAY_LIST_REALLOC(output, childModuleCount);                                               \
     json_t* childModuleIdJson;                                                                       \

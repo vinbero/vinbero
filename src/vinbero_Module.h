@@ -49,12 +49,12 @@ do {                                                                            
 } while(0)
 
 #define VINBERO_MODULE_DLSYM(interface, dlHandle, functionName, errorVariable) \
-do {                                                                          \
-    if(((interface)->functionName = dlsym(dlHandle, #functionName)) == NULL)  \
-        *errorVariable = 1;                                                   \
-    else                                                                      \
-        *errorVariable = 0;                                                   \
-}                                                                             \
+do {                                                                           \
+    if(((interface)->functionName = dlsym(dlHandle, #functionName)) == NULL)   \
+        *(errorVariable) = 1;                                                  \
+    else                                                                       \
+        *(errorVariable) = 0;                                                  \
+}                                                                              \
 while(0)
 
 #endif
