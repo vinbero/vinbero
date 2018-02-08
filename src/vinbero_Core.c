@@ -124,6 +124,12 @@ static int vinbero_Core_initInterfaceTree(struct vinbero_Interface* interface, s
         interface->module = module;
         interface->localInterface = malloc(1 * sizeof(struct vinbero_Core_Interface));
         struct vinbero_Core_Interface* localInterface = interface->localInterface;
+
+        int errorVariable;
+        VINBERO_MODULE_DLSYM(localInterface, module->dlHandle, vinbero_IModule_init, &errorVariable);
+        if(errorVariable == 1) {
+            warnx("%s: %u: %s: dlsym() failed for vinbero_IModule_init at module %s", __FILE__, __LINE__, __FUNCTION__, module->id);
+        }
     }
     GENC_TREE_NODE_FOR_EACH_CHILD(interface, index) {
         struct vinbero_Module* childInterface = &GENC_TREE_NODE_GET_CHILD(interface, index);
@@ -218,7 +224,7 @@ warnx("%s: %u: %s", __FILE__, __LINE__, __FUNCTION__);
     } while(0)
 */
 
-    if(vinbero_Core_checkConfig(config, (*module)->id) == -1)
+    if(vinbero_Core_checkConfig(config, "core") == -1)
         errx(EXIT_FAILURE, "%s: %u: vinbero_Core_checkConfig() failed", __FILE__, __LINE__);
     if(vinbero_Core_initModuleTree(*module, NULL, "core", config) == -1) {
         errx(EXIT_FAILURE, "%s: %u: vinbero_Core_initModuleTree() failed", __FILE__, __LINE__);
