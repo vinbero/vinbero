@@ -14,6 +14,9 @@
 #include "vinbero_Core.h"
 #include "vinbero_IModule.h"
 #include "vinbero_IBasic.h"
+#include "vinbero_Module.h"
+#include "vinbero_Interface.h"
+#include "vinbero_Config.h"
 
 static pthread_key_t vinbero_Core_tlKey;
 
@@ -95,11 +98,12 @@ warnx("%s: %u: %s", __FILE__, __LINE__, __FUNCTION__);
     size_t childModuleCount = GENC_ARRAY_LIST_SIZE(&childModuleIds);
 
     GENC_TREE_NODE_INIT3(module, childModuleCount);
-
     GENC_TREE_NODE_SET_PARENT(module, parentModule);
     module->id = moduleId;
-    GENC_TREE_NODE_INIT(&module->interface);
-    module->interface.module = NULL;
+    if(parentModule != NULL) {
+        int errorVariable;
+        VINBERO_MODULE_DLOPEN(config, module, &errorVariable);
+    }
     GENC_ARRAY_LIST_FOR_EACH(&childModuleIds, index) {
         struct vinbero_Module* childModule = &GENC_TREE_NODE_GET_CHILD(module, index);
         if(vinbero_Core_initModuleTree(childModule, module, GENC_ARRAY_LIST_GET(&childModuleIds, index), config) == -1) {
@@ -111,8 +115,26 @@ warnx("%s: %u: %s", __FILE__, __LINE__, __FUNCTION__);
     return 0;
 }
 
+static int vinbero_Core_initInterfaceTree(struct vinbero_Interface* interface, struct vinbero_Module* module) {
+    GENC_TREE_NODE_INIT3(interface, GENC_TREE_NODE_GET_CHILD_COUNT(module));
+    if(GENC_TREE_NODE_GET_PARENT(module) == NULL) {
+        interface->module = NULL;
+        interface->localInterface = NULL;
+    } else {
+        interface->module = module;
+        interface->localInterface = malloc(1 * sizeof(struct vinbero_Core_Interface));
+        struct vinbero_Core_Interface* localInterface = interface->localInterface;
+    }
+    GENC_TREE_NODE_FOR_EACH_CHILD(interface, index) {
+        struct vinbero_Module* childInterface = &GENC_TREE_NODE_GET_CHILD(interface, index);
+        struct vinbero_Module* childModule = &GENC_TREE_NODE_GET_CHILD(module, index);
+        vinbero_Core_initInterfaceTree(interface, childModule);
+    }
+    return 0;
+}
+
 static int vinbero_Core_preInitChildModules(struct vinbero_Module* module, struct vinbero_Config* config) {
-//    GENC_TREE_NODE_INIT3(&module->interface, GENC_TREE_NODE_CHILD_COUNT(module));
+    GENC_TREE_NODE_INIT3(&module->interface, GENC_TREE_NODE_GET_CHILD_COUNT(module));
 }
 
 static int vinbero_Core_initChildModules(struct vinbero_Module* module, struct vinbero_Config* config) {
