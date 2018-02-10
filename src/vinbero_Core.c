@@ -20,11 +20,6 @@
 
 static pthread_key_t vinbero_Core_tlKey;
 
-struct vinbero_Core_Interface {
-    VINBERO_IMODULE_FUNCTION_POINTERS;
-    VINBERO_IBASIC_FUNCTION_POINTERS; 
-};
-
 struct vinbero_Core_IModule_Interface {
     VINBERO_IMODULE_FUNCTION_POINTERS;
 };
@@ -132,6 +127,7 @@ static int vinbero_Core_initInterfaceTree(struct vinbero_Interface* interface, s
         interface->module = NULL;
         interface->localInterface = NULL;
     } else {
+// should I write this part as a callback function ???
         interface->module = module;
         interface->localInterface = malloc(1 * sizeof(struct vinbero_Core_Interface));
         struct vinbero_Core_Interface* localInterface = interface->localInterface;
@@ -156,6 +152,7 @@ static int vinbero_Core_initInterfaceTree(struct vinbero_Interface* interface, s
             warnx("%s: %u: %s: dlsym() failed for vinbero_IModule_rDestroy at module %s", __FILE__, __LINE__, __FUNCTION__, module->id);
             return -1;
         }
+/////////////////////////////////////
     }
     GENC_TREE_NODE_FOR_EACH_CHILD(interface, index) {
         struct vinbero_Module* childInterface = &GENC_TREE_NODE_GET_CHILD(interface, index);
@@ -285,6 +282,7 @@ warnx("%s: %u: %s", __FILE__, __LINE__, __FUNCTION__);
                 errx(EXIT_FAILURE, "%s: %u: vinbero_IBasic_service() failed", __FILE__, __LINE__);
         }
 */
+/*
         GENC_TREE_NODE_FOR_EACH_CHILD(&module->interface, index) {
             struct vinbero_Interface* childInterface = &GENC_TREE_NODE_GET_CHILD(&module->interface, index);
             struct vinbero_Core_Interface* childLocalInterface = childInterface->localInterface;
@@ -294,6 +292,7 @@ warnx("%s: %u: %s", __FILE__, __LINE__, __FUNCTION__);
                 errx(EXIT_FAILURE, "%s: %u: vinbero_IBasic_service() failed", __FILE__, __LINE__);
         }
     }
+*/
     free(jumpBuffer);
     pthread_key_delete(vinbero_Core_tlKey);
     GENC_TREE_NODE_FOR_EACH_CHILD(module, index) {
