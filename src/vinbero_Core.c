@@ -20,11 +20,6 @@
 
 static pthread_key_t vinbero_Core_tlKey;
 
-struct vinbero_Core {
-    uid_t setUid;
-    gid_t setGid;
-};
-
 struct vinbero_Core_Interface {
     VINBERO_IMODULE_FUNCTION_POINTERS;
     VINBERO_IBASIC_FUNCTION_POINTERS; 
@@ -36,6 +31,13 @@ struct vinbero_Core_IModule_Interface {
 
 struct vinbero_Core_IBasic_Interface {
     VINBERO_IBASIC_FUNCTION_POINTERS;
+};
+
+struct vinbero_Core {
+    uid_t setUid;
+    gid_t setGid;
+    struct vinbero_Core_IModule_Interface iModuleInterface;
+    struct vinbero_Core_IBasic_Interface iBasicInterface;
 };
 
 static void vinbero_Core_sigIntHandler(int signal_number) {
