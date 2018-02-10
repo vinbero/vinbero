@@ -30,6 +30,14 @@ struct vinbero_Core_Interface {
     VINBERO_IBASIC_FUNCTION_POINTERS; 
 };
 
+struct vinbero_Core_IModule_Interface {
+    VINBERO_IMODULE_FUNCTION_POINTERS;
+};
+
+struct vinbero_Core_IBasic_Interface {
+    VINBERO_IBASIC_FUNCTION_POINTERS;
+};
+
 static void vinbero_Core_sigIntHandler(int signal_number) {
 warnx("%s: %u: %s", __FILE__, __LINE__, __FUNCTION__);
     exit(EXIT_FAILURE);
