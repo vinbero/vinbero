@@ -8,7 +8,6 @@
 #include <libgenc/genc_ArrayList.h>
 #include "vinbero_IModule.h"
 #include "vinbero_Config.h"
-#include "vinbero_Interface.h"
 
 struct vinbero_Module {
     const char* id;
