@@ -15,6 +15,10 @@ int (*vinbero_ITLocal_rInit)(struct vinbero_Module*, struct vinbero_Config*, voi
 int (*vinbero_ITLocal_destroy)(struct vinbero_Module*);                               \
 int (*vinbero_ITLocal_rDestroy)(struct vinbero_Module*)
 
+struct vinbero_ITLocal_Interface {
+    VINBERO_ITLOCAL_FUNCTION_POINTERS;
+};
+
 #define VINBERO_ITLOCAL_DLSYM(interface, dlHandle, errorVariable)                      \
 do {                                                                                  \
     VINBERO_MODULE_DLSYM(interface, dlHandle, vinbero_ITLocal_init, errorVariable);     \
@@ -26,15 +30,5 @@ do {                                                                            
     VINBERO_MODULE_DLSYM(interface, dlHandle, vinbero_ITLocal_rDestroy, errorVariable); \
     if(*errorVariable == 1) break;                                                    \
 } while(0)
-
-/*
-#define VINBERO_ITLOCAL_INIT_CHILDREN(module, childInterfaceType, config, args) \
-GENC_TREE_NODE_FOR_EACH_CHILD(module, index) { \
-    struct vinbero_Module* childModule = &GENC_TREE_NODE_GET_CHILD(module, index) \
-    childInterfaceType* childInterface = childModule->interface; \
-    if(childInterface->vinbero_ITLocal_init(childModule, config, args) == -1) \
-        *errorVariable = 1; \
-}
-*/
 
 #endif

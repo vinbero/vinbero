@@ -11,6 +11,10 @@ int vinbero_ICLocal_destroy(struct vinbero_Module* module, struct vinbero_ClData
 int (*vinbero_ICLocal_init)(struct vinbero_Module*, struct vinbero_ClData*, void*[]); \
 int (*vinbero_ICLocal_destroy)(struct vinbero_Module*, struct vinbero_ClData*)
 
+struct vinbero_ICLocal_Interface {
+    VINBERO_ICLOCAL_FUNCTION_POINTERS;
+};
+
 #define VINBERO_ICLOCAL_DLSYM(interface, dlHandle, errorVariable) do { \
     VINBERO_MODULE_DLSYM(interface, dlHandle, vinbero_ICLocal_init, errorVariable); \
     if(*errorVariable == 1) break; \
