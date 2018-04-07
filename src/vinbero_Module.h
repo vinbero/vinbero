@@ -6,7 +6,6 @@
 #include <libgenc/genc_Generic.h>
 #include <libgenc/genc_Tree.h>
 #include <libgenc/genc_ArrayList.h>
-#include "vinbero_IModule.h"
 #include "vinbero_Config.h"
 
 struct vinbero_Module {

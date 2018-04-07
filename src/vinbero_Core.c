@@ -19,19 +19,9 @@
 
 static pthread_key_t vinbero_Core_tlKey;
 
-struct vinbero_Core_IModule_Interface {
-    VINBERO_IMODULE_FUNCTION_POINTERS;
-};
-
-struct vinbero_Core_IBasic_Interface {
-    VINBERO_IBASIC_FUNCTION_POINTERS;
-};
-
 struct vinbero_Core {
     uid_t setUid;
     gid_t setGid;
-//    struct vinbero_Core_IModule_Interface iModuleInterface;
-//    struct vinbero_Core_IBasic_Interface iBasicInterface;
 };
 
 static void vinbero_Core_sigIntHandler(int signal_number) {
@@ -122,55 +112,11 @@ warnx("%s: %u: %s", __FILE__, __LINE__, __FUNCTION__);
     return 0;
 }
 
-/*
-static int vinbero_Core_initInterfaceTree(struct vinbero_Interface* interface, struct vinbero_Module* module) {
-    GENC_TREE_NODE_INIT3(interface, GENC_TREE_NODE_GET_CHILD_COUNT(module));
-    if(GENC_TREE_NODE_GET_PARENT(module) == NULL) {
-        interface->module = NULL;
-        interface->localInterface = NULL;
-    } else {
-// should I write this part as a callback function ???
-        interface->module = module;
-        interface->localInterface = malloc(1 * sizeof(struct vinbero_Core_Interface));
-        struct vinbero_Core_Interface* localInterface = interface->localInterface;
-        int errorVariable;
-        VINBERO_MODULE_DLSYM(localInterface, module->dlHandle, vinbero_IModule_init, &errorVariable);
-        if(errorVariable == 1) {
-            warnx("%s: %u: %s: dlsym() failed for vinbero_IModule_init at module %s", __FILE__, __LINE__, __FUNCTION__, module->id);
-            return -1;
-        }
-        VINBERO_MODULE_DLSYM(localInterface, module->dlHandle, vinbero_IModule_rInit, &errorVariable);
-        if(errorVariable == 1) {
-            warnx("%s: %u: %s: dlsym() failed for vinbero_IModule_rInit at module %s", __FILE__, __LINE__, __FUNCTION__, module->id);
-            return -1;
-        }
-        VINBERO_MODULE_DLSYM(localInterface, module->dlHandle, vinbero_IModule_destroy, &errorVariable);
-        if(errorVariable == 1) {
-            warnx("%s: %u: %s: dlsym() failed for vinbero_IModule_destroy at module %s", __FILE__, __LINE__, __FUNCTION__, module->id);
-            return -1;
-        }
-        VINBERO_MODULE_DLSYM(localInterface, module->dlHandle, vinbero_IModule_rDestroy, &errorVariable);
-        if(errorVariable == 1) {
-            warnx("%s: %u: %s: dlsym() failed for vinbero_IModule_rDestroy at module %s", __FILE__, __LINE__, __FUNCTION__, module->id);
-            return -1;
-        }
-/////////////////////////////////////
-    }
-    GENC_TREE_NODE_FOR_EACH_CHILD(interface, index) {
-        struct vinbero_Module* childInterface = &GENC_TREE_NODE_GET_CHILD(interface, index);
-        struct vinbero_Module* childModule = &GENC_TREE_NODE_GET_CHILD(module, index);
-        if(vinbero_Core_initInterfaceTree(childInterface, childModule) == -1)
-            return -1;
-    }
-    return 0;
-}
-*/
-
 static int vinbero_Core_initChildModules(struct vinbero_Module* module, struct vinbero_Config* config) {
 warnx("%s: %u: %s", __FILE__, __LINE__, __FUNCTION__);
     GENC_TREE_NODE_FOR_EACH_CHILD(module, index) {
         struct vinbero_Module* childModule = &GENC_TREE_NODE_GET_CHILD(module, index);
-        struct vinbero_Core_IModule_Interface childInterface;
+        struct vinbero_IModule_Interface childInterface;
         int errorVariable;
         VINBERO_IMODULE_DLSYM(&childInterface, childModule->dlHandle, &errorVariable);
         if(errorVariable == 1)
@@ -195,7 +141,7 @@ static int vinbero_Core_rInitChildModules(struct vinbero_Module* module, struct 
 warnx("%s: %u: %s", __FILE__, __LINE__, __FUNCTION__);
     GENC_TREE_NODE_FOR_EACH_CHILD(module, index) {
         struct vinbero_Module* childModule = &GENC_TREE_NODE_GET_CHILD(module, index);
-        struct vinbero_Core_IModule_Interface childInterface;
+        struct vinbero_IModule_Interface childInterface;
         int errorVariable;
         if(vinbero_Core_initChildModules(childModule, config) == -1)
             return -1;
@@ -276,7 +222,7 @@ warnx("%s: %u: %s", __FILE__, __LINE__, __FUNCTION__);
 
         GENC_TREE_NODE_FOR_EACH_CHILD(module, index) {
             struct vinbero_Module* childModule = &GENC_TREE_NODE_GET_CHILD(module, index);
-            struct vinbero_Core_IBasic_Interface childInterface;
+            struct vinbero_IBasic_Interface childInterface;
             int errorVariable;
             VINBERO_IBASIC_DLSYM(&childInterface, childModule->dlHandle, &errorVariable);
             if(errorVariable == 1)
