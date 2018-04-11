@@ -118,7 +118,7 @@ warnx("%s: %u: %s", __FILE__, __LINE__, __FUNCTION__);
         struct vinbero_Module* childModule = &GENC_TREE_NODE_GET_CHILD(module, index);
         struct vinbero_IModule_Interface childInterface;
         int errorVariable;
-        VINBERO_IMODULE_DLSYM(&childInterface, childModule->dlHandle, &errorVariable);
+        VINBERO_IMODULE_DLSYM(&childInterface, &childModule->dlHandle, &errorVariable);
         if(errorVariable == 1)
             return -1;
         if(childInterface.vinbero_IModule_init(childModule, config, (void*[]){NULL}) == -1)
@@ -145,7 +145,7 @@ warnx("%s: %u: %s", __FILE__, __LINE__, __FUNCTION__);
         int errorVariable;
         if(vinbero_Core_initChildModules(childModule, config) == -1)
             return -1;
-        VINBERO_IMODULE_DLSYM(&childInterface, childModule->dlHandle, &errorVariable);
+        VINBERO_IMODULE_DLSYM(&childInterface, &childModule->dlHandle, &errorVariable);
         if(errorVariable == 1)
             return -1;
         if(childInterface.vinbero_IModule_rInit(childModule, config, (void*[]){NULL}) == -1)
@@ -224,7 +224,7 @@ warnx("%s: %u: %s", __FILE__, __LINE__, __FUNCTION__);
             struct vinbero_Module* childModule = &GENC_TREE_NODE_GET_CHILD(module, index);
             struct vinbero_IBasic_Interface childInterface;
             int errorVariable;
-            VINBERO_IBASIC_DLSYM(&childInterface, childModule->dlHandle, &errorVariable);
+            VINBERO_IBASIC_DLSYM(&childInterface, &childModule->dlHandle, &errorVariable);
             if(errorVariable == 1)
                 return -1;
             if(childInterface.vinbero_IBasic_service(childModule, (void*[]){NULL}) == -1)
