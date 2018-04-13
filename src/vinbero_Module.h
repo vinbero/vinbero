@@ -6,13 +6,14 @@
 #include <libgenc/genc_Generic.h>
 #include <libgenc/genc_Tree.h>
 #include <libgenc/genc_ArrayList.h>
+#include <fastdl.h>
 #include "vinbero_Config.h"
 
 struct vinbero_Module {
     const char* id;
     const char* name;
     const char* version;
-    void* dlHandle;
+    struct fastdl_Handle dlHandle;
     union genc_Generic localModule;
     pthread_rwlock_t* rwLock;
     pthread_key_t* tlModuleKey;
@@ -28,30 +29,28 @@ struct vinbero_Module_Ids {
 #define VINBERO_FUNC_SUCCESS 0
 #define VINBERO_FUNC_CONTINUE 1
 
-#define VINBERO_MODULE_DLOPEN(config, module, errorVariable)                                                               \
-do {                                                                                                                       \
-    const char* modulePath;                                                                                                \
+#define VINBERO_MODULE_DLOPEN(config, module, errorVariable) do { \
+    const char* modulePath; \
     if((modulePath = json_string_value(json_object_get(json_object_get((config)->json, (module)->id), "path"))) == NULL) { \
-        warnx("%s: %u: dlopen() failed, possible causes are:\n                                                             \
-               1. Unable to find next module\n                                                                             \
-               2. The next module didn't linked required shared libraries properly", __FILE__, __LINE__);                  \
-        *(errorVariable) = 1;                                                                                              \
-    } else if(((module)->dlHandle = dlopen(modulePath, RTLD_LAZY | RTLD_GLOBAL)) == NULL) {                                \
-        warnx("%s: %u: dlopen() failed, possible causes are:\n                                                             \
-               1. Unable to find next module\n                                                                             \
-               2. The next module didn't linked required shared libraries properly", __FILE__, __LINE__);                  \
-        *(errorVariable) = 1;                                                                                              \
-    } else                                                                                                                 \
-        *(errorVariable) = 0;                                                                                              \
+        warnx("%s: %u: fastdl_open() failed, possible causes are:\n \
+               1. Unable to find next module\n                                                            \
+               2. The next module didn't linked required shared libraries properly", __FILE__, __LINE__); \
+        *(errorVariable) = 1; \
+    } else if(fastdl_open(&(module)->dlHandle, modulePath, RTLD_LAZY | RTLD_GLOBAL) == -1) { \
+        warnx("%s: %u: fastdl_open() failed, possible causes are:\n                                       \
+               1. Unable to find next module\n                                                            \
+               2. The next module didn't linked required shared libraries properly", __FILE__, __LINE__); \
+        *(errorVariable) = 1; \
+    } else \
+        *(errorVariable) = 0; \
 } while(0)
 
-#define VINBERO_MODULE_DLSYM(interface, dlHandle, functionName, errorVariable) \
-do {                                                                           \
-    if(((interface)->functionName = dlsym(dlHandle, #functionName)) == NULL)   \
-        *(errorVariable) = 1;                                                  \
-    else                                                                       \
-        *(errorVariable) = 0;                                                  \
-}                                                                              \
+#define VINBERO_MODULE_DLSYM(interface, dlHandle, functionName, errorVariable) do { \
+    if(fastdl_sym(dlHandle, #functionName, (void**)&(interface)->functionName) == -1) \
+        *(errorVariable) = 1; \
+    else \
+        *(errorVariable) = 0; \
+} \
 while(0)
 
 #endif
