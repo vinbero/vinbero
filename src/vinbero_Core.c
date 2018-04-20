@@ -246,7 +246,6 @@ warnx("%s: %u: %s", __FILE__, __LINE__, __FUNCTION__);
     pthread_key_delete(vinbero_Core_tlKey);
     GENC_TREE_NODE_FOR_EACH_CHILD(module, index) {
         struct vinbero_Module* childModule = &GENC_TREE_NODE_GET_CHILD(module, index);
-//        free(&childModule->interface);
     }
     vinbero_Core_destroyChildModules(module);
     vinbero_Core_rDestroyChildModules(module);
