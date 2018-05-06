@@ -9,43 +9,40 @@ struct vinbero_Config {
     json_t* json;
 };
 
-#define VINBERO_CONFIG_CHECK(config, moduleId, errorVariable)                \
-do {                                                                         \
-    json_t* moduleJson;                                                      \
-    json_t* moduleConfigJson;                                                \
-    json_t* moduleChildrenJson;                                              \
-    if((moduleJson = json_object_get((config)->json, moduleId)) != NULL      \
-       && json_is_object(moduleJson)                                         \
+#define VINBERO_CONFIG_CHECK(config, moduleId, errorVariable) do { \
+    json_t* moduleJson; \
+    json_t* moduleConfigJson; \
+    json_t* moduleChildrenJson; \
+    if((moduleJson = json_object_get((config)->json, moduleId)) != NULL \
+       && json_is_object(moduleJson) \
        && (moduleConfigJson = json_object_get(moduleJson, "config")) != NULL \
-       && json_is_object(moduleConfigJson)                                   \
+       && json_is_object(moduleConfigJson) \
        && (moduleChildrenJson = json_object_get(moduleJson, "next")) != NULL \
-       && json_is_array(moduleChildrenJson)) {                               \
-        *errorVariable = 0;                                                  \
-    } else                                                                   \
-        *errorVariable = 1;                                                  \
+       && json_is_array(moduleChildrenJson)) { \
+        *errorVariable = 0; \
+    } else \
+        *errorVariable = VINBERO_EINVAL; \
 } while(0)
 
-#define VINBERO_CONFIG_GET(config, module, valueName, valueType, output, defaultValue)                                                         \
-do {                                                                                                                                           \
-    bool valueFound = false;                                                                                                                   \
-    json_t* outputJson;                                                                                                                        \
-    for(struct vinbero_Module* currentModule = module;                                                                                         \
-        GENC_TREE_NODE_PARENT(currentModule) != NULL;                                                                                          \
-        currentModule = GENC_TREE_NODE_PARENT(currentModule)) {                                                                                \
+#define VINBERO_CONFIG_GET(config, module, valueName, valueType, output, defaultValue) do { \
+    bool valueFound = false; \
+    json_t* outputJson; \
+    for(struct vinbero_Module* currentModule = module; \
+        GENC_TREE_NODE_PARENT(currentModule) != NULL; \
+        currentModule = GENC_TREE_NODE_PARENT(currentModule)) { \
         if((outputJson = json_object_get(json_object_get(json_object_get((config)->json, currentModule->id), "config"), valueName)) != NULL) { \
-            *(output) = json_##valueType##_value(outputJson);                                                                                  \
-            valueFound = true;                                                                                                                 \
-            break;                                                                                                                             \
-        }                                                                                                                                      \
-    }                                                                                                                                          \
-    if(valueFound == false)                                                                                                                    \
-        *(output) = defaultValue;                                                                                                              \
+            *(output) = json_##valueType##_value(outputJson); \
+            valueFound = true; \
+            break; \
+        } \
+    } \
+    if(valueFound == false) \
+        *(output) = defaultValue; \
 } while(0)
 
-#define VINBERO_CONFIG_GET_REQUIRED(config, module, valueName, valueType, output, errorVariable)                                               \
-do {                                                                                                                                           \
-    *(errorVariable) = 1;                                                                                                                      \
-    json_t* outputJson;                                                                                                                        \
+#define VINBERO_CONFIG_GET_REQUIRED(config, module, valueName, valueType, output, errorVariable) do { \
+    *(errorVariable) = VINBERO_EINVAL; \
+    json_t* outputJson; \
     for(struct vinbero_Module* currentModule = module;                                                                                         \
         GENC_TREE_NODE_PARENT(currentModule) != NULL;                                                                                          \
         currentModule = GENC_TREE_NODE_PARENT(currentModule)) {                                                                                \
