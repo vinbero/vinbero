@@ -11,20 +11,17 @@ bool vinbero_Options_checkConfig(struct vinbero_Config* config) {
 }
 
 int vinbero_Options_process(int argc, char* argv[], struct vinbero_Config* config) {
-
     struct option options[] = {
         {"help", no_argument, NULL, 'h'},
         {"inline-config", required_argument, NULL, 'i'},
         {"config-file", required_argument, NULL, 'f'},
         {NULL, 0, NULL, 0}
     };
-
     json_error_t configError;
     char optionChar;
-    bool isThereAnyOptions = false;
-
+    bool optionsExist = false;
     while((optionChar = getopt_long(argc, argv, "hi:f:", options, NULL)) != (char)-1) {
-        isThereAnyOptions = true;
+        optionsExist = true;
         switch(optionChar) {
         case 'i':
             if(config->json == NULL) {
@@ -45,7 +42,7 @@ int vinbero_Options_process(int argc, char* argv[], struct vinbero_Config* confi
         }
     }
 
-    if(!isThereAnyOptions)
+    if(!optionsExist)
         vinbero_Help_printAndExit();
 
     if(config->json == NULL)
