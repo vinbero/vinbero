@@ -4,11 +4,9 @@
 #include <string.h>
 #include "vinbero_Options.h"
 #include "vinbero_Core.h"
+#include "vinbero_Error.h"
 #include "vinbero_Help.h"
-
-bool vinbero_Options_checkConfig(struct vinbero_Config* config) {
-    return true;
-}
+#include "vinbero_Log.h"
 
 int vinbero_Options_process(int argc, char* argv[], struct vinbero_Config* config) {
 
@@ -28,14 +26,18 @@ int vinbero_Options_process(int argc, char* argv[], struct vinbero_Config* confi
         switch(optionChar) {
         case 'i':
             if(config->json == NULL) {
-                if((config->json = json_loads(optarg, 0, &configError)) == NULL)
-                    errx(EXIT_FAILURE, "%s: %d: %s", configError.source, configError.line, configError.text);
+                if((config->json = json_loads(optarg, 0, &configError)) == NULL) {
+                    VINBERO_LOG_ERROR("%s: %d: %s", configError.source, configError.line, configError.text);
+                    return VINBERO_EINVAL;
+                }
             }
             break;
         case 'f':
             if(config->json == NULL) {
-                if((config->json = json_load_file(optarg, 0, &configError)) == NULL)
-                    errx(EXIT_FAILURE, "%s: %d: %s", configError.source, configError.line, configError.text);
+                if((config->json = json_load_file(optarg, 0, &configError)) == NULL) {
+                    VINBERO_LOG_ERROR("%s: %d: %s", configError.source, configError.line, configError.text);
+                    return VINBERO_EINVAL;
+                }
             }
             break;
         case 'h':
@@ -50,9 +52,6 @@ int vinbero_Options_process(int argc, char* argv[], struct vinbero_Config* confi
 
     if(config->json == NULL)
         vinbero_Help_printAndExit();
-
-    if(vinbero_Options_checkConfig(config) == false)
-        errx(EXIT_FAILURE, "%s: %u: Invalid config file", __FILE__, __LINE__);
 
     return 0;
 }
