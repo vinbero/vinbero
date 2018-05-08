@@ -45,15 +45,15 @@ static int vinbero_Core_registerSignalHandlers() {
     signalAction.sa_handler = vinbero_Core_sigIntHandler;
     signalAction.sa_flags = SA_RESTART;
     if(sigfillset(&signalAction.sa_mask) == -1)
-        return -1;
+        return -errno;
     if(sigaction(SIGINT, &signalAction, NULL) == -1)
-        return -1;
+        return -errno;
     signalAction.sa_handler = SIG_IGN;
     signalAction.sa_flags = SA_RESTART;
     if(sigfillset(&signalAction.sa_mask) == -1)
-        return -1;
+        return -errno;
     if(sigaction(SIGPIPE, &signalAction, NULL) == -1)
-        return -1;
+        return -errno;
 }
 
 static int vinbero_Core_checkConfig(struct vinbero_Config* config, const char* moduleId) {
@@ -68,9 +68,9 @@ static int vinbero_Core_checkConfig(struct vinbero_Config* config, const char* m
     GENC_ARRAY_LIST_INIT(&childModuleIds);
     VINBERO_CONFIG_GET_CHILD_MODULE_IDS(config, moduleId, &childModuleIds);
     GENC_ARRAY_LIST_FOR_EACH(&childModuleIds, index) {
-        if(vinbero_Core_checkConfig(config, GENC_ARRAY_LIST_GET(&childModuleIds, index)) == -1) {
+        if((ret = vinbero_Core_checkConfig(config, GENC_ARRAY_LIST_GET(&childModuleIds, index))) < 0) {
             GENC_ARRAY_LIST_FREE(&childModuleIds);
-            return -1;
+            return ret;
         }
     }
     GENC_ARRAY_LIST_FREE(&childModuleIds);
@@ -106,9 +106,9 @@ static int vinbero_Core_loadChildModules(struct vinbero_Module* module, struct v
     }
     GENC_ARRAY_LIST_FOR_EACH(&childModuleIds, index) {
         struct vinbero_Module* childModule = &GENC_TREE_NODE_GET_CHILD(module, index);
-        if(vinbero_Core_loadChildModules(childModule, module, GENC_ARRAY_LIST_GET(&childModuleIds, index), config) == -1) {
+        if((ret = vinbero_Core_loadChildModules(childModule, module, GENC_ARRAY_LIST_GET(&childModuleIds, index), config)) < 0) {
             GENC_ARRAY_LIST_FREE(&childModuleIds);
-            return -1;
+            return ret;
         }
     }
     GENC_ARRAY_LIST_FREE(&childModuleIds);
@@ -136,8 +136,8 @@ static int vinbero_Core_initChildModules(struct vinbero_Module* module, struct v
             VINBERO_LOG_ERROR("Module %s has no version", childModule->id);
             return VINBERO_EINVAL;
         }
-        if(vinbero_Core_initChildModules(childModule, config) == -1)
-            return -1;
+        if((ret = vinbero_Core_initChildModules(childModule, config)) < 0)
+            return ret;
     }
     return 0;
 }
@@ -147,9 +147,10 @@ static int vinbero_Core_rInitChildModules(struct vinbero_Module* module, struct 
     int ret;
     GENC_TREE_NODE_FOR_EACH_CHILD(module, index) {
         struct vinbero_Module* childModule = &GENC_TREE_NODE_GET_CHILD(module, index);
-        if(vinbero_Core_initChildModules(childModule, config) == -1)
-            return -1;
+        if((ret = vinbero_Core_initChildModules(childModule, config)) < 0)
+            return ret;
         struct vinbero_IModule_Interface childInterface;
+        VINBERO_IMODULE_DLSYM(&childInterface, &childModule->dlHandle, &ret);
         if(ret < 0) {
             VINBERO_LOG_ERROR("%s", fastdl_error());
             return ret;
@@ -184,8 +185,8 @@ static int vinbero_Core_rDestroyChildModules(struct vinbero_Module* module) {
     int ret;
     GENC_TREE_NODE_FOR_EACH_CHILD(module, index) {
         struct vinbero_Module* childModule = &GENC_TREE_NODE_GET_CHILD(module, index);
-        if(vinbero_Core_rDestroyChildModules(childModule) == -1)
-            return -1;
+        if((ret = vinbero_Core_rDestroyChildModules(childModule)) < 0)
+            return ret;
         struct vinbero_IModule_Interface childInterface;
         VINBERO_IMODULE_DLSYM(&childInterface, &childModule->dlHandle, &ret);
         if(ret < 0) {
@@ -215,7 +216,7 @@ static int vinbero_Core_initCoreModule(struct vinbero_Module** module, struct vi
         VINBERO_LOG_ERROR("vinbero_Core_initLocalModule(...) failed");
         return ret;
     }
-    if(vinbero_Core_initLocalModule(*module, config) == -1)
+    if((ret = vinbero_Core_initLocalModule(*module, config)) < 0)
         VINBERO_LOG_ERROR("vinbero_Core_initLocalModule(...) failed");
 
     if((ret = vinbero_Core_initChildModules(*module, config)) < 0) {
