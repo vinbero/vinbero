@@ -1,12 +1,13 @@
 #ifndef _VINBERO_MODULE_H
 #define _VINBERO_MODULE_H
 
+#include <dlfcn.h>
+#include <fastdl.h>
 #include <jansson.h>
 #include <pthread.h>
 #include <libgenc/genc_Generic.h>
 #include <libgenc/genc_Tree.h>
 #include <libgenc/genc_ArrayList.h>
-#include <fastdl.h>
 #include "vinbero_Config.h"
 #include "vinbero_Error.h"
 
@@ -28,7 +29,7 @@ struct vinbero_Module_Ids {
 #define VINBERO_MODULE_DLOPEN(config, module, errorVariable) do { \
     const char* modulePath; \
     if((modulePath = json_string_value(json_object_get(json_object_get((config)->json, (module)->id), "path"))) == NULL) { \
-        *(errorVariable) = VINBERO_EUNKNOWN; \
+        *(errorVariable) = VINBERO_EINVAL; \
     } else if(fastdl_open(&(module)->dlHandle, modulePath, RTLD_LAZY | RTLD_GLOBAL) == -1) { \
         *(errorVariable) = VINBERO_EUNKNOWN; \
     } else \
@@ -36,9 +37,9 @@ struct vinbero_Module_Ids {
 } while(0)
 
 #define VINBERO_MODULE_DLSYM(interface, dlHandle, functionName, errorVariable) do { \
-    if(fastdl_sym(dlHandle, #functionName, (void**)&(interface)->functionName) == -1) { \
+    if(fastdl_sym(dlHandle, #functionName, (void**)&(interface)->functionName) == -1) \
         *(errorVariable) = VINBERO_EUNKNOWN; \
-    } else \
+    else \
         *(errorVariable) = 0; \
 } \
 while(0)
