@@ -6,7 +6,7 @@
 #include "vinbero_Core.h"
 #include "vinbero_Error.h"
 #include "vinbero_Help.h"
-#include "vinbero_Log.h"
+#include <vinbero_log.h>
 
 int vinbero_Options_process(int argc, char* argv[], struct vinbero_Config* config) {
     struct option options[] = {
