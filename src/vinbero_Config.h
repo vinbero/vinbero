@@ -80,4 +80,6 @@ do {                                                                            
         GENC_ARRAY_LIST_PUSH(output, json_string_value(childModuleIdJson));                          \
 } while(0)
 
+#define VINBERO_CONFIG_DESTROY(config) json_decref((config)->json)
+
 #endif
