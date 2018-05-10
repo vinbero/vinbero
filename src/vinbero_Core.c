@@ -39,7 +39,7 @@ static void vinbero_Core_exitHandler() {
     }
 }
 
-static int vinbero_Core_registerSignalHandlers() {
+int vinbero_Core_registerSignalHandlers() {
     VINBERO_LOG_TRACE("in %s(...)", __FUNCTION__);
     struct sigaction signalAction;
     signalAction.sa_handler = vinbero_Core_sigIntHandler;
@@ -56,7 +56,11 @@ static int vinbero_Core_registerSignalHandlers() {
         return -errno;
 }
 
-static int vinbero_Core_checkConfig(struct vinbero_Config* config, const char* moduleId) {
+void vinbero_Core_registerExitHandler() {
+    atexit(vinbero_Core_exitHandler);
+}
+
+int vinbero_Core_checkConfig(struct vinbero_Config* config, const char* moduleId) {
     VINBERO_LOG_TRACE("in %s(...)", __FUNCTION__);
     int ret;
     VINBERO_CONFIG_CHECK(config, moduleId, &ret);
@@ -77,7 +81,7 @@ static int vinbero_Core_checkConfig(struct vinbero_Config* config, const char* m
     return 0;
 }
 
-static int vinbero_Core_initLocalModule(struct vinbero_Module* module, struct vinbero_Config* config) {
+int vinbero_Core_initLocalModule(struct vinbero_Module* module, struct vinbero_Config* config) {
     VINBERO_LOG_TRACE("in %s(...)", __FUNCTION__);
     module->localModule.pointer = malloc(1 * sizeof(struct vinbero_Core));
     struct vinbero_Core* localModule = module->localModule.pointer;
@@ -86,7 +90,7 @@ static int vinbero_Core_initLocalModule(struct vinbero_Module* module, struct vi
     return 0;
 }
 
-static int vinbero_Core_loadChildModules(struct vinbero_Module* module, struct vinbero_Module* parentModule, const char* moduleId, struct vinbero_Config* config) {
+int vinbero_Core_loadChildModules(struct vinbero_Module* module, struct vinbero_Module* parentModule, const char* moduleId, struct vinbero_Config* config) {
     VINBERO_LOG_TRACE("in %s(...)", __FUNCTION__);
     int ret;
     struct vinbero_Module_Ids childModuleIds;
@@ -115,7 +119,7 @@ static int vinbero_Core_loadChildModules(struct vinbero_Module* module, struct v
     return 0;
 }
 
-static int vinbero_Core_initChildModules(struct vinbero_Module* module, struct vinbero_Config* config) {
+int vinbero_Core_initChildModules(struct vinbero_Module* module, struct vinbero_Config* config) {
     VINBERO_LOG_TRACE("in %s(...)", __FUNCTION__);
     int ret;
     GENC_TREE_NODE_FOR_EACH_CHILD(module, index) {
@@ -142,7 +146,7 @@ static int vinbero_Core_initChildModules(struct vinbero_Module* module, struct v
     return 0;
 }
 
-static int vinbero_Core_rInitChildModules(struct vinbero_Module* module, struct vinbero_Config* config) {
+int vinbero_Core_rInitChildModules(struct vinbero_Module* module, struct vinbero_Config* config) {
     VINBERO_LOG_TRACE("in %s(...)", __FUNCTION__);
     int ret;
     GENC_TREE_NODE_FOR_EACH_CHILD(module, index) {
@@ -161,7 +165,7 @@ static int vinbero_Core_rInitChildModules(struct vinbero_Module* module, struct 
     return 0;
 }
 
-static int vinbero_Core_destroyChildModules(struct vinbero_Module* module) {
+int vinbero_Core_destroyChildModules(struct vinbero_Module* module) {
     VINBERO_LOG_TRACE("in %s(...)", __FUNCTION__);
     int ret;
     GENC_TREE_NODE_FOR_EACH_CHILD(module, index) {
@@ -180,7 +184,7 @@ static int vinbero_Core_destroyChildModules(struct vinbero_Module* module) {
     return 0;
 }
 
-static int vinbero_Core_rDestroyChildModules(struct vinbero_Module* module) {
+int vinbero_Core_rDestroyChildModules(struct vinbero_Module* module) {
     VINBERO_LOG_TRACE("in %s(...)", __FUNCTION__);
     int ret;
     GENC_TREE_NODE_FOR_EACH_CHILD(module, index) {
@@ -200,60 +204,29 @@ static int vinbero_Core_rDestroyChildModules(struct vinbero_Module* module) {
     return 0;
 }
 
-static int vinbero_Core_initCoreModule(struct vinbero_Module** module, struct vinbero_Config* config) {
+int vinbero_Core_setGid(struct vinbero_Module* module) {
     VINBERO_LOG_TRACE("in %s(...)", __FUNCTION__);
-    int ret;
-    if((ret = vinbero_Core_checkConfig(config, "core")) < 0) {
-        VINBERO_LOG_ERROR("vinbero_Core_checkConfig(...) failed");
-        return ret; 
-    }
-    *module = calloc(1, sizeof(struct vinbero_Module));
-    if((ret = vinbero_Core_loadChildModules(*module, NULL, "core", config)) < 0) {
-        VINBERO_LOG_ERROR("vinbero_Core_loadChildModules(...) failed");
-        return ret;
-    }
-    if((ret = vinbero_Core_initLocalModule(*module, config)) < 0) {
-        VINBERO_LOG_ERROR("vinbero_Core_initLocalModule(...) failed");
-        return ret;
-    }
-    if((ret = vinbero_Core_initLocalModule(*module, config)) < 0)
-        VINBERO_LOG_ERROR("vinbero_Core_initLocalModule(...) failed");
-
-    if((ret = vinbero_Core_initChildModules(*module, config)) < 0) {
-        VINBERO_LOG_ERROR("vinbero_Core_initChildModules(...) failed");
-        return ret;
-    }
-    if((ret = vinbero_Core_rInitChildModules(*module, config)) < 0) {
-        VINBERO_LOG_ERROR("vinbero_Core_rInitChildModules(...) failed");
-        return ret;
-    }
-
-    struct vinbero_Core* localModule = (*module)->localModule.pointer;
+    struct vinbero_Core* localModule = module->localModule.pointer;
     if(setgid(localModule->setGid) < 0) {
         VINBERO_LOG_ERROR("setgid(...) failed");
         return -errno;
     }
-    if(setuid(localModule->setUid) < 0) {
+    return 0;
+}
+
+int vinbero_Core_setUid(struct vinbero_Module* module) {
+    VINBERO_LOG_TRACE("in %s(...)", __FUNCTION__);
+    struct vinbero_Core* localModule = module->localModule.pointer;
+    if(setgid(localModule->setUid) < 0) {
         VINBERO_LOG_ERROR("setuid(...) failed");
         return -errno;
     }
     return 0;
 }
 
-int vinbero_Core_start(struct vinbero_Config* config) {
+int vinbero_Core_start(struct vinbero_Module* module, struct vinbero_Config* config) {
     VINBERO_LOG_TRACE("in %s(...)", __FUNCTION__);
     int ret;
-    struct vinbero_Module* module;
-    if((ret = vinbero_Core_initCoreModule(&module, config)) < 0) {
-        VINBERO_LOG_ERROR("vinbero_Core_initCoreModule(...) failed");
-        return ret;
-    }
-    struct vinbero_Core* localModule = module->localModule.pointer;
-    if((ret = vinbero_Core_registerSignalHandlers()) < 0) {
-        VINBERO_LOG_ERROR("vinbero_Core_registerSignalHandlers(...) failed");
-        return ret;
-    }
-    atexit(vinbero_Core_exitHandler);
     jmp_buf* jumpBuffer = malloc(1 * sizeof(jmp_buf));
     if(setjmp(*jumpBuffer) == 0) {
         pthread_key_create(&vinbero_Core_tlKey, NULL);
