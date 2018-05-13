@@ -13,8 +13,11 @@ int main(int argc, char* argv[]) {
     memset(&module, 0, sizeof(struct vinbero_common_Module));
     struct vinbero_common_Config config;
     memset(&config, 0, sizeof(struct vinbero_common_Config));
-    vinbero_Options_process(argc, argv, &config);
 
+    if((ret = vinbero_Options_process(argc, argv, &config))) {
+        VINBERO_COMMON_LOG_ERROR("vinbero_Options_process(...) failed");
+        return EXIT_FAILURE;
+    }
     if((ret = vinbero_Core_checkConfig(&config, "core")) < 0) {
         VINBERO_COMMON_LOG_ERROR("vinbero_Core_checkConfig(...) failed");
         return EXIT_FAILURE;
@@ -31,7 +34,6 @@ int main(int argc, char* argv[]) {
         VINBERO_COMMON_LOG_ERROR("vinbero_Core_initLocalModule(...) failed");
         return EXIT_FAILURE;
     }
-
     if((ret = vinbero_Core_initChildModules(&module, &config)) < 0) {
         VINBERO_COMMON_LOG_ERROR("vinbero_Core_initChildModules(...) failed");
         return EXIT_FAILURE;
@@ -40,28 +42,23 @@ int main(int argc, char* argv[]) {
         VINBERO_COMMON_LOG_ERROR("vinbero_Core_rInitChildModules(...) failed");
         return EXIT_FAILURE;
     }
-
     if((ret = vinbero_Core_setGid(&module)) < 0) {
         VINBERO_COMMON_LOG_ERROR("vinbero_Core_setGid(...) failed");
         return EXIT_FAILURE;
     }
-
     if((ret = vinbero_Core_setUid(&module)) < 0) {
         VINBERO_COMMON_LOG_ERROR("vinbero_Core_setUid(...) failed");
         return EXIT_FAILURE;
     }
-
     if((ret = vinbero_Core_registerSignalHandlers()) < 0) {
         VINBERO_COMMON_LOG_ERROR("vinbero_Core_registerSignalHandlers(...) failed");
-        return ret;
+        return EXIT_FAILURE;
     }
     vinbero_Core_registerExitHandler();
-
     if((ret = vinbero_Core_start(&module, &config) < 0)) {
         VINBERO_COMMON_LOG_ERROR("vinbero_Core_start(...) failed");
         return EXIT_FAILURE;
     }
-
     vinbero_common_Config_destroy(&config);
 
     return 0;
