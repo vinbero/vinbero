@@ -1,14 +1,14 @@
-#include <err.h>
 #include <getopt.h>
+#include <jansson.h>
 #include <stdbool.h>
 #include <string.h>
+#include <vinbero_common/vinbero_common_Error.h>
+#include <vinbero_common/vinbero_common_Log.h>
 #include "vinbero_Options.h"
 #include "vinbero_Core.h"
-#include "vinbero_Error.h"
 #include "vinbero_Help.h"
-#include <vinbero_log.h>
 
-int vinbero_Options_process(int argc, char* argv[], struct vinbero_Config* config) {
+int vinbero_Options_process(int argc, char* argv[], struct vinbero_common_Config* config) {
     struct option options[] = {
         {"help", no_argument, NULL, 'h'},
         {"inline-config", required_argument, NULL, 'i'},
@@ -24,16 +24,16 @@ int vinbero_Options_process(int argc, char* argv[], struct vinbero_Config* confi
         case 'i':
             if(config->json == NULL) {
                 if((config->json = json_loads(optarg, 0, &configError)) == NULL) {
-                    VINBERO_LOG_ERROR("%s: %d: %s", configError.source, configError.line, configError.text);
-                    return VINBERO_EINVAL;
+                    VINBERO_COMMON_LOG_ERROR("%s: %d: %s", configError.source, configError.line, configError.text);
+                    return VINBERO_COMMON_EINVAL;
                 }
             }
             break;
         case 'f':
             if(config->json == NULL) {
                 if((config->json = json_load_file(optarg, 0, &configError)) == NULL) {
-                    VINBERO_LOG_ERROR("%s: %d: %s", configError.source, configError.line, configError.text);
-                    return VINBERO_EINVAL;
+                    VINBERO_COMMON_LOG_ERROR("%s: %d: %s", configError.source, configError.line, configError.text);
+                    return VINBERO_COMMON_EINVAL;
                 }
             }
             break;
