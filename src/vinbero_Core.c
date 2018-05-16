@@ -109,7 +109,10 @@ int vinbero_Core_loadChildModules(struct vinbero_common_Module* module, struct v
     if((ret = vinbero_common_Config_getChildModuleIds(config, moduleId, &childModuleIds)) < 0)
         return ret;
     size_t childModuleCount = GENC_ARRAY_LIST_SIZE(&childModuleIds);
-
+    if(module->needsChildren == true && childModuleCount == 0) {
+        VINBERO_COMMON_LOG_ERROR("module %s must have at least one child", module->name);
+        return VINBERO_COMMON_EINVAL;
+    }
     GENC_TREE_NODE_INIT3(module, childModuleCount);
     GENC_TREE_NODE_SET_PARENT(module, parentModule);
     module->id = moduleId;
@@ -142,6 +145,7 @@ int vinbero_Core_initChildModules(struct vinbero_common_Module* module, struct v
             VINBERO_COMMON_LOG_ERROR("%s", fastdl_error());
             return ret;
         }
+        childModule->needsChildren = true;
         if((ret = childInterface.vinbero_IModule_init(childModule, config, (void*[]){NULL})) < 0)
             return ret;
         if(childModule->name == NULL) {
