@@ -92,6 +92,7 @@ int vinbero_Core_checkConfig(struct vinbero_common_Config* config, const char* m
 int vinbero_Core_initLocalModule(struct vinbero_common_Module* module, struct vinbero_common_Config* config) {
     VINBERO_COMMON_LOG_TRACE("in %s(...)", __FUNCTION__);
     int ret;
+    module->needsChildren = true;
     module->localModule.pointer = malloc(1 * sizeof(struct vinbero_Core));
     struct vinbero_Core* localModule = module->localModule.pointer;
     if((ret = vinbero_common_Config_getInt(config, module, "vinbero.setUid", &localModule->setUid, geteuid())) < 0)
@@ -109,10 +110,6 @@ int vinbero_Core_loadChildModules(struct vinbero_common_Module* module, struct v
     if((ret = vinbero_common_Config_getChildModuleIds(config, moduleId, &childModuleIds)) < 0)
         return ret;
     size_t childModuleCount = GENC_ARRAY_LIST_SIZE(&childModuleIds);
-    if(module->needsChildren == true && childModuleCount == 0) {
-        VINBERO_COMMON_LOG_ERROR("module %s must have at least one child", module->name);
-        return VINBERO_COMMON_EINVAL;
-    }
     GENC_TREE_NODE_INIT3(module, childModuleCount);
     GENC_TREE_NODE_SET_PARENT(module, parentModule);
     module->id = moduleId;
@@ -148,6 +145,10 @@ int vinbero_Core_initChildModules(struct vinbero_common_Module* module, struct v
         childModule->needsChildren = true;
         if((ret = childInterface.vinbero_IModule_init(childModule, config, (void*[]){NULL})) < 0)
             return ret;
+        if(childModule->needsChildren == true && GENC_TREE_NODE_GET_CHILD_COUNT(childModule) == 0) {
+            VINBERO_COMMON_LOG_ERROR("module %s must have at least one child", childModule->name);
+            return VINBERO_COMMON_EINVAL;
+        }
         if(childModule->name == NULL) {
             VINBERO_COMMON_LOG_ERROR("Module %s has no name", childModule->id);
             return VINBERO_COMMON_EINVAL;
