@@ -11,7 +11,7 @@ int vinbero_IClService_call(struct vinbero_common_Module* module, struct vinbero
 int (*vinbero_IClService_call)(struct vinbero_common_Module*, struct vinbero_ClData*, void*[])
 
 struct vinbero_IClService_Interface {
-    VINBER_ICLSERVICE_FUNCTION_POINTERS;
+    VINBERO_ICLSERVICE_FUNCTION_POINTERS;
 };
 
 #define VINBERO_ICLSERVICE_DLSYM(interface, dlHandle, ret) \
