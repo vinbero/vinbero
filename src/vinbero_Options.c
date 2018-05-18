@@ -9,6 +9,7 @@
 #include "vinbero_Help.h"
 
 int vinbero_Options_process(int argc, char* argv[], struct vinbero_common_Config* config) {
+    int ret;
     struct option options[] = {
         {"help", no_argument, NULL, 'h'},
         {"inline-config", required_argument, NULL, 'i'},
@@ -22,19 +23,13 @@ int vinbero_Options_process(int argc, char* argv[], struct vinbero_common_Config
         optionsExist = true;
         switch(optionChar) {
         case 'i':
-            if(config->json == NULL) {
-                if((config->json = json_loads(optarg, 0, &configError)) == NULL) {
-                    VINBERO_COMMON_LOG_ERROR("%s: %d: %s", configError.source, configError.line, configError.text);
-                    return VINBERO_COMMON_EINVAL;
-                }
+            if((ret = vinbero_common_Config_fromString(config, optarg)) < 0) {
+                return ret;
             }
             break;
         case 'f':
-            if(config->json == NULL) {
-                if((config->json = json_load_file(optarg, 0, &configError)) == NULL) {
-                    VINBERO_COMMON_LOG_ERROR("%s: %d: %s", configError.source, configError.line, configError.text);
-                    return VINBERO_COMMON_EINVAL;
-                }
+            if((ret = vinbero_common_Config_fromFile(config, optarg)) < 0) {
+                return ret;
             }
             break;
         case 'h':
