@@ -193,7 +193,7 @@ int vinbero_Core_destroyChildModules(struct vinbero_common_Module* module) {
             VINBERO_COMMON_LOG_ERROR("%s", fastdl_error());
             return ret;
         }
-        if((ret = childInterface.vinbero_IModule_destroy(module)) < 0)
+        if((ret = childInterface.vinbero_IModule_destroy(childModule)) < 0)
             return ret;
         if((ret = vinbero_Core_destroyChildModules(childModule)) < 0)
             return ret;
@@ -214,7 +214,7 @@ int vinbero_Core_rDestroyChildModules(struct vinbero_common_Module* module) {
             VINBERO_COMMON_LOG_ERROR("%s", fastdl_error());
             return ret;
         }
-        if((ret = childInterface.vinbero_IModule_rDestroy(module)) < 0)
+        if((ret = childInterface.vinbero_IModule_rDestroy(childModule)) < 0)
             return ret;
     }
     GENC_TREE_NODE_FREE(module);
@@ -265,11 +265,6 @@ int vinbero_Core_start(struct vinbero_common_Module* module, struct vinbero_comm
 
     free(jumpBuffer);
     pthread_key_delete(vinbero_Core_tlKey);
-/*
-    GENC_TREE_NODE_FOR_EACH_CHILD(module, index) {
-        struct vinbero_common_Module* childModule = &GENC_TREE_NODE_GET_CHILD(module, index);
-    }
-*/
     vinbero_Core_destroyChildModules(module);
     vinbero_Core_rDestroyChildModules(module);
 
