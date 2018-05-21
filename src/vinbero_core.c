@@ -14,35 +14,35 @@
 #include <vinbero_common/vinbero_common_Log.h>
 #include <vinbero_common/vinbero_common_Config.h>
 #include <vinbero_common/vinbero_common_Module.h>
-#include "vinbero_Core.h"
+#include "vinbero_core.h"
 #include "vinbero_IModule.h"
 #include "vinbero_IBasic.h"
 
-static pthread_key_t vinbero_Core_tlKey;
+static pthread_key_t vinbero_core_tlKey;
 
-struct vinbero_Core {
+struct vinbero_core {
     uid_t setUid;
     gid_t setGid;
 };
 
-static void vinbero_Core_sigIntHandler(int signal_number) {
+static void vinbero_core_sigIntHandler(int signal_number) {
     VINBERO_COMMON_LOG_TRACE("in %s(...)", __FUNCTION__);
     exit(EXIT_FAILURE);
 }
 
-static void vinbero_Core_exitHandler() {
+static void vinbero_core_exitHandler() {
     VINBERO_COMMON_LOG_TRACE("in %s(...)", __FUNCTION__);
     if(syscall(SYS_gettid) == getpid()) {
-        jmp_buf* jumpBuffer = pthread_getspecific(vinbero_Core_tlKey);
+        jmp_buf* jumpBuffer = pthread_getspecific(vinbero_core_tlKey);
         if(jumpBuffer != NULL)
             longjmp(*jumpBuffer, 1);
     }
 }
 
-int vinbero_Core_registerSignalHandlers() {
+int vinbero_core_registerSignalHandlers() {
     VINBERO_COMMON_LOG_TRACE("in %s(...)", __FUNCTION__);
     struct sigaction signalAction;
-    signalAction.sa_handler = vinbero_Core_sigIntHandler;
+    signalAction.sa_handler = vinbero_core_sigIntHandler;
     signalAction.sa_flags = SA_RESTART;
     if(sigfillset(&signalAction.sa_mask) == -1)
         return -errno;
@@ -56,11 +56,11 @@ int vinbero_Core_registerSignalHandlers() {
         return -errno;
 }
 
-void vinbero_Core_registerExitHandler() {
-    atexit(vinbero_Core_exitHandler);
+void vinbero_core_registerExitHandler() {
+    atexit(vinbero_core_exitHandler);
 }
 
-int vinbero_Core_checkConfig(struct vinbero_common_Config* config, const char* moduleId) {
+int vinbero_core_checkConfig(struct vinbero_common_Config* config, const char* moduleId) {
     VINBERO_COMMON_LOG_TRACE("in %s(...)", __FUNCTION__);
     int ret;
     if((ret = vinbero_common_Config_check(config, moduleId)) < 0) {
@@ -78,7 +78,7 @@ int vinbero_Core_checkConfig(struct vinbero_common_Config* config, const char* m
 
 
     GENC_ARRAY_LIST_FOR_EACH(&childModuleIds, index) {
-        if((ret = vinbero_Core_checkConfig(config, GENC_ARRAY_LIST_GET(&childModuleIds, index))) < 0) {
+        if((ret = vinbero_core_checkConfig(config, GENC_ARRAY_LIST_GET(&childModuleIds, index))) < 0) {
             GENC_ARRAY_LIST_FREE(&childModuleIds);
             return ret;
         }
@@ -89,12 +89,12 @@ int vinbero_Core_checkConfig(struct vinbero_common_Config* config, const char* m
     return 0;
 }
 
-int vinbero_Core_initLocalModule(struct vinbero_common_Module* module, struct vinbero_common_Config* config) {
+int vinbero_core_initLocalModule(struct vinbero_common_Module* module, struct vinbero_common_Config* config) {
     VINBERO_COMMON_LOG_TRACE("in %s(...)", __FUNCTION__);
     int ret;
     module->needsChildren = true;
-    module->localModule.pointer = malloc(1 * sizeof(struct vinbero_Core));
-    struct vinbero_Core* localModule = module->localModule.pointer;
+    module->localModule.pointer = malloc(1 * sizeof(struct vinbero_core));
+    struct vinbero_core* localModule = module->localModule.pointer;
     if((ret = vinbero_common_Config_getInt(config, module, "vinbero.setUid", &localModule->setUid, geteuid())) < 0)
         return ret;
     if((ret = vinbero_common_Config_getInt(config, module, "vinbero.setGid", &localModule->setGid, getegid())) < 0)
@@ -102,7 +102,7 @@ int vinbero_Core_initLocalModule(struct vinbero_common_Module* module, struct vi
     return 0;
 }
 
-int vinbero_Core_loadChildModules(struct vinbero_common_Module* module, struct vinbero_common_Module* parentModule, const char* moduleId, struct vinbero_common_Config* config) {
+int vinbero_core_loadChildModules(struct vinbero_common_Module* module, struct vinbero_common_Module* parentModule, const char* moduleId, struct vinbero_common_Config* config) {
     VINBERO_COMMON_LOG_TRACE("in %s(...)", __FUNCTION__);
     int ret;
     struct vinbero_common_Module_Ids childModuleIds;
@@ -121,7 +121,7 @@ int vinbero_Core_loadChildModules(struct vinbero_common_Module* module, struct v
     }
     GENC_ARRAY_LIST_FOR_EACH(&childModuleIds, index) {
         struct vinbero_common_Module* childModule = &GENC_TREE_NODE_GET_CHILD(module, index);
-        if((ret = vinbero_Core_loadChildModules(childModule, module, GENC_ARRAY_LIST_GET(&childModuleIds, index), config)) < 0) {
+        if((ret = vinbero_core_loadChildModules(childModule, module, GENC_ARRAY_LIST_GET(&childModuleIds, index), config)) < 0) {
             GENC_ARRAY_LIST_FREE(&childModuleIds);
             return ret;
         }
@@ -131,7 +131,7 @@ int vinbero_Core_loadChildModules(struct vinbero_common_Module* module, struct v
     return 0;
 }
 
-int vinbero_Core_initChildModules(struct vinbero_common_Module* module, struct vinbero_common_Config* config) {
+int vinbero_core_initChildModules(struct vinbero_common_Module* module, struct vinbero_common_Config* config) {
     VINBERO_COMMON_LOG_TRACE("in %s(...)", __FUNCTION__);
     int ret;
     GENC_TREE_NODE_FOR_EACH_CHILD(module, index) {
@@ -157,18 +157,18 @@ int vinbero_Core_initChildModules(struct vinbero_common_Module* module, struct v
             VINBERO_COMMON_LOG_ERROR("Module %s has no version", childModule->id);
             return VINBERO_COMMON_EINVAL;
         }
-        if((ret = vinbero_Core_initChildModules(childModule, config)) < 0)
+        if((ret = vinbero_core_initChildModules(childModule, config)) < 0)
             return ret;
     }
     return 0;
 }
 
-int vinbero_Core_rInitChildModules(struct vinbero_common_Module* module, struct vinbero_common_Config* config) {
+int vinbero_core_rInitChildModules(struct vinbero_common_Module* module, struct vinbero_common_Config* config) {
     VINBERO_COMMON_LOG_TRACE("in %s(...)", __FUNCTION__);
     int ret;
     GENC_TREE_NODE_FOR_EACH_CHILD(module, index) {
         struct vinbero_common_Module* childModule = &GENC_TREE_NODE_GET_CHILD(module, index);
-        if((ret = vinbero_Core_initChildModules(childModule, config)) < 0)
+        if((ret = vinbero_core_initChildModules(childModule, config)) < 0)
             return ret;
         struct vinbero_IModule_Interface childInterface;
         VINBERO_IMODULE_DLSYM(&childInterface, &childModule->dlHandle, &ret);
@@ -182,7 +182,7 @@ int vinbero_Core_rInitChildModules(struct vinbero_common_Module* module, struct 
     return 0;
 }
 
-int vinbero_Core_destroyChildModules(struct vinbero_common_Module* module) {
+int vinbero_core_destroyChildModules(struct vinbero_common_Module* module) {
     VINBERO_COMMON_LOG_TRACE("in %s(...)", __FUNCTION__);
     int ret;
     GENC_TREE_NODE_FOR_EACH_CHILD(module, index) {
@@ -195,18 +195,18 @@ int vinbero_Core_destroyChildModules(struct vinbero_common_Module* module) {
         }
         if((ret = childInterface.vinbero_IModule_destroy(childModule)) < 0)
             return ret;
-        if((ret = vinbero_Core_destroyChildModules(childModule)) < 0)
+        if((ret = vinbero_core_destroyChildModules(childModule)) < 0)
             return ret;
     }
     return 0;
 }
 
-int vinbero_Core_rDestroyChildModules(struct vinbero_common_Module* module) {
+int vinbero_core_rDestroyChildModules(struct vinbero_common_Module* module) {
     VINBERO_COMMON_LOG_TRACE("in %s(...)", __FUNCTION__);
     int ret;
     GENC_TREE_NODE_FOR_EACH_CHILD(module, index) {
         struct vinbero_common_Module* childModule = &GENC_TREE_NODE_GET_CHILD(module, index);
-        if((ret = vinbero_Core_rDestroyChildModules(childModule)) < 0)
+        if((ret = vinbero_core_rDestroyChildModules(childModule)) < 0)
             return ret;
         struct vinbero_IModule_Interface childInterface;
         VINBERO_IMODULE_DLSYM(&childInterface, &childModule->dlHandle, &ret);
@@ -221,9 +221,9 @@ int vinbero_Core_rDestroyChildModules(struct vinbero_common_Module* module) {
     return 0;
 }
 
-int vinbero_Core_setGid(struct vinbero_common_Module* module) {
+int vinbero_core_setGid(struct vinbero_common_Module* module) {
     VINBERO_COMMON_LOG_TRACE("in %s(...)", __FUNCTION__);
-    struct vinbero_Core* localModule = module->localModule.pointer;
+    struct vinbero_core* localModule = module->localModule.pointer;
     if(setgid(localModule->setGid) < 0) {
         VINBERO_COMMON_LOG_ERROR("setgid(...) failed");
         return -errno;
@@ -231,9 +231,9 @@ int vinbero_Core_setGid(struct vinbero_common_Module* module) {
     return 0;
 }
 
-int vinbero_Core_setUid(struct vinbero_common_Module* module) {
+int vinbero_core_setUid(struct vinbero_common_Module* module) {
     VINBERO_COMMON_LOG_TRACE("in %s(...)", __FUNCTION__);
-    struct vinbero_Core* localModule = module->localModule.pointer;
+    struct vinbero_core* localModule = module->localModule.pointer;
     if(setgid(localModule->setUid) < 0) {
         VINBERO_COMMON_LOG_ERROR("setuid(...) failed");
         return -errno;
@@ -241,13 +241,13 @@ int vinbero_Core_setUid(struct vinbero_common_Module* module) {
     return 0;
 }
 
-int vinbero_Core_start(struct vinbero_common_Module* module, struct vinbero_common_Config* config) {
+int vinbero_core_start(struct vinbero_common_Module* module, struct vinbero_common_Config* config) {
     VINBERO_COMMON_LOG_TRACE("in %s(...)", __FUNCTION__);
     int ret;
     jmp_buf* jumpBuffer = malloc(1 * sizeof(jmp_buf));
     if(setjmp(*jumpBuffer) == 0) {
-        pthread_key_create(&vinbero_Core_tlKey, NULL);
-        pthread_setspecific(vinbero_Core_tlKey, jumpBuffer);
+        pthread_key_create(&vinbero_core_tlKey, NULL);
+        pthread_setspecific(vinbero_core_tlKey, jumpBuffer);
         GENC_TREE_NODE_FOR_EACH_CHILD(module, index) {
             struct vinbero_common_Module* childModule = &GENC_TREE_NODE_GET_CHILD(module, index);
             struct vinbero_IBasic_Interface childInterface;
@@ -264,9 +264,9 @@ int vinbero_Core_start(struct vinbero_common_Module* module, struct vinbero_comm
     }
 
     free(jumpBuffer);
-    pthread_key_delete(vinbero_Core_tlKey);
-    vinbero_Core_destroyChildModules(module);
-    vinbero_Core_rDestroyChildModules(module);
+    pthread_key_delete(vinbero_core_tlKey);
+    vinbero_core_destroyChildModules(module);
+    vinbero_core_rDestroyChildModules(module);
 
 //    dlclose(localModule->dlHandle);
     return 0;
