@@ -4,7 +4,7 @@
 #include <vinbero_common/vinbero_common_Config.h>
 #include <vinbero_common/vinbero_common_Module.h>
 #include <vinbero_common/vinbero_common_Log.h>
-#include "vinbero_Core.h"
+#include "vinbero_core.h"
 #include "vinbero_Options.h"
 
 int main(int argc, char* argv[]) {
@@ -18,45 +18,45 @@ int main(int argc, char* argv[]) {
         VINBERO_COMMON_LOG_ERROR("vinbero_Options_process(...) failed");
         return EXIT_FAILURE;
     }
-    if((ret = vinbero_Core_checkConfig(&config, "core")) < 0) {
-        VINBERO_COMMON_LOG_ERROR("vinbero_Core_checkConfig(...) failed");
+    if((ret = vinbero_core_checkConfig(&config, "core")) < 0) {
+        VINBERO_COMMON_LOG_ERROR("vinbero_core_checkConfig(...) failed");
         return EXIT_FAILURE;
     }
-    if((ret = vinbero_Core_loadChildModules(&module, NULL, "core", &config)) < 0) {
-        VINBERO_COMMON_LOG_ERROR("vinbero_Core_loadChildModules(...) failed");
+    if((ret = vinbero_core_loadChildModules(&module, NULL, "core", &config)) < 0) {
+        VINBERO_COMMON_LOG_ERROR("vinbero_core_loadChildModules(...) failed");
         return EXIT_FAILURE;
     }
-    if((ret = vinbero_Core_initLocalModule(&module, &config)) < 0) {
-        VINBERO_COMMON_LOG_ERROR("vinbero_Core_initLocalModule(...) failed");
+    if((ret = vinbero_core_initLocalModule(&module, &config)) < 0) {
+        VINBERO_COMMON_LOG_ERROR("vinbero_core_initLocalModule(...) failed");
         return EXIT_FAILURE;
     }
-    if((ret = vinbero_Core_initLocalModule(&module, &config)) < 0) {
-        VINBERO_COMMON_LOG_ERROR("vinbero_Core_initLocalModule(...) failed");
+    if((ret = vinbero_core_initLocalModule(&module, &config)) < 0) {
+        VINBERO_COMMON_LOG_ERROR("vinbero_core_initLocalModule(...) failed");
         return EXIT_FAILURE;
     }
-    if((ret = vinbero_Core_initChildModules(&module, &config)) < 0) {
-        VINBERO_COMMON_LOG_ERROR("vinbero_Core_initChildModules(...) failed");
+    if((ret = vinbero_core_initChildModules(&module, &config)) < 0) {
+        VINBERO_COMMON_LOG_ERROR("vinbero_core_initChildModules(...) failed");
         return EXIT_FAILURE;
     }
-    if((ret = vinbero_Core_rInitChildModules(&module, &config)) < 0) {
-        VINBERO_COMMON_LOG_ERROR("vinbero_Core_rInitChildModules(...) failed");
+    if((ret = vinbero_core_rInitChildModules(&module, &config)) < 0) {
+        VINBERO_COMMON_LOG_ERROR("vinbero_core_rInitChildModules(...) failed");
         return EXIT_FAILURE;
     }
-    if((ret = vinbero_Core_setGid(&module)) < 0) {
-        VINBERO_COMMON_LOG_ERROR("vinbero_Core_setGid(...) failed");
+    if((ret = vinbero_core_setGid(&module)) < 0) {
+        VINBERO_COMMON_LOG_ERROR("vinbero_core_setGid(...) failed");
         return EXIT_FAILURE;
     }
-    if((ret = vinbero_Core_setUid(&module)) < 0) {
-        VINBERO_COMMON_LOG_ERROR("vinbero_Core_setUid(...) failed");
+    if((ret = vinbero_core_setUid(&module)) < 0) {
+        VINBERO_COMMON_LOG_ERROR("vinbero_core_setUid(...) failed");
         return EXIT_FAILURE;
     }
-    if((ret = vinbero_Core_registerSignalHandlers()) < 0) {
-        VINBERO_COMMON_LOG_ERROR("vinbero_Core_registerSignalHandlers(...) failed");
+    if((ret = vinbero_core_registerSignalHandlers()) < 0) {
+        VINBERO_COMMON_LOG_ERROR("vinbero_core_registerSignalHandlers(...) failed");
         return EXIT_FAILURE;
     }
-    vinbero_Core_registerExitHandler();
-    if((ret = vinbero_Core_start(&module, &config) < 0)) {
-        VINBERO_COMMON_LOG_ERROR("vinbero_Core_start(...) failed");
+    vinbero_core_registerExitHandler();
+    if((ret = vinbero_core_start(&module, &config) < 0)) {
+        VINBERO_COMMON_LOG_ERROR("vinbero_core_start(...) failed");
         return EXIT_FAILURE;
     }
     vinbero_common_Config_destroy(&config);

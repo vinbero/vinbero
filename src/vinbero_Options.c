@@ -5,7 +5,6 @@
 #include <vinbero_common/vinbero_common_Error.h>
 #include <vinbero_common/vinbero_common_Log.h>
 #include "vinbero_Options.h"
-#include "vinbero_Core.h"
 #include "vinbero_Help.h"
 
 int vinbero_Options_process(int argc, char* argv[], struct vinbero_common_Config* config) {
