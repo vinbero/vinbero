@@ -12,7 +12,7 @@ int main(int argc, char* argv[]) {
     struct vinbero_common_Module module;
     memset(&module, 0, sizeof(struct vinbero_common_Module));
     struct vinbero_common_Config config;
-    memset(&config, 0, sizeof(struct vinbero_common_Config));
+    vinbero_common_Config_init(&config);
 
     if((ret = vinbero_Options_process(argc, argv, &config))) {
         VINBERO_COMMON_LOG_ERROR("vinbero_Options_process(...) failed");
