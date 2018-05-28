@@ -12,11 +12,12 @@
 #include <libgenc/genc_Tree.h>
 #include <libgenc/genc_ArrayList.h>
 #include <vinbero_common/vinbero_common_Log.h>
+#include <vinbero_common/vinbero_common_Call.h>
 #include <vinbero_common/vinbero_common_Config.h>
 #include <vinbero_common/vinbero_common_Module.h>
 #include "vinbero_core.h"
-#include "vinbero_IModule.h"
-#include "vinbero_IBasic.h"
+#include "vinbero_IMODULE.h"
+#include "vinbero_IBASIC.h"
 
 static pthread_key_t vinbero_core_tlKey;
 
@@ -136,14 +137,14 @@ int vinbero_core_initChildModules(struct vinbero_common_Module* module, struct v
     int ret;
     GENC_TREE_NODE_FOR_EACH_CHILD(module, index) {
         struct vinbero_common_Module* childModule = &GENC_TREE_NODE_GET_CHILD(module, index);
-        struct vinbero_IModule_Interface childInterface;
+        struct vinbero_IMODULE_Interface childInterface;
         VINBERO_IMODULE_DLSYM(&childInterface, &childModule->dlHandle, &ret);
         if(ret < 0) {
             VINBERO_COMMON_LOG_ERROR("%s", fastdl_error());
             return ret;
         }
         childModule->needsChildren = true;
-        if((ret = childInterface.vinbero_IModule_init(childModule, config, (void*[]){NULL})) < 0)
+        if((ret = childInterface.vinbero_IMODULE_init(childModule, config, (void*[]){NULL})) < 0)
             return ret;
         if(childModule->needsChildren == true && GENC_TREE_NODE_GET_CHILD_COUNT(childModule) == 0) {
             VINBERO_COMMON_LOG_ERROR("module %s must have at least one child", childModule->name);
@@ -170,13 +171,13 @@ int vinbero_core_rInitChildModules(struct vinbero_common_Module* module, struct 
         struct vinbero_common_Module* childModule = &GENC_TREE_NODE_GET_CHILD(module, index);
         if((ret = vinbero_core_initChildModules(childModule, config)) < 0)
             return ret;
-        struct vinbero_IModule_Interface childInterface;
+        struct vinbero_IMODULE_Interface childInterface;
         VINBERO_IMODULE_DLSYM(&childInterface, &childModule->dlHandle, &ret);
         if(ret < 0) {
             VINBERO_COMMON_LOG_ERROR("%s", fastdl_error());
             return ret;
         }
-        if((ret = childInterface.vinbero_IModule_rInit(childModule, config, (void*[]){NULL})) < 0)
+        if((ret = childInterface.vinbero_IMODULE_rInit(childModule, config, (void*[]){NULL})) < 0)
             return ret;
     }
     return 0;
@@ -187,13 +188,13 @@ int vinbero_core_destroyChildModules(struct vinbero_common_Module* module) {
     int ret;
     GENC_TREE_NODE_FOR_EACH_CHILD(module, index) {
         struct vinbero_common_Module* childModule = &GENC_TREE_NODE_GET_CHILD(module, index);
-        struct vinbero_IModule_Interface childInterface;
+        struct vinbero_IMODULE_Interface childInterface;
         VINBERO_IMODULE_DLSYM(&childInterface, &childModule->dlHandle, &ret);
         if(ret < 0) {
             VINBERO_COMMON_LOG_ERROR("%s", fastdl_error());
             return ret;
         }
-        if((ret = childInterface.vinbero_IModule_destroy(childModule)) < 0)
+        if((ret = childInterface.vinbero_IMODULE_destroy(childModule)) < 0)
             return ret;
         if((ret = vinbero_core_destroyChildModules(childModule)) < 0)
             return ret;
@@ -208,13 +209,13 @@ int vinbero_core_rDestroyChildModules(struct vinbero_common_Module* module) {
         struct vinbero_common_Module* childModule = &GENC_TREE_NODE_GET_CHILD(module, index);
         if((ret = vinbero_core_rDestroyChildModules(childModule)) < 0)
             return ret;
-        struct vinbero_IModule_Interface childInterface;
+        struct vinbero_IMODULE_Interface childInterface;
         VINBERO_IMODULE_DLSYM(&childInterface, &childModule->dlHandle, &ret);
         if(ret < 0) {
             VINBERO_COMMON_LOG_ERROR("%s", fastdl_error());
             return ret;
         }
-        if((ret = childInterface.vinbero_IModule_rDestroy(childModule)) < 0)
+        if((ret = childInterface.vinbero_IMODULE_rDestroy(childModule)) < 0)
             return ret;
     }
     GENC_TREE_NODE_FREE(module);
@@ -250,16 +251,21 @@ int vinbero_core_start(struct vinbero_common_Module* module, struct vinbero_comm
         pthread_setspecific(vinbero_core_tlKey, jumpBuffer);
         GENC_TREE_NODE_FOR_EACH_CHILD(module, index) {
             struct vinbero_common_Module* childModule = &GENC_TREE_NODE_GET_CHILD(module, index);
-            struct vinbero_IBasic_Interface childInterface;
+            VINBERO_COMMON_CALL(IBASIC, service, childModule, &ret, childModule, (void*[]){NULL});
+            if(ret < 0)
+                return ret;
+/*
+            struct vinbero_IBASIC_Interface childInterface;
             VINBERO_IBASIC_DLSYM(&childInterface, &childModule->dlHandle, &ret);
             if(ret < 0) {
                 VINBERO_COMMON_LOG_ERROR("%s", fastdl_error());              
                 return ret;
             }
-            if((ret = childInterface.vinbero_IBasic_service(childModule, (void*[]){NULL})) < 0) {
-                VINBERO_COMMON_LOG_ERROR("vinbero_IBasic_service(...) failed");
+            if((ret = childInterface.vinbero_IBASIC_service(childModule, (void*[]){NULL})) < 0) {
+                VINBERO_COMMON_LOG_ERROR("vinbero_IBASIC_service(...) failed");
                 return ret;
             }
+*/
         }
     }
 
