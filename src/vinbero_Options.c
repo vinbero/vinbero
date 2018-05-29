@@ -8,9 +8,24 @@
 #include "vinbero_Options.h"
 #include "vinbero_Help.h"
 
+static void printLogFlagInfo(int flag) {
+    if(flag & VINBERO_COMMON_LOG_FLAG_TRACE)
+        VINBERO_COMMON_LOG_INFO("TRACE LEVEL LOGGING ENABLED");
+    if(flag & VINBERO_COMMON_LOG_FLAG_DEBUG)
+        VINBERO_COMMON_LOG_INFO("DEBUG LEVEL LOGGING ENABLED");
+    if(flag & VINBERO_COMMON_LOG_FLAG_INFO)
+        VINBERO_COMMON_LOG_INFO("INFO LEVEL LOGGING ENABLED");
+    if(flag & VINBERO_COMMON_LOG_FLAG_WARN)
+        VINBERO_COMMON_LOG_INFO("WARN LEVEL LOGGING ENABLED");
+    if(flag & VINBERO_COMMON_LOG_FLAG_ERROR)
+        VINBERO_COMMON_LOG_INFO("ERROR LEVEL LOGGING ENABLED");
+    if(flag & VINBERO_COMMON_LOG_FLAG_FATAL)
+        VINBERO_COMMON_LOG_INFO("FATAL LEVEL LOGGING ENABLED");
+}
+
 int vinbero_Options_process(int argc, char* argv[], struct vinbero_common_Config* config) {
     int ret;
-    vinbero_common_Log_flag = 0;
+    vinbero_common_Log_flag = VINBERO_COMMON_LOG_FLAG_ALL & ~VINBERO_COMMON_LOG_FLAG_TRACE;
     const char* configString = NULL;
     const char* configFile = NULL;
 
@@ -37,6 +52,7 @@ int vinbero_Options_process(int argc, char* argv[], struct vinbero_common_Config
             vinbero_common_Log_flag = strtol(optarg, NULL, 10);
             if(vinbero_common_Log_flag == LONG_MIN || vinbero_common_Log_flag == LONG_MAX)
                 return -errno;
+            printLogFlagInfo(vinbero_common_Log_flag);
             break;
         case 'h':
         default:
