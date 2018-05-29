@@ -4,7 +4,7 @@ add_library(vinbero_core SHARED vinbero_core.c)
 install(TARGETS vinbero_core LIBRARY DESTINATION lib)
 
 add_executable(vinbero vinbero.c vinbero_Help.c vinbero_Options.c)
-set_target_properties(vinbero PROPERTIES PUBLIC_HEADER "vinbero_core.h;vinbero_ClData.h;vinbero_IMODULE.h;vinbero_ICLOCAL.h;vinbero_ICLSERVICE.h;vinbero_ITLSERVICE.h;vinbero_ITLOCAL.h;vinbero_IBASIC.h")
+set_target_properties(vinbero PROPERTIES PUBLIC_HEADER "vinbero_core.h;vinbero_IMODULE.h;vinbero_ICLOCAL.h;vinbero_ICLSERVICE.h;vinbero_ITLSERVICE.h;vinbero_ITLOCAL.h;vinbero_IBASIC.h")
 target_link_libraries(vinbero vinbero_core vinbero_common jansson fastdl pthread gaio)
 install(TARGETS vinbero 
         RUNTIME DESTINATION bin
