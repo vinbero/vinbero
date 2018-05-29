@@ -25,7 +25,7 @@ static void printLogFlagInfo(int flag) {
 
 int vinbero_Options_process(int argc, char* argv[], struct vinbero_common_Config* config) {
     int ret;
-    vinbero_common_Log_flag = VINBERO_COMMON_LOG_FLAG_ALL & ~VINBERO_COMMON_LOG_FLAG_TRACE;
+    int loggingFlag = VINBERO_COMMON_LOG_FLAG_ALL & ~VINBERO_COMMON_LOG_FLAG_TRACE;
     const char* configString = NULL;
     const char* configFile = NULL;
 
@@ -49,10 +49,9 @@ int vinbero_Options_process(int argc, char* argv[], struct vinbero_common_Config
             configFile = optarg;
             break;
         case 'l':
-            vinbero_common_Log_flag = strtol(optarg, NULL, 10);
-            if(vinbero_common_Log_flag == LONG_MIN || vinbero_common_Log_flag == LONG_MAX)
+            loggingFlag = strtol(optarg, NULL, 10);
+            if(loggingFlag == LONG_MIN || loggingFlag == LONG_MAX)
                 return -errno;
-            printLogFlagInfo(vinbero_common_Log_flag);
             break;
         case 'h':
         default:
@@ -63,6 +62,9 @@ int vinbero_Options_process(int argc, char* argv[], struct vinbero_common_Config
 
     if(!optionsExist)
         vinbero_Help_printAndExit();
+
+    vinbero_common_Log_init(loggingFlag);
+    printLogFlagInfo(loggingFlag);
 
     if(configString != NULL) {
         if((ret = vinbero_common_Config_fromString(config, configString)) < 0) {
