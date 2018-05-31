@@ -2,13 +2,13 @@
 #define _VINBERO_ICLSERVICE_H
 
 #include <vinbero_common/vinbero_common_Module.h>
-#include "vinbero_ClData.h"
+#include <vinbero_common/vinbero_common_ClData.h>
 
 #define VINBERO_ICLSERVICE_FUNCTIONS \
-int vinbero_ICLSERVICE_call(struct vinbero_common_Module* module, struct vinbero_ClData* clData, void* args[])
+int vinbero_ICLSERVICE_call(struct vinbero_common_Module* module, struct vinbero_common_ClData* clData, void* args[])
 
 #define VINBERO_ICLSERVICE_FUNCTION_POINTERS \
-int (*vinbero_ICLSERVICE_call)(struct vinbero_common_Module*, struct vinbero_ClData*, void*[])
+int (*vinbero_ICLSERVICE_call)(struct vinbero_common_Module*, struct vinbero_common_ClData*, void*[])
 
 struct vinbero_ICLSERVICE_Interface {
     VINBERO_ICLSERVICE_FUNCTION_POINTERS;
