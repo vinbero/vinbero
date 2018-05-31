@@ -11,7 +11,7 @@ int (*vinbero_Interface_TLSERVICE_call)(struct vinbero_common_Module*, void*[])
 
 struct vinbero_Interface_TLSERVICE {
     VINBERO_INTERFACE_TLSERVICE_FUNCTION_POINTERS;
-}
+};
 
 #define VINBERO_INTERFACE_TLSERVICE_DLSYM(interface, dlHandle, ret) \
 do { \
