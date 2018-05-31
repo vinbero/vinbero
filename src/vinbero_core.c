@@ -16,8 +16,8 @@
 #include <vinbero_common/vinbero_common_Config.h>
 #include <vinbero_common/vinbero_common_Module.h>
 #include "vinbero_core.h"
-#include "vinbero_IMODULE.h"
-#include "vinbero_IBASIC.h"
+#include "vinbero_Interface_MODULE.h"
+#include "vinbero_Interface_BASIC.h"
 
 static pthread_key_t vinbero_core_tlKey;
 
@@ -137,22 +137,21 @@ int vinbero_core_initChildModules(struct vinbero_common_Module* module, struct v
     int ret;
     GENC_TREE_NODE_FOR_EACH_CHILD(module, index) {
         struct vinbero_common_Module* childModule = &GENC_TREE_NODE_GET_CHILD(module, index);
-        struct vinbero_IMODULE_Interface childInterface;
         childModule->childrenRequired = true;
-        VINBERO_COMMON_CALL(IMODULE, init, childModule, &ret, childModule, config, (void*[]){NULL});
+        VINBERO_COMMON_CALL(MODULE, init, childModule, &ret, childModule, config, (void*[]){NULL});
         if(ret < 0)
             return ret;
         if(childModule->childrenRequired == true && GENC_TREE_NODE_GET_CHILD_COUNT(childModule) == 0) {
             VINBERO_COMMON_LOG_ERROR("module %s must have at least one child", childModule->name);
-            return VINBERO_COMMON_EINVAL;
+            return VINBERO_COMMON_ERROR_INVALID_MODULE;
         }
         if(childModule->name == NULL) {
             VINBERO_COMMON_LOG_ERROR("Module %s has no name", childModule->id);
-            return VINBERO_COMMON_EINVAL;
+            return VINBERO_COMMON_ERROR_INVALID_MODULE;
         }
         if(childModule->version == NULL) {
             VINBERO_COMMON_LOG_ERROR("Module %s has no version", childModule->id);
-            return VINBERO_COMMON_EINVAL;
+            return VINBERO_COMMON_ERROR_INVALID_MODULE;
         }
         if((ret = vinbero_core_initChildModules(childModule, config)) < 0)
             return ret;
@@ -167,7 +166,7 @@ int vinbero_core_rInitChildModules(struct vinbero_common_Module* module, struct 
         struct vinbero_common_Module* childModule = &GENC_TREE_NODE_GET_CHILD(module, index);
         if((ret = vinbero_core_initChildModules(childModule, config)) < 0)
             return ret;
-        VINBERO_COMMON_CALL(IMODULE, rInit, childModule, &ret, childModule, config, (void*[]){NULL});
+        VINBERO_COMMON_CALL(MODULE, rInit, childModule, &ret, childModule, config, (void*[]){NULL});
         if(ret < 0)
             return ret;
     }
@@ -179,7 +178,7 @@ int vinbero_core_destroyChildModules(struct vinbero_common_Module* module) {
     int ret;
     GENC_TREE_NODE_FOR_EACH_CHILD(module, index) {
         struct vinbero_common_Module* childModule = &GENC_TREE_NODE_GET_CHILD(module, index);
-        VINBERO_COMMON_CALL(IMODULE, destroy, childModule, &ret, childModule);
+        VINBERO_COMMON_CALL(MODULE, destroy, childModule, &ret, childModule);
         if(ret < 0)
             return ret;
         if((ret = vinbero_core_destroyChildModules(childModule)) < 0)
@@ -195,7 +194,7 @@ int vinbero_core_rDestroyChildModules(struct vinbero_common_Module* module) {
         struct vinbero_common_Module* childModule = &GENC_TREE_NODE_GET_CHILD(module, index);
         if((ret = vinbero_core_rDestroyChildModules(childModule)) < 0)
             return ret;
-        VINBERO_COMMON_CALL(IMODULE, rDestroy, childModule, &ret, childModule);
+        VINBERO_COMMON_CALL(MODULE, rDestroy, childModule, &ret, childModule);
         if(ret < 0)
             return ret;
     }
@@ -232,7 +231,7 @@ int vinbero_core_start(struct vinbero_common_Module* module, struct vinbero_comm
         pthread_setspecific(vinbero_core_tlKey, jumpBuffer);
         GENC_TREE_NODE_FOR_EACH_CHILD(module, index) {
             struct vinbero_common_Module* childModule = &GENC_TREE_NODE_GET_CHILD(module, index);
-            VINBERO_COMMON_CALL(IBASIC, service, childModule, &ret, childModule, (void*[]){NULL});
+            VINBERO_COMMON_CALL(BASIC, service, childModule, &ret, childModule, (void*[]){NULL});
             if(ret < 0)
                 return ret;
         }
