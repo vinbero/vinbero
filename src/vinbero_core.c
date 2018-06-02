@@ -122,7 +122,6 @@ int vinbero_core_loadChildModules(struct vinbero_common_Module* module) {
         GENC_TREE_NODE_SET_PARENT(childModule, module);
         childModule->id = GENC_ARRAY_LIST_GET(&childModuleIds, index);
         childModule->config = module->config;
-        VINBERO_COMMON_LOG_DEBUG("Set parent of module %s as %s", childModule->id, GENC_TREE_NODE_GET_PARENT(childModule)->id);
         if((ret = vinbero_common_Module_dlopen(childModule)) < 0) {
             VINBERO_COMMON_LOG_ERROR("%s", fastdl_error());
             GENC_ARRAY_LIST_FREE(&childModuleIds);
@@ -184,12 +183,7 @@ int vinbero_core_sendArgsChildModules(struct vinbero_common_Module* module) {
     int ret;
     GENC_TREE_NODE_FOR_EACH_CHILD(module, index) {
         struct vinbero_common_Module* childModule = &GENC_TREE_NODE_GET_CHILD(module, index);
- VINBERO_COMMON_LOG_DEBUG("BEFORE %u", childModule);
-
         VINBERO_COMMON_CALL(MODULE, sendArgs, childModule, &ret, childModule);
-VINBERO_COMMON_LOG_DEBUG("%d", ret);
-        if(ret < 0)
-            return ret;
         if((ret = vinbero_core_sendArgsChildModules(childModule)) < 0)
             return ret;
     }
