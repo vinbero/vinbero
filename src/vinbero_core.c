@@ -77,68 +77,74 @@ int vinbero_core_checkConfig(struct vinbero_common_Config* config, const char* m
         return ret;
     }
 
-
     GENC_ARRAY_LIST_FOR_EACH(&childModuleIds, index) {
         if((ret = vinbero_core_checkConfig(config, GENC_ARRAY_LIST_GET(&childModuleIds, index))) < 0) {
             GENC_ARRAY_LIST_FREE(&childModuleIds);
             return ret;
         }
     }
-
     GENC_ARRAY_LIST_FREE(&childModuleIds);
-
     return 0;
 }
 
 int vinbero_core_initLocalModule(struct vinbero_common_Module* module, struct vinbero_common_Config* config) {
     VINBERO_COMMON_LOG_TRACE2();
     int ret;
-    module->childrenRequired = true;
+    GENC_TREE_NODE_SET_PARENT(module, NULL);
+    module->id = "core";
+    module->config = config;
+    vinbero_common_Module_init(module, "core", "0.0.1", true);
     module->localModule.pointer = malloc(1 * sizeof(struct vinbero_core));
     struct vinbero_core* localModule = module->localModule.pointer;
-    if((ret = vinbero_common_Config_getInt(config, module, "vinbero.setUid", &localModule->setUid, geteuid())) < 0)
+    if((ret = vinbero_common_Config_getInt(module->config, module, "vinbero.setUid", &localModule->setUid, geteuid())) < 0)
         return ret;
-    if((ret = vinbero_common_Config_getInt(config, module, "vinbero.setGid", &localModule->setGid, getegid())) < 0)
+    if((ret = vinbero_common_Config_getInt(module->config, module, "vinbero.setGid", &localModule->setGid, getegid())) < 0)
         return ret;
     return 0;
 }
 
-int vinbero_core_loadChildModules(struct vinbero_common_Module* module, struct vinbero_common_Module* parentModule, const char* moduleId, struct vinbero_common_Config* config) {
+int vinbero_core_loadChildModules(struct vinbero_common_Module* module) {
     VINBERO_COMMON_LOG_TRACE2();
     int ret;
+
     struct vinbero_common_Module_Ids childModuleIds;
     GENC_ARRAY_LIST_INIT(&childModuleIds);
-    if((ret = vinbero_common_Config_getChildModuleIds(config, moduleId, &childModuleIds)) < 0)
+    if((ret = vinbero_common_Config_getChildModuleIds(module->config, module->id, &childModuleIds)) < 0) {
+        GENC_ARRAY_LIST_FREE(&childModuleIds);
         return ret;
+    }
+
     size_t childModuleCount = GENC_ARRAY_LIST_SIZE(&childModuleIds);
     GENC_TREE_NODE_INIT3(module, childModuleCount);
-    GENC_TREE_NODE_SET_PARENT(module, parentModule);
-    module->id = moduleId;
-    if(parentModule != NULL) {
-        if((ret = vinbero_common_Module_dlopen(module, config)) < 0) {
-            VINBERO_COMMON_LOG_ERROR("%s", fastdl_error());
-            return ret;
-        }
-    }
+
     GENC_ARRAY_LIST_FOR_EACH(&childModuleIds, index) {
         struct vinbero_common_Module* childModule = &GENC_TREE_NODE_GET_CHILD(module, index);
-        if((ret = vinbero_core_loadChildModules(childModule, module, GENC_ARRAY_LIST_GET(&childModuleIds, index), config)) < 0) {
+        GENC_TREE_NODE_SET_PARENT(childModule, module);
+        childModule->id = GENC_ARRAY_LIST_GET(&childModuleIds, index);
+        childModule->config = module->config;
+        VINBERO_COMMON_LOG_DEBUG("Set parent of module %s as %s", childModule->id, GENC_TREE_NODE_GET_PARENT(childModule)->id);
+        if((ret = vinbero_common_Module_dlopen(childModule)) < 0) {
+            VINBERO_COMMON_LOG_ERROR("%s", fastdl_error());
+            GENC_ARRAY_LIST_FREE(&childModuleIds);
+            return ret;
+        }
+        if((ret = vinbero_core_loadChildModules(childModule)) < 0) {
             GENC_ARRAY_LIST_FREE(&childModuleIds);
             return ret;
         }
     }
-    GENC_ARRAY_LIST_FREE(&childModuleIds);
 
+    GENC_ARRAY_LIST_FREE(&childModuleIds);
     return 0;
 }
 
-int vinbero_core_initChildModules(struct vinbero_common_Module* module, struct vinbero_common_Config* config) {
+int vinbero_core_initChildModules(struct vinbero_common_Module* module) {
     VINBERO_COMMON_LOG_TRACE2();
     int ret;
     GENC_TREE_NODE_FOR_EACH_CHILD(module, index) {
         struct vinbero_common_Module* childModule = &GENC_TREE_NODE_GET_CHILD(module, index);
         childModule->childrenRequired = true;
-        VINBERO_COMMON_CALL(MODULE, init, childModule, &ret, childModule, config, (void*[]){NULL});
+        VINBERO_COMMON_CALL(MODULE, init, childModule, &ret, childModule);
         if(ret < 0)
             return ret;
         if(childModule->childrenRequired == true && GENC_TREE_NODE_GET_CHILD_COUNT(childModule) == 0) {
@@ -153,27 +159,44 @@ int vinbero_core_initChildModules(struct vinbero_common_Module* module, struct v
             VINBERO_COMMON_LOG_ERROR("Module %s has no version", childModule->id);
             return VINBERO_COMMON_ERROR_INVALID_MODULE;
         }
-        if((ret = vinbero_core_initChildModules(childModule, config)) < 0)
+        if((ret = vinbero_core_initChildModules(childModule)) < 0)
             return ret;
     }
     return 0;
 }
 
-int vinbero_core_rInitChildModules(struct vinbero_common_Module* module, struct vinbero_common_Config* config) {
+int vinbero_core_rInitChildModules(struct vinbero_common_Module* module) {
     VINBERO_COMMON_LOG_TRACE2();
     int ret;
     GENC_TREE_NODE_FOR_EACH_CHILD(module, index) {
         struct vinbero_common_Module* childModule = &GENC_TREE_NODE_GET_CHILD(module, index);
-        if((ret = vinbero_core_initChildModules(childModule, config)) < 0)
+        if((ret = vinbero_core_rInitChildModules(childModule)) < 0)
             return ret;
-        VINBERO_COMMON_CALL(MODULE, rInit, childModule, &ret, childModule, config, (void*[]){NULL});
+        VINBERO_COMMON_CALL(MODULE, rInit, childModule, &ret, childModule);
         if(ret < 0)
             return ret;
     }
     return 0;
 }
 
-int vinbero_core_destroyChildModules(struct vinbero_common_Module* module) {
+int vinbero_core_sendArgsChildModules(struct vinbero_common_Module* module) {
+    VINBERO_COMMON_LOG_TRACE2();
+    int ret;
+    GENC_TREE_NODE_FOR_EACH_CHILD(module, index) {
+        struct vinbero_common_Module* childModule = &GENC_TREE_NODE_GET_CHILD(module, index);
+ VINBERO_COMMON_LOG_DEBUG("BEFORE %u", childModule);
+
+        VINBERO_COMMON_CALL(MODULE, sendArgs, childModule, &ret, childModule);
+VINBERO_COMMON_LOG_DEBUG("%d", ret);
+        if(ret < 0)
+            return ret;
+        if((ret = vinbero_core_sendArgsChildModules(childModule)) < 0)
+            return ret;
+    }
+    return 0;
+}
+
+static int vinbero_core_destroyChildModules(struct vinbero_common_Module* module) {
     VINBERO_COMMON_LOG_TRACE2();
     int ret;
     GENC_TREE_NODE_FOR_EACH_CHILD(module, index) {
@@ -187,7 +210,7 @@ int vinbero_core_destroyChildModules(struct vinbero_common_Module* module) {
     return 0;
 }
 
-int vinbero_core_rDestroyChildModules(struct vinbero_common_Module* module) {
+static int vinbero_core_rDestroyChildModules(struct vinbero_common_Module* module) {
     VINBERO_COMMON_LOG_TRACE2();
     int ret;
     GENC_TREE_NODE_FOR_EACH_CHILD(module, index) {
@@ -222,7 +245,7 @@ int vinbero_core_setUid(struct vinbero_common_Module* module) {
     return 0;
 }
 
-int vinbero_core_start(struct vinbero_common_Module* module, struct vinbero_common_Config* config) {
+int vinbero_core_start(struct vinbero_common_Module* module) {
     VINBERO_COMMON_LOG_TRACE2();
     int ret;
     jmp_buf* jumpBuffer = malloc(1 * sizeof(jmp_buf));
