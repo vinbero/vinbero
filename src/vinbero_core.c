@@ -123,7 +123,7 @@ int vinbero_core_loadChildModules(struct vinbero_common_Module* module) {
         childModule->id = GENC_ARRAY_LIST_GET(&childModuleIds, index);
         childModule->config = module->config;
         if((ret = vinbero_common_Module_dlopen(childModule)) < 0) {
-            VINBERO_COMMON_LOG_ERROR("%s", fastdl_error());
+            VINBERO_COMMON_LOG_ERROR("%s", fastdl_error()); // dlerror is not thread safe
             GENC_ARRAY_LIST_FREE(&childModuleIds);
             return ret;
         }
