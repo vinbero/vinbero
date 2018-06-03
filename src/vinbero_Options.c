@@ -51,7 +51,7 @@ int vinbero_Options_process(int argc, char* argv[], struct vinbero_common_Config
         case 'l':
             loggingFlag = strtol(optarg, NULL, 10);
             if(loggingFlag == LONG_MIN || loggingFlag == LONG_MAX)
-                return -errno;
+                return VINBERO_COMMON_ERROR_OUT_OF_RANGE; 
             break;
         case 'h':
         default:
