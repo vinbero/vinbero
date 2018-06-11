@@ -10,8 +10,3 @@ void vinbero_Help_print() {
     puts("  -i --inline-config       Inline JSON-based config.");
     puts("  -f --config-file         JSON-based config file.");
 }
-
-void vinbero_Help_printAndExit() {
-    vinbero_Help_print();
-    exit(EXIT_SUCCESS);
-}

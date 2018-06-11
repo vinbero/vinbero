@@ -1,6 +1,7 @@
 #include <jansson.h>
 #include <libgenc/genc_Tree.h>
 #include <string.h>
+#include <vinbero_common/vinbero_common_Status.h>
 #include <vinbero_common/vinbero_common_Config.h>
 #include <vinbero_common/vinbero_common_Module.h>
 #include <vinbero_common/vinbero_common_Log.h>
@@ -13,10 +14,11 @@ int main(int argc, char* argv[]) {
     struct vinbero_common_Config config;
     vinbero_common_Config_init(&config);
 
-    if((ret = vinbero_Options_process(argc, argv, &config))) {
+    if((ret = vinbero_Options_process(argc, argv, &config)) < 0) {
         VINBERO_COMMON_LOG_ERROR("vinbero_Options_process() failed");
         return EXIT_FAILURE;
-    }
+    } else if(ret == VINBERO_COMMON_STATUS_EXIT)
+        return EXIT_SUCCESS;
 
     struct vinbero_common_Module module;
 
