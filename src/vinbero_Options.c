@@ -41,14 +41,17 @@ int vinbero_Options_process(int argc, char* argv[], struct vinbero_common_Config
                 return VINBERO_COMMON_ERROR_INVALID_OPTION; 
             break;
         case 'h':
+            vinbero_Help_print();
+            return VINBERO_COMMON_STATUS_EXIT;
         default:
-            vinbero_Help_printAndExit();
-            break;
+            vinbero_Help_print();
+            return VINBERO_COMMON_ERROR_INVALID_OPTION;
         }
     }
-
-    if(!optionsExist)
-        vinbero_Help_printAndExit();
+    if(!optionsExist) {
+        vinbero_Help_print();
+        return VINBERO_COMMON_ERROR_INVALID_OPTION;
+    }
 
     vinbero_common_Log_init(loggingFlag);
     vinbero_common_Log_printLogLevelInfo(loggingFlag);
@@ -61,7 +64,8 @@ int vinbero_Options_process(int argc, char* argv[], struct vinbero_common_Config
         if((ret = vinbero_common_Config_fromFile(config, configFile)) < VINBERO_COMMON_STATUS_SUCCESS) {
             return ret;
         }
-    }
+    } else
+         return VINBERO_COMMON_ERROR_INVALID_CONFIG;
 
     if(config->json == NULL) {
         vinbero_Help_print();
