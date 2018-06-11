@@ -3,32 +3,19 @@
 #include <limits.h>
 #include <stdbool.h>
 #include <string.h>
+#include <vinbero_common/vinbero_common_Status.h>
 #include <vinbero_common/vinbero_common_Error.h>
 #include <vinbero_common/vinbero_common_Log.h>
 #include "vinbero_Options.h"
 #include "vinbero_Help.h"
 
-static void printLogFlagInfo(int flag) {
-    if(flag & VINBERO_COMMON_LOG_FLAG_TRACE)
-        VINBERO_COMMON_LOG_INFO("TRACE LEVEL LOGGING ENABLED");
-    if(flag & VINBERO_COMMON_LOG_FLAG_DEBUG)
-        VINBERO_COMMON_LOG_INFO("DEBUG LEVEL LOGGING ENABLED");
-    if(flag & VINBERO_COMMON_LOG_FLAG_INFO)
-        VINBERO_COMMON_LOG_INFO("INFO LEVEL LOGGING ENABLED");
-    if(flag & VINBERO_COMMON_LOG_FLAG_WARN)
-        VINBERO_COMMON_LOG_INFO("WARN LEVEL LOGGING ENABLED");
-    if(flag & VINBERO_COMMON_LOG_FLAG_ERROR)
-        VINBERO_COMMON_LOG_INFO("ERROR LEVEL LOGGING ENABLED");
-    if(flag & VINBERO_COMMON_LOG_FLAG_FATAL)
-        VINBERO_COMMON_LOG_INFO("FATAL LEVEL LOGGING ENABLED");
-}
-
 int vinbero_Options_process(int argc, char* argv[], struct vinbero_common_Config* config) {
     int ret;
+    if(argv == NULL || config == NULL)
+        return VINBERO_COMMON_ERROR_NULL;
     int loggingFlag = VINBERO_COMMON_LOG_FLAG_ALL & ~VINBERO_COMMON_LOG_FLAG_TRACE;
     const char* configString = NULL;
     const char* configFile = NULL;
-
     struct option options[] = {
         {"help", no_argument, NULL, 'h'},
         {"inline-config", required_argument, NULL, 'i'},
@@ -39,7 +26,7 @@ int vinbero_Options_process(int argc, char* argv[], struct vinbero_common_Config
     json_error_t configError;
     char optionChar;
     bool optionsExist = false;
-    while((optionChar = getopt_long(argc, argv, "hi:f:l:", options, NULL)) != (char)-1) {
+    while((optionChar = getopt_long(argc, argv, "hi:f:l:", options, NULL)) != (char) - 1) {
         optionsExist = true;
         switch(optionChar) {
         case 'i':
@@ -51,7 +38,7 @@ int vinbero_Options_process(int argc, char* argv[], struct vinbero_common_Config
         case 'l':
             loggingFlag = strtol(optarg, NULL, 10);
             if(loggingFlag == LONG_MIN || loggingFlag == LONG_MAX)
-                return VINBERO_COMMON_ERROR_OUT_OF_RANGE; 
+                return VINBERO_COMMON_ERROR_INVALID_OPTION; 
             break;
         case 'h':
         default:
@@ -64,20 +51,22 @@ int vinbero_Options_process(int argc, char* argv[], struct vinbero_common_Config
         vinbero_Help_printAndExit();
 
     vinbero_common_Log_init(loggingFlag);
-    printLogFlagInfo(loggingFlag);
+    vinbero_common_Log_printLogLevelInfo(loggingFlag);
 
     if(configString != NULL) {
-        if((ret = vinbero_common_Config_fromString(config, configString)) < 0) {
+        if((ret = vinbero_common_Config_fromString(config, configString)) < VINBERO_COMMON_STATUS_SUCCESS) {
             return ret;
         }
     } else if(configFile != NULL) {
-        if((ret = vinbero_common_Config_fromFile(config, configFile)) < 0) {
+        if((ret = vinbero_common_Config_fromFile(config, configFile)) < VINBERO_COMMON_STATUS_SUCCESS) {
             return ret;
         }
     }
 
-    if(config->json == NULL)
-        vinbero_Help_printAndExit();
+    if(config->json == NULL) {
+        vinbero_Help_print();
+        return VINBERO_COMMON_ERROR_INVALID_CONFIG;
+    }
 
-    return 0;
+    return VINBERO_COMMON_STATUS_SUCCESS;
 }

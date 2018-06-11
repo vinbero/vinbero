@@ -14,10 +14,10 @@ void __wrap_vinbero_Help_print() {}
 void __wrap_vinbero_Help_printAndExit() {}
 
 void test_vinbero_Options_process(void** state) {
-    char* args[] = {"-l", "63", "-i", "{\"core\": {\"config\": {\"vinbero.setUid\": 1001}, \"next\": [] } }"};
+    char* args[] = {"-l", "63"};
     struct vinbero_common_Config config;
     vinbero_common_Config_init(&config);
-    assert_int_equal(vinbero_Options_process(4, args, &config), VINBERO_COMMON_STATUS_SUCCESS);
+    assert_int_equal(vinbero_Options_process(2, args, &config), VINBERO_COMMON_ERROR_INVALID_CONFIG);
 }
 
 int main() {
