@@ -96,10 +96,8 @@ int vinbero_core_initLocalModule(struct vinbero_common_Module* module, struct vi
     vinbero_common_Module_init(module, "core", "0.0.1", true);
     module->localModule.pointer = malloc(1 * sizeof(struct vinbero_core));
     struct vinbero_core* localModule = module->localModule.pointer;
-    if((ret = vinbero_common_Config_getInt(module->config, module, "vinbero.setUid", &localModule->setUid, geteuid())) < 0)
-        return ret;
-    if((ret = vinbero_common_Config_getInt(module->config, module, "vinbero.setGid", &localModule->setGid, getegid())) < 0)
-        return ret;
+    vinbero_common_Config_getInt(module->config, module, "vinbero.setUid", &localModule->setUid, geteuid());
+    vinbero_common_Config_getInt(module->config, module, "vinbero.setGid", &localModule->setGid, getegid());
     return 0;
 }
 

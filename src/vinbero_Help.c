@@ -6,7 +6,9 @@ void vinbero_Help_print() {
     puts("Usage: vinbero [OPTION]...");
     puts("A Modular TCP/UDP Server.");
     puts("Options:");
-    puts("  -h --help                Print this help message.");
     puts("  -i --inline-config       Inline JSON-based config.");
-    puts("  -f --config-file         JSON-based config file.");
+    puts("  -c --config-file         JSON-based config file.");
+    puts("  -f --logging-flag        Set logging level flag.");
+    puts("  -o --logging-option      Set logging option.");
+    puts("  -h --help                Print this help message.");
 }

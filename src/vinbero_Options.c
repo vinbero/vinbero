@@ -14,30 +14,38 @@ int vinbero_Options_process(int argc, char* argv[], struct vinbero_common_Config
     if(argv == NULL || config == NULL)
         return VINBERO_COMMON_ERROR_NULL;
     int loggingFlag = VINBERO_COMMON_LOG_FLAG_ALL & ~VINBERO_COMMON_LOG_FLAG_TRACE;
+    int loggingOption = 0;
+
     const char* configString = NULL;
     const char* configFile = NULL;
     struct option options[] = {
         {"help", no_argument, NULL, 'h'},
         {"inline-config", required_argument, NULL, 'i'},
-        {"config-file", required_argument, NULL, 'f'},
-        {"logging-flag", required_argument, NULL, 'l'},
+        {"config-file", required_argument, NULL, 'c'},
+        {"logging-flag", required_argument, NULL, 'f'},
+        {"logging-option", required_argument, NULL, 'o'},
         {NULL, 0, NULL, 0}
     };
     json_error_t configError;
     char optionChar;
     bool optionsExist = false;
-    while((optionChar = getopt_long(argc, argv, "hi:f:l:", options, NULL)) != (char) - 1) {
+    while((optionChar = getopt_long(argc, argv, "i:c:f:o:h", options, NULL)) != (char) - 1) {
         optionsExist = true;
         switch(optionChar) {
         case 'i':
             configString = optarg;
             break;
-        case 'f':
+        case 'c':
             configFile = optarg;
             break;
-        case 'l':
+        case 'f':
             loggingFlag = strtol(optarg, NULL, 10);
             if(loggingFlag == LONG_MIN || loggingFlag == LONG_MAX)
+                return VINBERO_COMMON_ERROR_INVALID_OPTION; 
+            break;
+        case 'o':
+            loggingOption = strtol(optarg, NULL, 10);
+            if(loggingOption == LONG_MIN || loggingOption == LONG_MAX)
                 return VINBERO_COMMON_ERROR_INVALID_OPTION; 
             break;
         case 'h':
@@ -53,7 +61,7 @@ int vinbero_Options_process(int argc, char* argv[], struct vinbero_common_Config
         return VINBERO_COMMON_ERROR_INVALID_OPTION;
     }
 
-    vinbero_common_Log_init(loggingFlag);
+    vinbero_common_Log_init(loggingFlag, loggingOption);
     vinbero_common_Log_printLogLevelInfo(loggingFlag);
 
     if(configString != NULL) {
