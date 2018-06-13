@@ -14,7 +14,7 @@ int vinbero_Options_process(int argc, char* argv[], struct vinbero_common_Config
     if(argv == NULL || config == NULL)
         return VINBERO_COMMON_ERROR_NULL;
     int loggingFlag = VINBERO_COMMON_LOG_FLAG_ALL & ~VINBERO_COMMON_LOG_FLAG_TRACE;
-    int loggingOption = 0;
+    int loggingOption = VINBERO_COMMON_LOG_OPTION_COLOR;
 
     const char* configString = NULL;
     const char* configFile = NULL;
