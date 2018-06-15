@@ -4,18 +4,18 @@
 #include <vinbero_common/vinbero_common_Module.h>
 
 #define VINBERO_INTERFACE_TLSERVICE_FUNCTIONS \
-int vinbero_Interface_TLSERVICE_call(struct vinbero_common_Module* module, void* args[])
+int vinbero_interface_TLSERVICE_call(struct vinbero_common_Module* module, void* args[])
 
 #define VINBERO_INTERFACE_TLSERVICE_FUNCTION_POINTERS \
-int (*vinbero_Interface_TLSERVICE_call)(struct vinbero_common_Module*, void*[])
+int (*vinbero_interface_TLSERVICE_call)(struct vinbero_common_Module*, void*[])
 
-struct vinbero_Interface_TLSERVICE {
+struct vinbero_interface_TLSERVICE {
     VINBERO_INTERFACE_TLSERVICE_FUNCTION_POINTERS;
 };
 
 #define VINBERO_INTERFACE_TLSERVICE_DLSYM(interface, dlHandle, ret) \
 do { \
-    VINBERO_COMMON_MODULE_DLSYM(interface, dlHandle, vinbero_Interface_TLSERVICE_call, ret); \
+    VINBERO_COMMON_MODULE_DLSYM(interface, dlHandle, vinbero_interface_TLSERVICE_call, ret); \
     if(*ret < 0) break; \
 } while(0)
 
