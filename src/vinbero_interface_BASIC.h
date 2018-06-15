@@ -4,18 +4,18 @@
 #include <vinbero_common/vinbero_common_Module.h>
 
 #define VINBERO_INTERFACE_BASIC_FUNCTIONS \
-int vinbero_Interface_BASIC_service(struct vinbero_common_Module* module, void* args[])
+int vinbero_interface_BASIC_service(struct vinbero_common_Module* module, void* args[])
 
 #define VINBERO_INTERFACE_BASIC_FUNCTION_POINTERS \
-int (*vinbero_Interface_BASIC_service)(struct vinbero_common_Module*, void*[])
+int (*vinbero_interface_BASIC_service)(struct vinbero_common_Module*, void*[])
 
-struct vinbero_Interface_BASIC {
+struct vinbero_interface_BASIC {
     VINBERO_INTERFACE_BASIC_FUNCTION_POINTERS;
 };
 
 #define VINBERO_INTERFACE_BASIC_DLSYM(interface, dlHandle, ret) \
 do { \
-    VINBERO_COMMON_MODULE_DLSYM(interface, dlHandle, vinbero_Interface_BASIC_service, ret); \
+    VINBERO_COMMON_MODULE_DLSYM(interface, dlHandle, vinbero_interface_BASIC_service, ret); \
     if(*ret < 0) break; \
 } while(0)
 
