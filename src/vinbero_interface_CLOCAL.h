@@ -5,11 +5,11 @@
 #include <vinbero_common/vinbero_common_ClData.h>
 
 #define VINBERO_INTERFACE_CLOCAL_FUNCTIONS \
-int vinbero_interface_CLOCAL_init(struct vinbero_common_Module* module, struct vinbero_common_ClData* clData, void* args[]); \
+int vinbero_interface_CLOCAL_init(struct vinbero_common_Module* module, struct vinbero_common_ClData* clData); \
 int vinbero_interface_CLOCAL_destroy(struct vinbero_common_Module* module, struct vinbero_common_ClData* clData)
 
 #define VINBERO_INTERFACE_CLOCAL_FUNCTION_POINTERS \
-int (*vinbero_interface_CLOCAL_init)(struct vinbero_common_Module*, struct vinbero_common_ClData*, void*[]); \
+int (*vinbero_interface_CLOCAL_init)(struct vinbero_common_Module*, struct vinbero_common_ClData*); \
 int (*vinbero_interface_CLOCAL_destroy)(struct vinbero_common_Module*, struct vinbero_common_ClData*)
 
 struct vinbero_interface_CLOCAL {
