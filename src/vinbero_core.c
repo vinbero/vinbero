@@ -184,18 +184,6 @@ int vinbero_core_rInitChildModules(struct vinbero_common_Module* module) {
     return 0;
 }
 
-int vinbero_core_sendArgsChildModules(struct vinbero_common_Module* module) {
-    VINBERO_COMMON_LOG_TRACE2();
-    int ret;
-    GENC_TREE_NODE_FOR_EACH_CHILD(module, index) {
-        struct vinbero_common_Module* childModule = &GENC_TREE_NODE_GET_CHILD(module, index);
-        VINBERO_COMMON_CALL(MODULE, sendArgs, childModule, &ret, childModule);
-        if((ret = vinbero_core_sendArgsChildModules(childModule)) < 0)
-            return ret;
-    }
-    return 0;
-}
-
 static int vinbero_core_destroyChildModules(struct vinbero_common_Module* module) {
     VINBERO_COMMON_LOG_TRACE2();
     int ret;

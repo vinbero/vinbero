@@ -44,12 +44,6 @@ int main(int argc, char* argv[]) {
         VINBERO_COMMON_LOG_ERROR("vinbero_core_rInitChildModules() failed");
         return EXIT_FAILURE;
     }
-
-    if((ret = vinbero_core_sendArgsChildModules(&module)) < 0) {
-        VINBERO_COMMON_LOG_ERROR("vinbero_core_rInitChildModules() failed");
-        return EXIT_FAILURE;
-    }
-
     if((ret = vinbero_core_setGid(&module)) < 0) {
         VINBERO_COMMON_LOG_ERROR("vinbero_core_setGid() failed");
         return EXIT_FAILURE;
