@@ -242,7 +242,7 @@ int vinbero_core_start(struct vinbero_common_Module* module) {
         pthread_setspecific(vinbero_core_tlKey, jumpBuffer);
         GENC_TREE_NODE_FOR_EACH_CHILD(module, index) {
             struct vinbero_common_Module* childModule = &GENC_TREE_NODE_GET_CHILD(module, index);
-            VINBERO_COMMON_CALL(BASIC, service, childModule, &ret, childModule, (void*[]){NULL});
+            VINBERO_COMMON_CALL(BASIC, service, childModule, &ret, childModule);
             if(ret < 0)
                 return ret;
         }

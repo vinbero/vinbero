@@ -4,10 +4,10 @@
 #include <vinbero_common/vinbero_common_Module.h>
 
 #define VINBERO_INTERFACE_BASIC_FUNCTIONS \
-int vinbero_interface_BASIC_service(struct vinbero_common_Module* module, void* args[])
+int vinbero_interface_BASIC_service(struct vinbero_common_Module* module)
 
 #define VINBERO_INTERFACE_BASIC_FUNCTION_POINTERS \
-int (*vinbero_interface_BASIC_service)(struct vinbero_common_Module*, void*[])
+int (*vinbero_interface_BASIC_service)(struct vinbero_common_Module*)
 
 struct vinbero_interface_BASIC {
     VINBERO_INTERFACE_BASIC_FUNCTION_POINTERS;
