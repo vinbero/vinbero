@@ -1,14 +1,13 @@
 #ifndef _VINBERO_INTERFACE_CLSERVICE_H
 #define _VINBERO_INTERFACE_CLSERVICE_H
 
-#include <vinbero_common/vinbero_common_Module.h>
-#include <vinbero_common/vinbero_common_ClData.h>
+#include <vinbero_common/vinbero_common_ClModule.h>
 
 #define VINBERO_INTERFACE_CLSERVICE_FUNCTIONS \
-int vinbero_interface_CLSERVICE_call(struct vinbero_common_Module* module, struct vinbero_common_ClData* clData, void* args[])
+int vinbero_interface_CLSERVICE_call(struct vinbero_common_ClModule* clModule)
 
 #define VINBERO_INTERFACE_CLSERVICE_FUNCTION_POINTERS \
-int (*vinbero_interface_CLSERVICE_call)(struct vinbero_common_Module*, struct vinbero_common_ClData*, void*[])
+int (*vinbero_interface_CLSERVICE_call)(struct vinbero_common_ClModule*)
 
 struct vinbero_interface_CLSERVICE {
     VINBERO_INTERFACE_CLSERVICE_FUNCTION_POINTERS;

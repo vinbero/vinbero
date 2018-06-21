@@ -1,23 +1,19 @@
 #ifndef _VINBERO_INTERFACE_TLOCAL_H
 #define _VINBERO_INTERFACE_TLOCAL_H
 
-#include <vinbero_common/vinbero_common_Module.h>
+#include <vinbero_common/vinbero_common_TlModule.h>
 
 #define VINBERO_INTERFACE_TLOCAL_FUNCTIONS \
-int vinbero_interface_TLOCAL_init(struct vinbero_common_Module* module); \
-int vinbero_interface_TLOCAL_rInit(struct vinbero_common_Module* module); \
-int vinbero_interface_TLOCAL_sendArgs(struct vinbero_common_Module* module, void* args[]); \
-int vinbero_interface_TLOCAL_recvArgs(struct vinbero_common_Module* module, void* args[]); \
-int vinbero_interface_TLOCAL_destroy(struct vinbero_common_Module* module); \
-int vinbero_interface_TLOCAL_rDestroy(struct vinbero_common_Module* module)
+int vinbero_interface_TLOCAL_init(struct vinbero_common_TlModule* tlModule); \
+int vinbero_interface_TLOCAL_rInit(struct vinbero_common_TlModule* tlModule); \
+int vinbero_interface_TLOCAL_destroy(struct vinbero_common_TlModule* tlModule); \
+int vinbero_interface_TLOCAL_rDestroy(struct vinbero_common_TlModule* tlModule)
 
 #define VINBERO_INTERFACE_TLOCAL_FUNCTION_POINTERS \
-int (*vinbero_interface_TLOCAL_init)(struct vinbero_common_Module*); \
-int (*vinbero_interface_TLOCAL_rInit)(struct vinbero_common_Module*); \
-int (*vinbero_interface_TLOCAL_sendArgs)(struct vinbero_common_Module*, void*[]); \
-int (*vinbero_interface_TLOCAL_recvArgs)(struct vinbero_common_Module*, void*[]); \
-int (*vinbero_interface_TLOCAL_destroy)(struct vinbero_common_Module*); \
-int (*vinbero_interface_TLOCAL_rDestroy)(struct vinbero_common_Module*)
+int (*vinbero_interface_TLOCAL_init)(struct vinbero_common_TlModule*); \
+int (*vinbero_interface_TLOCAL_rInit)(struct vinbero_common_TlModule*); \
+int (*vinbero_interface_TLOCAL_destroy)(struct vinbero_common_TlModule*); \
+int (*vinbero_interface_TLOCAL_rDestroy)(struct vinbero_common_TlModule*)
 
 struct vinbero_interface_TLOCAL {
     VINBERO_INTERFACE_TLOCAL_FUNCTION_POINTERS;

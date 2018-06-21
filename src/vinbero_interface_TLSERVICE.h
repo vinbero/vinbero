@@ -1,13 +1,13 @@
 #ifndef _VINBERO_INTERFACE_TLSERVICE_H
 #define _VINBERO_INTERFACE_TLSERVICE_H
 
-#include <vinbero_common/vinbero_common_Module.h>
+#include <vinbero_common/vinbero_common_TlModule.h>
 
 #define VINBERO_INTERFACE_TLSERVICE_FUNCTIONS \
-int vinbero_interface_TLSERVICE_call(struct vinbero_common_Module* module, void* args[])
+int vinbero_interface_TLSERVICE_call(struct vinbero_common_TlModule* tlModule)
 
 #define VINBERO_INTERFACE_TLSERVICE_FUNCTION_POINTERS \
-int (*vinbero_interface_TLSERVICE_call)(struct vinbero_common_Module*, void*[])
+int (*vinbero_interface_TLSERVICE_call)(struct vinbero_common_TlModule*)
 
 struct vinbero_interface_TLSERVICE {
     VINBERO_INTERFACE_TLSERVICE_FUNCTION_POINTERS;
