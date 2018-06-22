@@ -59,6 +59,10 @@ Options:
 }
 ```
 
+### Core module config options
+- vinbero.setUid (***int***) : Change uid after module initialization.
+- vinbero.setGid (***int***) : Change gid after module initialization.
+
 ## History
 It is initially started as a hobby project by Byeonggon Lee at Jul, 2016.
 There have been many architectural changes for two years.
