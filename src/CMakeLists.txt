@@ -13,8 +13,9 @@ list(APPEND vinbero_public_headers "vinbero_interface_TLSERVICE.h")
 list(APPEND vinbero_public_headers "vinbero_interface_CLOCAL.h")
 list(APPEND vinbero_public_headers "vinbero_interface_CLSERVICE.h")
 
-set_target_properties(vinbero PROPERTIES PUBLIC_HEADER "${vinbero_public_headers}")
+set_target_properties(vinbero PROPERTIES
+                              PUBLIC_HEADER "${vinbero_public_headers}")
 target_link_libraries(vinbero vinbero_core vinbero_common)
 install(TARGETS vinbero 
         RUNTIME DESTINATION bin
-	PUBLIC_HEADER DESTINATION include/vinbero)
+        PUBLIC_HEADER DESTINATION include/vinbero)
