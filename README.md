@@ -1,6 +1,5 @@
 # Vinbero
-<p align="center"><img src="https://gonapps.com/vinbero/img/vinbero.png" alt="Vinbero" height="150px"/></p>
-
+<p align="center"><img src="vinbero.png" alt="Vinbero" height="150px"/><img src="vinbero-text.png" alt="Vinbero" height="150px"/></p>
 
 ## Intoduction
 ## Usage
