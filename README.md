@@ -5,7 +5,8 @@
 Vinbero is a modular server written in C, and its main goal is flexibility. Its core is very small; It just loads children modules, initializes them, calls callbacks on them and destroys them. Currently multithreading, tcp, epoll, http, lua module exist. So you can try it as a simple web application server with lua scripting. But if you add your own module it could be even used as a mailserver, chatserver or gameserver.
 
 ## Warning
-**Currenttly this software is under heavy development, so there will be bugs or the architecture can change.**
+**Currenttly this software is under heavy development, so there will be bugs or the architecture can change.
+Writing new modules is not encouraged yet.**
 
 ## Usage
 ```console
