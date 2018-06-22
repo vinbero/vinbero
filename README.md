@@ -6,10 +6,17 @@ Vinbero is a modular server written in C, and its main goal is flexibility. Its 
 
 ## Usage
 ```console
-vinbero -c config.json
+Usage: vinbero [OPTION]...
+A Modular Server.
+Options:
+  -i --inline-config       Inline JSON-based config.
+  -c --config-file         JSON-based config file.
+  -f --logging-flag        Set logging level flag.
+  -o --logging-option      Set logging option.
+  -h --help                Print this help message.
 ```
 ## History
-It is initially started as a hobby project by @gonapps at Jul, 2016.
+It is initially started as a hobby project by Byeonggon Lee at Jul, 2016.
 There have been many architectural changes for two years.
 
 ## License
