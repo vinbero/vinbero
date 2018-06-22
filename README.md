@@ -17,6 +17,44 @@ Options:
 ```
 [![asciicast](https://asciinema.org/a/F4u9GUUVZBcSO9ICGVd240TLP.png)](https://asciinema.org/a/F4u9GUUVZBcSO9ICGVd240TLP)
 
+### Config file example
+```JSON
+{
+    "core": {
+        "config": {"vinbero.setUid": 1001},
+        "next": ["vinbero_tcp"]
+    },
+    "vinbero_tcp": {
+        "path": "/usr/local/lib/vinbero/vinbero_tcp.so",
+        "config": {"vinbero_tcp.port": 8000, "vinbero_tcp.reuseAddress": true},
+        "next": ["vinbero_mt"]
+    }, 
+    "vinbero_mt": {
+        "path": "/usr/local/lib/vinbero/vinbero_mt.so",
+        "config": {"vinbero_mt.workerCount": 4},
+        "next": ["vinbero_tcp_mt_epoll"]
+    },
+    "vinbero_tcp_mt_epoll": {
+        "path": "/usr/local/lib/vinbero/vinbero_tcp_mt_epoll.so",
+        "config": {},
+        "next": ["vinbero_mt_epoll_http"]
+    },
+    "vinbero_mt_epoll_http": {
+        "path": "/usr/local/lib/vinbero/vinbero_mt_epoll_http.so",
+        "config": {},
+        "next": ["vinbero_mt_http_lua"]
+    },
+    "vinbero_mt_http_lua": {
+        "path": "/usr/local/lib/vinbero/vinbero_mt_http_lua.so",
+        "config": {
+            "vinbero_mt_http_lua.scriptFile": "test/test.lua",
+            "vinbero_mt_http_lua.scriptArg": {}
+        },
+        "next": []
+    }
+}
+```
+
 ## History
 It is initially started as a hobby project by Byeonggon Lee at Jul, 2016.
 There have been many architectural changes for two years.
