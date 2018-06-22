@@ -15,6 +15,7 @@ Options:
   -o --logging-option      Set logging option.
   -h --help                Print this help message.
 ```
+[![asciicast](https://asciinema.org/a/F4u9GUUVZBcSO9ICGVd240TLP.png)](https://asciinema.org/a/F4u9GUUVZBcSO9ICGVd240TLP)
 
 ## History
 It is initially started as a hobby project by Byeonggon Lee at Jul, 2016.
