@@ -1,8 +1,0 @@
-하위 모듈은 상위 모듈에 의존하지만 상위모듈은 하위모듈에 의존해서는 안된다
-하위모듈은 여러 개의 상위모듈을 지원할 수 있다(함수를 여러개 만든다)
-모듈의 이름을 지을 때는 의존하는 상위 모듈들의 이름을 포함한다. 단 너무 당연 경우는 포함하지 않는다 tucube_epoll_http 는 tucube_tcp_epoll에 의존한다, http가 tcp에 의존하는 것은 너무나도 당연한 사실이기에 tcp를 포함하지 않았다.
-prepare base module object from the parent;
-tucube_Module_Config doesn't have to be tree or list.. A single object is enough to find the config of a current module
-Use dlsym() only for tucube_IModule_init(), Use function pointer assignment at child module instead
-
-How about using conan.io for distributing modules
