@@ -20,7 +20,7 @@ Options:
   -h --help                Print this help message.
 ```
 
-[![asciicast](https://asciinema.org/a/AFs8nCQz2er9wqpQlugTOyOTf.png)](https://asciinema.org/a/AFs8nCQz2er9wqpQlugTOyOTf)
+[![asciicast](https://asciinema.org/a/CFA53rBFdYHAlQP5wprg6ciCi.png)](https://asciinema.org/a/CFA53rBFdYHAlQP5wprg6ciCi)
 
 ### Config file example
 ```JSON
