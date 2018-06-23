@@ -19,7 +19,8 @@ Options:
   -o --logging-option      Set logging option.
   -h --help                Print this help message.
 ```
-[![asciicast](https://asciinema.org/a/F4u9GUUVZBcSO9ICGVd240TLP.png)](https://asciinema.org/a/F4u9GUUVZBcSO9ICGVd240TLP)
+
+[![asciicast](https://asciinema.org/a/AFs8nCQz2er9wqpQlugTOyOTf.png)](https://asciinema.org/a/AFs8nCQz2er9wqpQlugTOyOTf)
 
 ### Config file example
 ```JSON
@@ -58,6 +59,18 @@ Options:
     }
 }
 ```
+
+### Logging flags and Logging options
+Logging flags and logging options are integer bitmasks:
+- FLAG_TRACE: 1
+- FLAG_DEBUG: 2
+- FLAG_INFO: 4
+- FLAG_WARN: 8
+- FLAG_ERROR: 16
+- FLAG_FATAL: 32
+- **default logging flag is 62**
+- OPTION_COLOR: 1
+- **defualt logging option is 1**
 
 ### Core module config options
 - vinbero.setUid (***int***) : Change uid after module initialization.
