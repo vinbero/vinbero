@@ -59,6 +59,18 @@ Options:
 }
 ```
 
+### Logging flags Logging options
+Logging flags and logging options are integer bitmasks
+- FLAG_TRACE: 1
+- FLAG_DEBUG: 2
+- FLAG_INFO: 4
+- FLAG_WARN: 8
+- FLAG_ERROR: 16
+- FLAG_FATAL: 32
+- **default logging flag is 62**
+- OPTION_COLOR: 1
+- **defualt logging option is 1**
+
 ### Core module config options
 - vinbero.setUid (***int***) : Change uid after module initialization.
 - vinbero.setGid (***int***) : Change gid after module initialization.
