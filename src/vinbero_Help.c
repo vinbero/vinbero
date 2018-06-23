@@ -4,7 +4,7 @@
 
 void vinbero_Help_print() {
     puts("Usage: vinbero [OPTION]...");
-    puts("A Modular TCP/UDP Server.");
+    puts("A Modular Server.");
     puts("Options:");
     puts("  -i --inline-config       Inline JSON-based config.");
     puts("  -c --config-file         JSON-based config file.");
