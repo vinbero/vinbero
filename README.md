@@ -19,6 +19,7 @@ Options:
   -o --logging-option      Set logging option.
   -h --help                Print this help message.
 ```
+
 [![asciicast](https://asciinema.org/a/AFs8nCQz2er9wqpQlugTOyOTf.png)](https://asciinema.org/a/AFs8nCQz2er9wqpQlugTOyOTf)
 
 ### Config file example
