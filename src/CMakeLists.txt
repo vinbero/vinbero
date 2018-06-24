@@ -3,6 +3,7 @@ set(CMAKE_INSTALL_RPATH "/usr/local/lib")
 add_library(vinbero_core SHARED vinbero_core.c)
 list(APPEND vinbero_core_public_headers "vinbero_core.h")
 set_target_properties(vinbero_core PROPERTIES
+                                   C_STANDARD 11
                                    VERSION 0.1.0
                                    SOVERSION 0.1
                                    PUBLIC_HEADER ${vinbero_core_public_headers})
@@ -19,6 +20,7 @@ list(APPEND vinbero_public_headers "vinbero_interface_TLSERVICE.h")
 list(APPEND vinbero_public_headers "vinbero_interface_CLOCAL.h")
 list(APPEND vinbero_public_headers "vinbero_interface_CLSERVICE.h")
 set_target_properties(vinbero PROPERTIES
+                              C_STANDARD 11
                               PUBLIC_HEADER "${vinbero_public_headers}")
 target_link_libraries(vinbero vinbero_core vinbero_common)
 install(TARGETS vinbero 
