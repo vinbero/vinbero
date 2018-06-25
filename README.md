@@ -1,5 +1,5 @@
 # Vinbero
-<p align="center"><img src="img/vinbero.png" alt="Vinbero" height="175px"/><img src="img/vinbero-text.png" alt="Vinbero" height="150px"/></p>
+<p align="center"><img src="https://github.com/vinbero/vinbero/blob/master/img/vinbero.png?raw=true" alt="Vinbero" height="175px"/><img src="https://github.com/vinbero/vinbero/blob/master/img/vinbero-text.png?raw=true" alt="Vinbero" height="150px"/></p>
 
 ## Intoduction
 Vinbero is a modular server written in C, and its main goal is flexibility. Its core is very small; It just loads children modules, initializes them, calls callbacks on them and destroys them. Currently multithreading, tcp, epoll, http, lua module exist. So you can try it as a simple web application server with lua scripting. But if you add your own module it could be even used as a mailserver, chatserver or gameserver.
