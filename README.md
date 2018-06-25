@@ -62,6 +62,7 @@ Options:
 
 ### Logging flags and Logging options
 Logging flags and logging options are integer bitmasks:
+
 - FLAG_TRACE: 1
 - FLAG_DEBUG: 2
 - FLAG_INFO: 4
