@@ -1,5 +1,12 @@
-# Vinbero
-<p align="center"><img src="https://github.com/vinbero/vinbero/blob/master/img/vinbero.png?raw=true" alt="Vinbero" height="175px"/><img src="https://github.com/vinbero/vinbero/blob/master/img/vinbero-text.png?raw=true" alt="Vinbero" height="150px"/></p>
+<!--
++++
+title = "Vinbero"
+description = "The Modular Server"
++++
+-->
+# <a href="https://github.com/vinbero/vinbero">Vinbero</a> [![Build Status](https://travis-ci.org/vinbero/vinbero.svg?branch=master)](https://travis-ci.org/vinbero/vinbero)
+
+<p align="center"><img src="img/vinbero.png" alt="Vinbero" height="175px"/><img src="img/vinbero-text.png" alt="Vinbero" height="150px"/></p>
 
 ## Intoduction
 Vinbero is a modular server written in C, and its main goal is flexibility. Its core is very small; It just loads children modules, initializes them, calls callbacks on them and destroys them. Currently multithreading, tcp, epoll, http, lua module exist. So you can try it as a simple web application server with lua scripting. But if you add your own module it could be even used as a mailserver, chatserver or gameserver.
@@ -20,7 +27,7 @@ Options:
   -h --help                Print this help message.
 ```
 
-<a href="https://asciinema.org/a/188477" target="_blank"><img src="https://asciinema.org/a/188477.png" /></a>
+<a href="https://asciinema.org/a/188477" target="_blank"><img src="https://asciinema.org/a/188477.png" width="100%"/></a>
 
 ### Config file example
 ```JSON
@@ -62,6 +69,7 @@ Options:
 
 ### Logging flags and Logging options
 Logging flags and logging options are integer bitmasks:
+
 - FLAG_TRACE: 1
 - FLAG_DEBUG: 2
 - FLAG_INFO: 4
