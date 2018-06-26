@@ -1,0 +1,103 @@
+dist: trusty
+sudo: required
+language: c
+compiler:
+  - gcc
+before_install:
+  - pwd
+  - git clone git://git.cryptomilk.org/projects/cmocka.git 
+  - cd cmocka
+  - mkdir build
+  - cd build
+  - cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr ..
+  - cd ../../
+
+  - pwd
+  - git clone https://github.com/akheron/jansson
+  - cd jansson
+  - autoreconf -i
+  - ./configure --prefix=/usr
+  - cd ../
+
+  - pwd
+  - git clone https://github.com/vinbero/libgenc
+  - cd libgenc
+  - mkdir build
+  - cd build
+  - cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr ..
+  - cd ../../
+
+  - pwd
+  - git clone https://github.com/vinbero/libgaio
+  - cd libgaio
+  - mkdir build
+  - cd build
+  - cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr ..
+  - cd ../../
+
+  - pwd
+  - git clone https://github.com/vinbero/libfastdl
+  - cd libfastdl
+  - mkdir build
+  - cd build
+  - cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr ..
+  - cd ../../
+
+  - pwd
+  - git clone https://github.com/vinbero/libvinbero_common
+  - cd libvinbero_common
+  - mkdir build
+  - cd build
+  - cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr ..
+  - cd ../../
+
+install:
+  - sudo apt-get install -y uthash-dev
+#  - sudo apt-get install -y autoconf
+
+  - pwd
+  - cd cmocka/build
+  - make
+  - sudo make install
+  - cd ../../
+
+  - pwd
+  - cd jansson
+  - make
+  - make check
+  - sudo make install
+  - cd ../
+
+  - pwd
+  - cd libgenc/build
+  - make
+  - sudo make install
+  - cd ../../
+
+  - pwd
+  - cd libgaio/build
+  - make
+  - sudo make install
+  - cd ../../
+
+  - pwd
+  - cd libfastdl/build
+  - make
+  - sudo make install
+  - cd ../../
+
+  - pwd
+  - cd libvinbero_common/build
+  - make
+  - sudo make install
+  - cd ../../
+
+before_script:
+  - cmake -version
+  - make --version 
+  - gcc --version
+  - mkdir build
+  - cd build
+  - cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr ..
+
+script: make && ctest --verbose
