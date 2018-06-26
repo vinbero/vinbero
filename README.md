@@ -1,6 +1,7 @@
 <!--
 +++
 title = "Vinbero"
+description = "The Modular Server"
 +++
 -->
 # <a href="https://github.com/vinbero/vinbero">Vinbero</a> [![Build Status](https://travis-ci.org/vinbero/vinbero.svg?branch=master)](https://travis-ci.org/vinbero/vinbero)
