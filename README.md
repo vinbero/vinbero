@@ -3,7 +3,7 @@
 title = "Vinbero"
 +++
 -->
-# Vinbero [![Build Status](https://travis-ci.org/vinbero/vinbero.svg?branch=master)](https://travis-ci.org/vinbero/vinbero)
+# <a href="https://github.com/vinbero/vinbero">Vinbero</a> [![Build Status](https://travis-ci.org/vinbero/vinbero.svg?branch=master)](https://travis-ci.org/vinbero/vinbero)
 
 <p align="center"><img src="img/vinbero.png" alt="Vinbero" height="175px"/><img src="img/vinbero-text.png" alt="Vinbero" height="150px"/></p>
 
