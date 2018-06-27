@@ -5,7 +5,7 @@ list(APPEND vinbero_core_public_headers "vinbero_core.h")
 set_target_properties(vinbero_core PROPERTIES
                                    VERSION 0.1.0
                                    SOVERSION 0.1
-                                   PUBLIC_HEADER ${vinbero_core_public_headers})
+                                   PUBLIC_HEADER "${vinbero_core_public_headers}")
 target_link_libraries(vinbero_core jansson fastdl pthread gaio)
 install(TARGETS vinbero_core 
         LIBRARY DESTINATION lib

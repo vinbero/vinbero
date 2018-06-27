@@ -1,5 +1,14 @@
-cmake_minimum_required(VERSION 3.8)
-project(vinbero)
+cmake_minimum_required(VERSION 2.8)
+project(vinbero C)
+
 enable_testing()
+if(CMAKE_VERSION VERSION_LESS "3.1")
+  if(CMAKE_C_COMPILER_ID STREQUAL "GNU")
+    set (CMAKE_C_FLAGS "-std=gnu11 ${CMAKE_C_FLAGS}")
+  endif()
+else()
+    set(CMAKE_C_STANDARD 11)
+endif()
+
 add_subdirectory(src)
 add_subdirectory(test)
