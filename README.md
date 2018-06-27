@@ -156,13 +156,12 @@ Struct variable names are same as function names. but local variables don't star
 - vinbero_local
 
 ### Versioning
-This project follows **semantic versioning**.
-https://semver.org
+This project follows **[semantic versioning](https://semver.org)**
 
 ### Branching
 This project and all sub-projects are going to follow this branching model after vinbero v0.1.0 release.
-**https://nvie.com/posts/a-successful-git-branching-model**
+**[](https://nvie.com/posts/a-successful-git-branching-model)**
 
 ### Slack
-https://vinbero.slack.com
+[](https://vinbero.slack.com)
 
