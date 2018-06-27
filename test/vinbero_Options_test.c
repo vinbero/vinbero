@@ -14,8 +14,7 @@ void __wrap_vinbero_Help_print() {}
 void __wrap_vinbero_Help_printAndExit() {}
 
 void test_vinbero_Options_process(void** state) {
-//    char* args[] = {"vinbero", "-l", "63", "-i", "{\"core\": {\"config\": {\"vinbero.setUid\": 1001}, \"next\": [] } }"};
-    char* args[] = {"vinbero", "-l", "63", "-f", "test.json"};
+    char* args[] = {"vinbero", "-f", "63", "-c", "test.json"};
     struct vinbero_common_Config config;
     vinbero_common_Config_init(&config);
     assert_int_equal(vinbero_Options_process(sizeof(args) / sizeof(char*), args, &config), VINBERO_COMMON_STATUS_SUCCESS);
