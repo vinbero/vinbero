@@ -16,6 +16,7 @@
 #include <vinbero_common/vinbero_common_Config.h>
 #include <vinbero_common/vinbero_common_Module.h>
 #include "vinbero_core.h"
+#include "vinbero_Version.h"
 #include "vinbero_interface_MODULE.h"
 #include "vinbero_interface_BASIC.h"
 
@@ -93,7 +94,7 @@ int vinbero_core_initLocalModule(struct vinbero_common_Module* module, struct vi
     GENC_TREE_NODE_SET_PARENT(module, NULL);
     module->id = "core";
     module->config = config;
-    vinbero_common_Module_init(module, "core", "0.0.1", true);
+    vinbero_common_Module_init(module, "core", VINBERO_VERSION, true);
     module->localModule.pointer = malloc(1 * sizeof(struct vinbero_core));
     struct vinbero_core* localModule = module->localModule.pointer;
     vinbero_common_Config_getInt(module->config, module, "vinbero.setUid", &localModule->setUid, geteuid());
