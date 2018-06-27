@@ -14,7 +14,7 @@ void __wrap_vinbero_Help_print() {}
 void __wrap_vinbero_Help_printAndExit() {}
 
 void test_vinbero_Options_process(void** state) {
-    char* args[] = {"vinbero", "-l", "63"};
+    char* args[] = {"vinbero", "-f", "63"};
     struct vinbero_common_Config config;
     vinbero_common_Config_init(&config);
     assert_int_equal(vinbero_Options_process(sizeof(args) / sizeof(char*), args, &config), VINBERO_COMMON_ERROR_INVALID_CONFIG);
