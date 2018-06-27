@@ -4,7 +4,11 @@ title = "Vinbero"
 description = "The Modular Server"
 +++
 -->
-# Vinbero [![Build Status](https://travis-ci.org/vinbero/vinbero.svg?branch=master)](https://travis-ci.org/vinbero/vinbero)
+# Vinbero
+
+[![GitHub release](https://img.shields.io/github/release/vinbero/vinbero.svg)](https://github.com/vinbero/vinbero/releases)[![Github All Releases](https://img.shields.io/github/downloads/vinbero/vinbero/total.svg)](https://github.com/vinbero/vinbero/releases)
+[![Travis](https://img.shields.io/travis/vinbero/vinbero.svg)](https://travis-ci.org/vinbero/vinbero)
+
 
 <p align="center"><img src="https://raw.githubusercontent.com/vinbero/vinbero/master/img/vinbero.png" alt="Vinbero" height="175px"/><img src="https://raw.githubusercontent.com/vinbero/vinbero/master/img/vinbero-text.png" alt="Vinbero" height="150px"/></p>
 
