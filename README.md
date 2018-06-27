@@ -24,6 +24,7 @@ Options:
   -c --config-file         JSON-based config file.
   -f --logging-flag        Set logging level flag.
   -o --logging-option      Set logging option.
+  -v --version             Print version info.
   -h --help                Print this help message.
 ```
 
