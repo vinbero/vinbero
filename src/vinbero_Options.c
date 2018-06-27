@@ -2,12 +2,14 @@
 #include <jansson.h>
 #include <limits.h>
 #include <stdbool.h>
+#include <stdio.h>
 #include <string.h>
 #include <vinbero_common/vinbero_common_Status.h>
 #include <vinbero_common/vinbero_common_Error.h>
 #include <vinbero_common/vinbero_common_Log.h>
 #include "vinbero_Options.h"
 #include "vinbero_Help.h"
+#include "vinbero_Version.h"
 
 int vinbero_Options_process(int argc, char* argv[], struct vinbero_common_Config* config) {
     int ret;
@@ -29,7 +31,7 @@ int vinbero_Options_process(int argc, char* argv[], struct vinbero_common_Config
     json_error_t configError;
     char optionChar;
     bool optionsExist = false;
-    while((optionChar = getopt_long(argc, argv, "i:c:f:o:h", options, NULL)) != (char) - 1) {
+    while((optionChar = getopt_long(argc, argv, "i:c:f:o:vh", options, NULL)) != (char) - 1) {
         optionsExist = true;
         switch(optionChar) {
         case 'i':
@@ -48,6 +50,9 @@ int vinbero_Options_process(int argc, char* argv[], struct vinbero_common_Config
             if(loggingOption == LONG_MIN || loggingOption == LONG_MAX)
                 return VINBERO_COMMON_ERROR_INVALID_OPTION; 
             break;
+        case 'v':
+            printf("%s\n", VINBERO_VERSION);
+            return VINBERO_COMMON_STATUS_EXIT;
         case 'h':
             vinbero_Help_print();
             return VINBERO_COMMON_STATUS_EXIT;
