@@ -6,9 +6,11 @@ description = "The Modular Server"
 -->
 # Vinbero
 
-[![GitHub release](https://img.shields.io/github/release/vinbero/vinbero.svg)](https://github.com/vinbero/vinbero/releases)[![Github All Releases](https://img.shields.io/github/downloads/vinbero/vinbero/total.svg)](https://github.com/vinbero/vinbero/releases)
+[![GitHub release](https://img.shields.io/github/release/vinbero/vinbero.svg)](https://github.com/vinbero/vinbero/releases)
+[![Github All Releases](https://img.shields.io/github/downloads/vinbero/vinbero/total.svg)](https://github.com/vinbero/vinbero/releases)
 [![Travis](https://img.shields.io/travis/vinbero/vinbero.svg)](https://travis-ci.org/vinbero/vinbero)
-
+[![Read the Docs](https://img.shields.io/readthedocs/vinbero.svg)](https://vinbero.readthedocs.io)
+[![license](https://img.shields.io/github/license/vinbero/vinbero.svg)(https://raw.githubusercontent.com/vinbero/vinbero/master/LICENSE)
 
 <p align="center"><img src="https://raw.githubusercontent.com/vinbero/vinbero/master/img/vinbero.png" alt="Vinbero" height="175px"/><img src="https://raw.githubusercontent.com/vinbero/vinbero/master/img/vinbero-text.png" alt="Vinbero" height="150px"/></p>
 
