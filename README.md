@@ -4,7 +4,7 @@ title = "Vinbero"
 description = "The Modular Server"
 +++
 -->
-# <a href="https://github.com/vinbero/vinbero">Vinbero</a> [![Build Status](https://travis-ci.org/vinbero/vinbero.svg?branch=master)](https://travis-ci.org/vinbero/vinbero)
+# Vinbero [![Build Status](https://travis-ci.org/vinbero/vinbero.svg?branch=master)](https://travis-ci.org/vinbero/vinbero)
 
 <p align="center"><img src="https://raw.githubusercontent.com/vinbero/vinbero/feature-travis/img/vinbero.png" alt="Vinbero" height="175px"/><img src="https://raw.githubusercontent.com/vinbero/vinbero/feature-travis/img/vinbero-text.png" alt="Vinbero" height="150px"/></p>
 
