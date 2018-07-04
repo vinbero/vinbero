@@ -1,7 +1,6 @@
 set(CMAKE_INSTALL_RPATH "/usr/local/lib")
+
 # Build and install libvinbero_core
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
-configure_file(vinbero_Version.h.in vinbero_Version.h @ONLY)
 add_library(vinbero_core SHARED vinbero_core.c)
 list(APPEND vinbero_core_public_headers "vinbero_core.h")
 set_target_properties(vinbero_core PROPERTIES VERSION ${vinbero_version}
