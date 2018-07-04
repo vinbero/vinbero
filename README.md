@@ -4,7 +4,12 @@ title = "Vinbero"
 description = "The Modular Server"
 +++
 -->
-# Vinbero [![Build Status](https://travis-ci.org/vinbero/vinbero.svg?branch=master)](https://travis-ci.org/vinbero/vinbero)
+# Vinbero
+
+[![GitHub release](http://img.shields.io/github/release/vinbero/vinbero.svg)](https://github.com/vinbero/vinbero/releases)
+[![Github All Releases](http://img.shields.io/github/downloads/vinbero/vinbero/total.svg)](https://github.com/vinbero/vinbero/releases)
+[![Travis](http://img.shields.io/travis/vinbero/vinbero.svg)](https://travis-ci.org/vinbero/vinbero)
+[![license](http://img.shields.io/github/license/vinbero/vinbero.svg)](https://raw.githubusercontent.com/vinbero/vinbero/master/LICENSE)
 
 <p align="center"><img src="https://raw.githubusercontent.com/vinbero/vinbero/master/img/vinbero.png" alt="Vinbero" height="175px"/><img src="https://raw.githubusercontent.com/vinbero/vinbero/master/img/vinbero-text.png" alt="Vinbero" height="150px"/></p>
 
@@ -12,7 +17,7 @@ description = "The Modular Server"
 Vinbero is a modular server written in C, and its main goal is flexibility. Its core is very small; It just loads children modules, initializes them, calls callbacks on them and destroys them. Currently multithreading, tcp, epoll, http, lua module exist. So you can try it as a simple web application server with lua scripting. But if you add your own module it could be even used as a mailserver, chatserver or gameserver.
 
 ## Warning
-**Currenttly this software is under heavy development, so there will be bugs or the architecture can change.
+**Currently this software is under heavy development, so there will be bugs or the architecture can change.
 Writing new modules is not encouraged yet.**
 
 ## Usage
@@ -150,13 +155,12 @@ Struct variable names are same as function names. but local variables don't star
 - vinbero_local
 
 ### Versioning
-This project follows **semantic versioning**.
-https://semver.org
+This project follows **[semantic versioning](https://semver.org)**
 
 ### Branching
 This project and all sub-projects are going to follow this branching model after vinbero v0.1.0 release.
-**https://nvie.com/posts/a-successful-git-branching-model**
+**[](https://nvie.com/posts/a-successful-git-branching-model)**
 
 ### Slack
-https://vinbero.slack.com
+[](https://vinbero.slack.com)
 
