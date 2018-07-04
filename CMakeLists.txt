@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.8)
 project(vinbero C)
-set(vinbero_version "0.1.2")
+set(vinbero_version "0.1.1")
 set(vinbero_soversion "0.1")
 
 enable_testing()
