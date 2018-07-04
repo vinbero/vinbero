@@ -3,7 +3,6 @@ project(vinbero C)
 set(vinbero_version "0.1.1")
 set(vinbero_soversion "0.1")
 
-enable_testing()
 if(CMAKE_VERSION VERSION_LESS "3.1")
   if(CMAKE_C_COMPILER_ID STREQUAL "GNU")
     set (CMAKE_C_FLAGS "-std=gnu11 ${CMAKE_C_FLAGS}")
@@ -12,5 +11,10 @@ else()
     set(CMAKE_C_STANDARD 11)
 endif()
 
+configure_file("${PROJECT_SOURCE_DIR}/src/vinbero_Version.h.in"
+               "${PROJECT_BINARY_DIR}/vinbero_Version.h" @ONLY)
+include_directories("${PROJECT_BINARY_DIR}")
+
 add_subdirectory(src)
+enable_testing()
 add_subdirectory(test)
