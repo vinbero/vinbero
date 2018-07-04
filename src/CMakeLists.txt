@@ -15,13 +15,6 @@ install(TARGETS vinbero_core
 
 # Build and install vinbero)
 add_executable(vinbero vinbero.c vinbero_Help.c vinbero_Options.c)
-list(APPEND vinbero_public_headers "vinbero_interface_MODULE.h")
-list(APPEND vinbero_public_headers "vinbero_interface_BASIC.h")
-list(APPEND vinbero_public_headers "vinbero_interface_TLOCAL.h")
-list(APPEND vinbero_public_headers "vinbero_interface_TLSERVICE.h")
-list(APPEND vinbero_public_headers "vinbero_interface_CLOCAL.h")
-list(APPEND vinbero_public_headers "vinbero_interface_CLSERVICE.h")
-set_target_properties(vinbero PROPERTIES PUBLIC_HEADER "${vinbero_public_headers}")
 find_library(vinbero_common libvinbero_common.so REQUIRED)
 target_link_libraries(vinbero vinbero_core ${vinbero_common})
 install(TARGETS vinbero 
