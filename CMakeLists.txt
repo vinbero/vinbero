@@ -11,8 +11,8 @@ else()
     set(CMAKE_C_STANDARD 11)
 endif()
 
-configure_file("${PROJECT_SOURCE_DIR}/src/vinbero_Version.h.in"
-               "${PROJECT_BINARY_DIR}/vinbero_Version.h" @ONLY)
+configure_file("${PROJECT_SOURCE_DIR}/src/${PROJECT_NAME}_Version.h.in"
+               "${PROJECT_BINARY_DIR}/${PROJECT_NAME}_Version.h" @ONLY)
 include_directories("${PROJECT_BINARY_DIR}")
 
 add_subdirectory(src)
