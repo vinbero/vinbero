@@ -1,4 +1,4 @@
-set(CMAKE_INSTALL_RPATH "/usr/local/lib")
+set(CMAKE_INSTALL_RPATH "\$ORIGIN:/usr/local/lib")
 
 # Build and install libvinbero_core
 add_library(vinbero_core SHARED vinbero_core.c)
