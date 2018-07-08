@@ -10,7 +10,7 @@ description = "The Modular Server"
 [![Github All Releases](http://img.shields.io/github/downloads/vinbero/vinbero/total.svg)](https://github.com/vinbero/vinbero/releases)
 [![Build Status](https://travis-ci.org/vinbero/vinbero.svg?branch=master)](https://travis-ci.org/vinbero/vinbero)
 [![license](http://img.shields.io/github/license/vinbero/vinbero.svg)](https://raw.githubusercontent.com/vinbero/vinbero/master/LICENSE)
-[![Docker Build Status](http://img.shields.io/docker/build/vinbero/alpine-vinbero.svg)](https://hub.docker.com/r/vinbero/alpine-vinbero)
+[![Docker Build Status](http://img.shields.io/docker/build/vinbero/alpine-vinbero.svg)](https://hub.docker.com/r/vinbero/alpine-vinbero/builds)
 [![Docker Stars](http://img.shields.io/docker/stars/vinbero/alpine-vinbero.svg)](https://hub.docker.com/r/vinbero/alpine-vinbero)
 [![Docker Pulls](http://img.shields.io/docker/pulls/vinbero/alpine-vinbero.svg)](https://hub.docker.com/r/vinbero/alpine-vinbero)
 
