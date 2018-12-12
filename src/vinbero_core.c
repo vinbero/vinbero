@@ -239,16 +239,19 @@ int vinbero_core_start(struct vinbero_common_Module* module) {
     int ret;
     jmp_buf* jumpBuffer = malloc(1 * sizeof(jmp_buf));
     if(setjmp(*jumpBuffer) == 0) {
+        VINBERO_COMMON_LOG_TRACE2();
         pthread_key_create(&vinbero_core_tlKey, NULL);
         pthread_setspecific(vinbero_core_tlKey, jumpBuffer);
         GENC_TREE_NODE_FOR_EACH_CHILD(module, index) {
             struct vinbero_common_Module* childModule = &GENC_TREE_NODE_GET_CHILD(module, index);
             VINBERO_COMMON_CALL(BASIC, service, childModule, &ret, childModule);
-            if(ret < 0)
-                return ret;
+            if(ret < 0) {
+                VINBERO_COMMON_LOG_ERROR("vinbero_interface_BASIC_service() failed");
+                break;
+            }
         }
     }
-
+    VINBERO_COMMON_LOG_TRACE2();
     free(jumpBuffer);
     pthread_key_delete(vinbero_core_tlKey);
     vinbero_core_destroyChildModules(module);
