@@ -253,6 +253,7 @@ int vinbero_core_start(struct vinbero_common_Module* module) {
     }
     VINBERO_COMMON_LOG_TRACE2();
     free(jumpBuffer);
+    pthread_setspecific(vinbero_core_tlKey, NULL);
     pthread_key_delete(vinbero_core_tlKey);
     vinbero_core_destroyChildModules(module);
     vinbero_core_rDestroyChildModules(module);
