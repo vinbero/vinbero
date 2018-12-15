@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8)
 project(vinbero C)
 set(CMAKE_BUILD_TYPE RelWithDebInfo)
 
-set(vinbero_version "0.1.2")
+set(vinbero_version "0.1.3")
 set(vinbero_soversion "0.1")
 
 if(CMAKE_VERSION VERSION_LESS "3.1")
