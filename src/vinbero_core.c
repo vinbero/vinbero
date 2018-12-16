@@ -172,15 +172,10 @@ int vinbero_core_rInitChildModules(struct vinbero_common_Module* module) {
         struct vinbero_common_Module* childModule = &GENC_TREE_NODE_GET_CHILD(module, index);
         if((ret = vinbero_core_rInitChildModules(childModule)) < 0)
             return ret;
-/*
-        VINBERO_COMMON_MODULE_DLOPEN(childModule, &ret); // This casues memory leak but also eliminates uninitialised value error.
-        if(ret < 0)
-            return ret;
-*/
+
         VINBERO_COMMON_CALL(MODULE, rInit, childModule, &ret, childModule);
         if(ret < 0)
             return ret;
-
     }
     return 0;
 }
