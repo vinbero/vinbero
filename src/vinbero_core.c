@@ -17,6 +17,7 @@
 #include <vinbero_common/vinbero_common_Call.h>
 #include <vinbero_common/vinbero_common_Config.h>
 #include <vinbero_common/vinbero_common_Module.h>
+#include <vinbero_common/vinbero_common_Status.h>
 #include "vinbero_core.h"
 #include "vinbero_Version.h"
 
