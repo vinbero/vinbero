@@ -93,6 +93,7 @@ Logging flags and logging options are integer bitmasks:
 - FLAG_FATAL: 32
 - **default logging flag is 62**
 - OPTION_COLOR: 1
+- OPTION_SOURCE: 2
 - **defualt logging option is 1**
 
 ### Core module config options
