@@ -52,29 +52,29 @@ Options:
         "next": ["vinbero_tcp"]
     },
     "vinbero_tcp": {
-        "path": "/usr/local/lib/vinbero/vinbero_tcp.so",
-        "config": {"vinbero_tcp.port": 8000, "vinbero_tcp.reuseAddress": true},
+        "path": "/usr/lib/vinbero/vinbero_tcp.so",
+        "config": {"vinbero_tcp.port": 80, "vinbero_tcp.reuseAddress": true},
         "next": ["vinbero_mt"]
     }, 
     "vinbero_mt": {
-        "path": "/usr/local/lib/vinbero/vinbero_mt.so",
+        "path": "/usr/lib/vinbero/vinbero_mt.so",
         "config": {"vinbero_mt.workerCount": 4},
         "next": ["vinbero_tcp_mt_epoll"]
     },
     "vinbero_tcp_mt_epoll": {
-        "path": "/usr/local/lib/vinbero/vinbero_tcp_mt_epoll.so",
-        "config": {},
+        "path": "/usr/lib/vinbero/vinbero_tcp_mt_epoll.so",
+        "config": {"vinbero_tcp_mt_epoll.clientTimeoutSeconds": 3},
         "next": ["vinbero_mt_epoll_http"]
     },
     "vinbero_mt_epoll_http": {
-        "path": "/usr/local/lib/vinbero/vinbero_mt_epoll_http.so",
+        "path": "/usr/lib/vinbero/vinbero_mt_epoll_http.so",
         "config": {},
         "next": ["vinbero_mt_http_lua"]
     },
     "vinbero_mt_http_lua": {
-        "path": "/usr/local/lib/vinbero/vinbero_mt_http_lua.so",
+        "path": "/usr/lib/vinbero/vinbero_mt_http_lua.so",
         "config": {
-            "vinbero_mt_http_lua.scriptFile": "test/test.lua",
+            "vinbero_mt_http_lua.scriptFile": "/srv/app.lua",
             "vinbero_mt_http_lua.scriptArg": {}
         },
         "next": []
