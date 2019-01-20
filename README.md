@@ -112,6 +112,9 @@ Any type of contribution is welcome!
 Radical changes like function renaming or small changes like removing extra spacing is allowed too.
 Please don't hesitate to fork and contribute, this project needs a lot of work to do.
 
+### Language
+Use English on your commit message so everyone can understand
+
 ### Naming convention
 #### Modules
 Module names are snake case, and should be start with vinbero_
