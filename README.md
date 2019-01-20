@@ -170,7 +170,7 @@ This project follows **[semantic versioning](https://semver.org)**
 ### Branching
 This project and all sub-projects are going to follow **[this branching model](https://nvie.com/posts/a-successful-git-branching-model)** after vinbero v0.1.0 release.
 - master: Should always be executed without a bug.
-- dev: Can contain a bug
+- dev: Development branch, can contain a bug
 - feature: When creating a new feature. this branch will be merged into dev branch
 - release: When creating a new release. this branch will be merged into master branch
 - hotfix: When a bug is found on master branch and you need to fix it fast, create this branch and merge it into master branch
