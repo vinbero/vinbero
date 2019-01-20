@@ -26,6 +26,7 @@ curl localhost:8080
 ```
 ```console
 docker run -it -d --name vinbero -p 8080:80 vinbero/alpine-vinbero-blog
+# default id: 'admin', default password: 'password'
 ngrok http 8080
 ```
 
