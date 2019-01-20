@@ -176,7 +176,10 @@ This project and all sub-projects are going to follow **[this branching model](h
 - hotfix: When a bug is found on master branch and you need to fix it fast, create this branch and merge it into master branch
 - bugfix: When a bug is found on dev branch, create this branch and merge it into dev branch
 
-#### Example
+### AUTHORS file
+To be an author, you have to run cmake or make to update AUTHORS file and you need to add this file into your commit
+
+### Example
 1. To start from an environment where all official modules are installed, run a docker container like this:
 ```console
 docker run -it -d --name vinbero vinbero/alpine-vinbero_mt_http_lua:dev
@@ -192,5 +195,5 @@ git clone -b dev https://github.com/YOU/vinbero
 ```console
 git checkout -b feature-something or git checkout
 ```
-4. Edit sources, commit and push
+4. Edit sources, run cmake, commit and push
 5. Make a pull request
