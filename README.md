@@ -177,14 +177,20 @@ This project and all sub-projects are going to follow **[this branching model](h
 - bugfix: When a bug is found on dev branch, create this branch and merge it into dev branch
 
 #### Example
-1. Clone a forked repository, start from a branch you want to improve e.g., dev, feature, release, hotfix, bugfix
+1. To start from an environment where all official modules are installed, run a docker container like this:
 ```console
+docker run -it -d --name vinbero vinbero/alpine-vinbero_mt_http_lua:dev
+docker exec -it vinbero /bin/sh
+```
+2. Inside the container clone a forked repository, start from a branch you want to improve e.g., dev, feature, release, hotfix, bugfix
+```console
+cd /
+rm -rf vinbero
 git clone -b dev https://github.com/YOU/vinbero
 ```
-2. Checkout to a new branch
+3. Checkout to a new branch
 ```console
 git checkout -b feature-something or git checkout
 ```
-3. Edit sources, commit and push
-...
-4. Make a pull request
+4. Edit sources, commit and push
+5. Make a pull request
