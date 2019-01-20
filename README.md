@@ -188,6 +188,3 @@ git checkout -b feature-something or git checkout
 3. Edit sources, commit and push
 ...
 4. Make a pull request
-```
-
-
