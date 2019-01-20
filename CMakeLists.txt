@@ -17,6 +17,9 @@ configure_file("${PROJECT_SOURCE_DIR}/src/${PROJECT_NAME}_Version.h.in"
                "${PROJECT_BINARY_DIR}/${PROJECT_NAME}_Version.h" @ONLY)
 include_directories("${PROJECT_BINARY_DIR}")
 
+execute_process(COMMAND git shortlog --all -nse --no-merges HEAD OUTPUT_FILE "${CMAKE_SOURCE_DIR}/AUTHORS")
+add_custom_target(authors ALL git shortlog --all -nse --no-merges HEAD > "${CMAKE_SOURCE_DIR}/AUTHORS")
+
 add_subdirectory(src)
 enable_testing()
 add_subdirectory(test)
