@@ -21,6 +21,7 @@ int main(int argc, char* argv[]) {
         return EXIT_SUCCESS;
 
     struct vinbero_common_Module module;
+    GENC_TREE_NODE_INIT(&module);
 
     if((ret = vinbero_core_initLocalModule(&module, &config)) < VINBERO_COMMON_STATUS_SUCCESS) {
         VINBERO_COMMON_LOG_ERROR("vinbero_core_initLocalModule() failed");

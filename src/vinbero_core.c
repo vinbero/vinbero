@@ -108,6 +108,7 @@ int vinbero_core_loadChildModules(struct vinbero_common_Module* module) {
 
     GENC_TREE_NODE_FOR_EACH_CHILD(childModuleIds, index) {
         struct vinbero_common_Module* childModule = malloc(sizeof(struct vinbero_common_Module));
+        GENC_TREE_NODE_INIT(childModule);
         GENC_TREE_NODE_ADD_CHILD(module, childModule);
         childModule->id = VINBERO_COMMON_OBJECT_CONSTRING(GENC_TREE_NODE_GET_CHILD(childModuleIds, index));
         childModule->config = module->config;
