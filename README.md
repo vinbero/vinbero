@@ -24,6 +24,10 @@ Vinbero is a modular server written in C, and its main goal is flexibility. Its 
 docker run -it -d --name vinbero -p 8080:80 vinbero/alpine-vinbero_mt_http_lua
 curl localhost:8080
 ```
+```console
+docker run -it -d --name vinbero -p 8080:80 vinbero/alpine-vinbero-blog
+ngrok http 8080
+```
 
 ## Warning
 **Currently this software is under heavy development, so there will be bugs or the architecture can change.
