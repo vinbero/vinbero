@@ -17,6 +17,8 @@ configure_file("${PROJECT_SOURCE_DIR}/src/${PROJECT_NAME}_Version.h.in"
                "${PROJECT_BINARY_DIR}/${PROJECT_NAME}_Version.h" @ONLY)
 include_directories("${PROJECT_BINARY_DIR}")
 
+execute_process(COMMAND git shortlog --all -nse HEAD OUTPUT_FILE "${CMAKE_SOURCE_DIR}/AUTHORS")
+
 add_subdirectory(src)
 enable_testing()
 add_subdirectory(test)

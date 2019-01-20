@@ -1,2 +1,0 @@
-AUTHORS=$(git shortlog -nse HEAD)
-echo $AUTHORS > AUTHORS
