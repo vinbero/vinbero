@@ -176,7 +176,7 @@ This project and all sub-projects are going to follow **[this branching model](h
 - hotfix: When a bug is found on master branch and you need to fix it fast, create this branch and merge it into master branch
 - bugfix: When a bug is found on dev branch, create this branch and merge it into dev branch
 
-### Example
+#### Example
 1. Clone a forked repository, start from a branch you want to improve e.g., dev, feature, release, hotfix, bugfix
 ```console
 git clone -b dev https://github.com/YOU/vinbero
