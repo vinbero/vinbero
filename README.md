@@ -184,7 +184,7 @@ This project and all sub-projects are going to follow **[this branching model](h
 - bugfix: When a bug is found on dev branch, create this branch and merge it into dev branch
 
 ### AUTHORS file
-To be an author, you have to run cmake or make to update AUTHORS file and you need to add this file into your commit
+To update AUTHORS file, you have to run cmake or make to update AUTHORS file based on commits from origin/master
 
 ### Example
 1. To start from an environment where all official modules are installed, run a docker container like this:
