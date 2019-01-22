@@ -7,11 +7,12 @@ description = "The Modular Server"
 # Vinbero
 
 [![GitHub release](http://img.shields.io/github/release/vinbero/vinbero.svg)](https://github.com/vinbero/vinbero/releases)
-[![Github All Releases](http://img.shields.io/github/downloads/vinbero/vinbero/total.svg)](https://github.com/vinbero/vinbero/releases)
 [![Build Status](https://travis-ci.org/vinbero/vinbero.svg?branch=master)](https://travis-ci.org/vinbero/vinbero)
 [![license](http://img.shields.io/github/license/vinbero/vinbero.svg)](https://raw.githubusercontent.com/vinbero/vinbero/master/LICENSE)
 [![Docker Stars](http://img.shields.io/docker/stars/vinbero/alpine-vinbero.svg)](https://hub.docker.com/r/vinbero/alpine-vinbero)
 [![Docker Pulls](http://img.shields.io/docker/pulls/vinbero/alpine-vinbero.svg)](https://hub.docker.com/r/vinbero/alpine-vinbero)
+[![Total alerts](https://img.shields.io/lgtm/alerts/g/vinbero/vinbero.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/vinbero/vinbero/alerts/)
+[![Language grade: C/C++](https://img.shields.io/lgtm/grade/cpp/g/vinbero/vinbero.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/vinbero/vinbero/context:cpp)
 
 <p align="center"><img src="https://raw.githubusercontent.com/vinbero/vinbero/master/img/vinbero.png" alt="Vinbero" height="175px"/><img src="https://raw.githubusercontent.com/vinbero/vinbero/master/img/vinbero-text.png" alt="Vinbero" height="150px"/></p>
 
