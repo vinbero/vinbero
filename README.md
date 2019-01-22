@@ -124,7 +124,7 @@ Use English on your commit message so everyone can understand
 #### Modules
 Module names are snake case, and should be start with vinbero_
 
-##### examples:
+##### Example
 ```C
 vinbero_mt_epoll_http
 vinbero_mt
@@ -133,14 +133,14 @@ vinbero_mt
 #### Interfaces
 Interface names are snake case and should start with vinbero_interface and **interface part** must be **uppercase with underscore**.
 
-##### examples:
+##### Example
 ```C
 vinbero_interface_HTTP
 ```
 
 #### Structs
 Struct names are pascal case and start with module names or interface names.
-##### examples: 
+##### Example
 ```C
 struct vinbero_mt_epoll_http_Module;
 struct vinbero_mt_epoll_http_ParserData;
@@ -148,7 +148,7 @@ struct vinbero_mt_epoll_http_ParserData;
 
 #### Functions
 Function names are camel case and start with struct names if it act like methods, or start with module names or interface names.
-##### examples:
+##### Example
 ```C
 int vinbero_tcp_mt_epoll_loadChildClModules(struct vinbero_common_ClModule* clModule);
 int vinbero_interface_HTTP_onRequestStart(struct vinbero_common_ClModule* clModule);
@@ -156,7 +156,7 @@ int vinbero_interface_HTTP_onRequestStart(struct vinbero_common_ClModule* clModu
 
 #### Macros
 Macro naming is same as C macros (uppercase with underscore). But it also starts with module names or interfaces names.
-#### examples:
+#### Example
 ```C
 #define VINBERO_INTERFACE_HTTP_DLSYM(interface, dlHandle, ret)
 ```
