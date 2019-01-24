@@ -98,6 +98,30 @@ int vinbero_core_initLocalModule(struct vinbero_common_Module* module, struct vi
     return VINBERO_COMMON_STATUS_SUCCESS;
 }
 
+static int vinbero_core_loadModule(struct vinbero_common_Module* module) {
+    struct vinbero_common_Object* paths;
+    VINBERO_COMMON_CONFIG_MGET_REQ(module->config, module, "paths", ARRAY, &paths);
+    if(paths == NULL) {
+        return VINBERO_COMMON_ERROR_INVALID_CONFIG;
+    }
+    if(GENC_TREE_NODE_CHILD_COUNT(paths) < 1) {
+        return VINBERO_COMMON_ERROR_INVALID_CONFIG;
+    }
+    int ret = VINBERO_COMMON_STATUS_SUCCESS;
+    GENC_TREE_NODE_FOR_EACH_CHILD(paths, index) {
+        struct vinbero_common_Object* path = GENC_TREE_NODE_GET_CHILD(paths, index);
+        if(!VINBERO_COMMON_OBJECT_IS_CONSTRING(path)) {
+            return VINBERO_COMMON_ERROR_INVALID_CONFIG;
+        }
+        if(fastdl_open(&module->dlHandle, VINBERO_COMMON_OBJECT_CONSTRING(path), RTLD_LAZY | RTLD_GLOBAL) == 0) {
+            module->path = VINBERO_COMMON_OBJECT_CONSTRING(path);
+            return VINBERO_COMMON_STATUS_SUCCESS;
+        }
+        ret = VINBERO_COMMON_ERROR_DLOPEN;
+    }
+    return ret;
+}
+
 int vinbero_core_loadChildModules(struct vinbero_common_Module* module) {
     VINBERO_COMMON_LOG_TRACE2();
     int ret;
@@ -112,12 +136,16 @@ int vinbero_core_loadChildModules(struct vinbero_common_Module* module) {
         GENC_TREE_NODE_ADD_CHILD(module, childModule);
         childModule->id = VINBERO_COMMON_OBJECT_CONSTRING(GENC_TREE_NODE_GET_CHILD(childModuleIds, index));
         childModule->config = module->config;
-        VINBERO_COMMON_MODULE_DLOPEN(childModule, &ret);
-        if(ret < VINBERO_COMMON_STATUS_SUCCESS) {
+        ret = vinbero_core_loadModule(childModule);
+        if(ret == VINBERO_COMMON_ERROR_INVALID_CONFIG) {
+            VINBERO_COMMON_LOG_ERROR("Content of config file is invalid");
+            return ret;
+        }
+        if(ret == VINBERO_COMMON_ERROR_DLOPEN) {
             VINBERO_COMMON_LOG_ERROR("%s", fastdl_error()); // dlerror is not thread safe
             return ret;
         }
-        VINBERO_COMMON_LOG_DEBUG("Load dynamic library of module %s", childModule->id);
+        VINBERO_COMMON_LOG_DEBUG("Module %s is loaded from %s", childModule->id, childModule->path);
         if((ret = vinbero_core_loadChildModules(childModule)) < VINBERO_COMMON_STATUS_SUCCESS)
             return ret;
     }
@@ -135,7 +163,7 @@ int vinbero_core_initChildModules(struct vinbero_common_Module* module) {
         if(ret < VINBERO_COMMON_STATUS_SUCCESS)
             return ret;
         if(childModule->childrenRequired == true && GENC_TREE_NODE_CHILD_COUNT(childModule) == 0) {
-            VINBERO_COMMON_LOG_ERROR("module %s must have at least one child", childModule->name);
+            VINBERO_COMMON_LOG_ERROR("Module %s must have at least one child", childModule->name);
             return VINBERO_COMMON_ERROR_INVALID_MODULE;
         }
         if(childModule->name == NULL) {
