@@ -3,9 +3,13 @@ sudo: required
 language: c
 compiler:
   - gcc
+branches:
+  only:
+    - master
+    - dev
 before_install:
   - pwd
-  - git clone git://git.cryptomilk.org/projects/cmocka.git 
+  - git clone -b $TRAVIS_BRANCH git://git.cryptomilk.org/projects/cmocka.git 
   - cd cmocka
   - mkdir build
   - cd build
@@ -13,14 +17,14 @@ before_install:
   - cd ../../
 
   - pwd
-  - git clone https://github.com/akheron/jansson
+  - git clone -b $TRAVIS_BRANCH https://github.com/akheron/jansson
   - cd jansson
   - autoreconf -i
   - ./configure --prefix=/usr
   - cd ../
 
   - pwd
-  - git clone https://github.com/vinbero/libgenc
+  - git clone -b $TRAVIS_BRANCH https://github.com/vinbero/libgenc
   - cd libgenc
   - mkdir build
   - cd build
@@ -28,7 +32,7 @@ before_install:
   - cd ../../
 
   - pwd
-  - git clone https://github.com/vinbero/libgaio
+  - git clone -b $TRAVIS_BRANCH https://github.com/vinbero/libgaio
   - cd libgaio
   - mkdir build
   - cd build
@@ -36,7 +40,7 @@ before_install:
   - cd ../../
 
   - pwd
-  - git clone https://github.com/vinbero/libfastdl
+  - git clone -b $TRAVIS_BRANCH https://github.com/vinbero/libfastdl
   - cd libfastdl
   - mkdir build
   - cd build
@@ -44,7 +48,7 @@ before_install:
   - cd ../../
 
   - pwd
-  - git clone https://github.com/vinbero/libvinbero_common
+  - git clone -b $TRAVIS_BRANCH https://github.com/vinbero/libvinbero_common
   - cd libvinbero_common
   - mkdir build
   - cd build
