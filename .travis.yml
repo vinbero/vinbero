@@ -9,7 +9,7 @@ branches:
     - dev
 before_install:
   - pwd
-  - git clone -b $TRAVIS_BRANCH git://git.cryptomilk.org/projects/cmocka.git 
+  - git clone git://git.cryptomilk.org/projects/cmocka.git
   - cd cmocka
   - mkdir build
   - cd build
@@ -17,7 +17,7 @@ before_install:
   - cd ../../
 
   - pwd
-  - git clone -b $TRAVIS_BRANCH https://github.com/akheron/jansson
+  - git clone https://github.com/akheron/jansson
   - cd jansson
   - autoreconf -i
   - ./configure --prefix=/usr
