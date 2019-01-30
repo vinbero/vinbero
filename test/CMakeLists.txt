@@ -1,12 +1,7 @@
-set(CMAKE_C_FLAGS "--coverage ${CMAKE_C_FLAGS}")
-set(CMAKE_C_OUTPUT_EXTENSION_REPLACE ON)
-
-add_custom_target(gcov)
 file(GLOB test_srcs RELATIVE ${CMAKE_SOURCE_DIR}/test *.c)
 foreach(test_src ${test_srcs})
   get_filename_component(test_name ${test_src} NAME_WE)
   add_executable(${test_name} "${test_name}.c" ${CMAKE_SOURCE_DIR}/src/vinbero_Options.c ${CMAKE_SOURCE_DIR}/src/vinbero_core.c)
   target_link_libraries(${test_name} vinbero_core vinbero_common cmocka "-Wl,--wrap,vinbero_common_Log_raw -Wl,--wrap,vinbero_common_Log_init -Wl,-wrap,vinbero_Help_print")
   add_test(NAME ${test_name} COMMAND ${test_name} WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
-  add_custom_command(TARGET gcov PRE_BUILD COMMAND gcov ${CMAKE_SOURCE_DIR}/test/${test_name}.c -o ${CMAKE_BINARY_DIR}/test/CMakeFiles/${test_name}.dir VERBATIM)
 endforeach()
