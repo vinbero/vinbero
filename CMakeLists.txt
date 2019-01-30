@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 2.8)
 project(vinbero C)
 
-set(CMAKE_C_OUTPUT_EXTENSION_REPLACE ON)
 set(vinbero_version "0.2.0")
 set(vinbero_soversion "0.2")
 
