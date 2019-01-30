@@ -1,4 +1,5 @@
 set(CMAKE_C_FLAGS "--coverage ${CMAKE_C_FLAGS}")
+set(CMAKE_C_OUTPUT_EXTENSION_REPLACE ON)
 
 add_custom_target(gcov)
 file(GLOB test_srcs RELATIVE ${CMAKE_SOURCE_DIR}/test *.c)
