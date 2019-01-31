@@ -1,7 +1,7 @@
 file(GLOB test_srcs RELATIVE ${CMAKE_SOURCE_DIR}/test *.c)
 foreach(test_src ${test_srcs})
   get_filename_component(test_name ${test_src} NAME_WE)
-  add_executable(${test_name} "${test_name}.c" ${CMAKE_SOURCE_DIR}/src/vinbero_Options.c ${CMAKE_SOURCE_DIR}/src/vinbero_core.c)
+  add_executable(${test_name} "${test_name}.c" ${CMAKE_SOURCE_DIR}/src/vinbero_Options.c)
   target_link_libraries(${test_name} vinbero_core vinbero_common cmocka "-Wl,--wrap,vinbero_common_Log_raw -Wl,--wrap,vinbero_common_Log_init -Wl,-wrap,vinbero_Help_print")
   add_test(NAME ${test_name} COMMAND ${test_name} WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 endforeach()
