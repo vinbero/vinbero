@@ -3,7 +3,7 @@ project(vinbero C)
 
 if(CMAKE_VERSION VERSION_LESS "3.1")
   if(CMAKE_C_COMPILER_ID STREQUAL "GNU")
-    set(CMAKE_C_FLAGS "-std=gnu11 ${CMAKE_C_FLAGS}")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=gnu11")
   endif()
 else()
     set(CMAKE_C_STANDARD 11)
