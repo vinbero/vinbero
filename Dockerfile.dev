@@ -17,4 +17,4 @@ RUN mkdir libfastdl/build; cd libfastdl/build; cmake -DCMAKE_INSTALL_PREFIX:PATH
 
 RUN mkdir libvinbero_common/build; cd libvinbero_common/build; cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr ..; make; make test; make install
 
-RUN mkdir vinbero/build; cd vinbero/build; cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr ..; make; make test; make install
+RUN mkdir vinbero/build; cd vinbero/build; cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr -DCMAKE_BUILD_TYPE=Debug ..; make; make test; make install
