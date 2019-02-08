@@ -9,8 +9,8 @@ description = "The Modular Server"
 [![GitHub release](http://img.shields.io/github/release/vinbero/vinbero.svg)](https://github.com/vinbero/vinbero/releases)
 [![Build Status](https://travis-ci.org/vinbero/vinbero.svg?branch=master)](https://travis-ci.org/vinbero/vinbero)
 [![license](http://img.shields.io/github/license/vinbero/vinbero.svg)](https://raw.githubusercontent.com/vinbero/vinbero/master/LICENSE)
-[![Docker Stars](http://img.shields.io/docker/stars/vinbero/alpine-vinbero.svg)](https://hub.docker.com/r/vinbero/vinbero)
-[![Docker Pulls](http://img.shields.io/docker/pulls/vinbero/alpine-vinbero.svg)](https://hub.docker.com/r/vinbero/vinbero)
+[![Docker Stars](http://img.shields.io/docker/stars/vinbero/vinbero.svg)](https://hub.docker.com/r/vinbero/vinbero)
+[![Docker Pulls](http://img.shields.io/docker/pulls/vinbero/vinbero.svg)](https://hub.docker.com/r/vinbero/vinbero)
 [![codecov](https://codecov.io/gh/vinbero/vinbero/branch/master/graph/badge.svg)](https://codecov.io/gh/vinbero/vinbero)
 
 <p align="center"><img src="https://raw.githubusercontent.com/vinbero/vinbero/master/img/vinbero.png" alt="Vinbero" height="175px"/><img src="https://raw.githubusercontent.com/vinbero/vinbero/master/img/vinbero-text.png" alt="Vinbero" height="150px"/></p>
@@ -20,11 +20,11 @@ Vinbero is a modular server written in C, and its main goal is flexibility. Its 
 
 ## Example
 ```console
-docker run -it -d --name vinbero -p 8080:80 vinbero/alpine-vinbero_mt_http_lua
+docker run -it -d --name vinbero -p 8080:80 vinbero/vinbero_mt_http_lua
 curl localhost:8080
 ```
 ```console
-docker run -it -d --name vinbero -p 8080:80 vinbero/alpine-vinbero-blog
+docker run -it -d --name vinbero -p 8080:80 vinbero/vinbero-blog
 #default id: 'admin', default password: 'password'
 ngrok http 8080
 ```
@@ -189,7 +189,7 @@ To update AUTHORS file, you have to run cmake or make to update AUTHORS file bas
 ### Example
 1. To start developing from the environment where all official modules are installed, run a docker container like this:
 ```console
-docker run --cap-add=SYS_PTRACE --security-opt seccomp=unconfined -it -d --name vinbero vinbero/alpine-vinbero_mt_http_lua:dev
+docker run --cap-add=SYS_PTRACE --security-opt seccomp=unconfined -it -d --name vinbero vinbero/vinbero_mt_http_lua:dev
 docker exec -it vinbero /bin/sh
 ```
 2. Inside the container clone a forked repository, start from a branch you want to improve e.g., dev, feature, release, hotfix, bugfix
