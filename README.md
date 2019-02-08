@@ -109,7 +109,7 @@ It is initially started as a hobby project by Byeonggon Lee at Jul, 2016.
 There have been many architectural changes for two years.
 
 ## License
-MPLv2
+MPL-2.0
 
 ## Contribution guide
 Any type of contribution is welcome!
