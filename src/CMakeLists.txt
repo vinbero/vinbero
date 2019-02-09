@@ -15,8 +15,8 @@ install(TARGETS vinbero_core
 
 # Build and install vinbero)
 add_executable(vinbero vinbero.c vinbero_Help.c vinbero_Options.c)
-find_library(vinbero_common libvinbero_common.so REQUIRED)
-target_link_libraries(vinbero vinbero_core ${vinbero_common})
+find_library(vinbero_com libvinbero_com.so REQUIRED)
+target_link_libraries(vinbero vinbero_core ${vinbero_com})
 install(TARGETS vinbero 
         RUNTIME DESTINATION bin
         PUBLIC_HEADER DESTINATION include/vinbero)
