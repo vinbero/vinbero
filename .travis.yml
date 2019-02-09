@@ -48,7 +48,15 @@ before_install:
   - cd ../../
 
   - pwd
-  - git clone -b "$TRAVIS_BRANCH" https://github.com/vinbero/libvinbero_common
+  - git clone -b $TRAVIS_BRANCH https://github.com/vinbero/vinbero-interfaces
+  - cd vinbero-interfaces
+  - mkdir build
+  - cd build
+  - cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr ..
+  - cd ../../
+
+  - pwd
+  - git clone -b $TRAVIS_BRANCH https://github.com/vinbero/libvinbero_common
   - cd libvinbero_common
   - mkdir build
   - cd build
@@ -85,6 +93,12 @@ install:
 
   - pwd
   - cd libfastdl/build
+  - make
+  - sudo make install
+  - cd ../../
+
+  - pwd
+  - cd vinbero-interfaces/build
   - make
   - sudo make install
   - cd ../../
