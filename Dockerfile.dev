@@ -2,6 +2,8 @@ FROM alpine:latest
 MAINTAINER Byeonggon Lee (gonny952@gmail.com)
 
 RUN apk update && apk add git cmake automake autoconf libtool make gcc musl-dev cmocka-dev jansson-dev uthash-dev
+RUN apk add tmux vim less grep curl openssl openssl-dev musl-dbg gdb valgrind
+COPY vimrc /etc/vim/vimrc
 
 RUN mkdir -p /usr/src
 RUN git clone -b dev https://github.com/vinbero/libgenc /usr/src/libgenc
