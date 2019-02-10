@@ -1,0 +1,35 @@
+FROM alpine:latest
+MAINTAINER Byeonggon Lee (gonny952@gmail.com)
+
+RUN apk update && apk add git cmake automake autoconf libtool make gcc musl-dev cmocka-dev jansson-dev uthash-dev
+RUN mkdir -p /usr/src
+
+#{{
+  _def github {https://github.com}
+  if [expr {$branch ne {master}}] {
+    _println "RUN apk add tmux vim less grep curl openssl openssl-dev musl-dbg gdb valgrind tree"
+    _println "RUN apk add tcl"
+    _println "COPY vimrc /etc/vim/vimrc"
+    _println "RUN git clone [_getdef github]/gonapps-org/gmcr /usr/src/gmcr"
+    _println "RUN git clone --depth 1 [_getdef github]/tcltk/tcllib /usr/src/tcllib"
+    _println "RUN cp /usr/src/gmcr/gmcr /usr/bin/gmcr"
+    _println "RUN cd /usr/src/tcllib; yes | ./installer.tcl"
+  }
+}}#
+#{{
+  set repos {libgenc libgaio libfastdl libvinbero_com vinbero-ifaces vinbero}
+  if [expr {$branch ne {master}}] {
+     foreach {repo} $repos {
+       _println "RUN git clone -b dev [_getdef github]/vinbero/$repo /usr/src/$repo"
+     }
+  } else {
+     foreach {repo} $repos {
+       _println "RUN git clone [_getdef github]/vinbero/$repo /usr/src/$repo"
+     }
+  }
+}}#
+#{{
+  foreach {repo} {libgenc libgaio libfastdl libvinbero_com vinbero-ifaces vinbero} {
+    _println "RUN mkdir /usr/src/$repo/build; cd /usr/src/$repo/build; cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr -DCMAKE_BUILD_TYPE=Debug ..; make; make test; make install"
+  }
+}}#
