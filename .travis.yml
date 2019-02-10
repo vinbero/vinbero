@@ -48,16 +48,16 @@ before_install:
   - cd ../../
 
   - pwd
-  - git clone -b $TRAVIS_BRANCH https://github.com/vinbero/vinbero-interfaces
-  - cd vinbero-interfaces
+  - git clone -b $TRAVIS_BRANCH https://github.com/vinbero/vinbero-ifaces
+  - cd vinbero-ifaces
   - mkdir build
   - cd build
   - cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr ..
   - cd ../../
 
   - pwd
-  - git clone -b $TRAVIS_BRANCH https://github.com/vinbero/libvinbero_common
-  - cd libvinbero_common
+  - git clone -b $TRAVIS_BRANCH https://github.com/vinbero/libvinbero_com
+  - cd libvinbero_com
   - mkdir build
   - cd build
   - cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr ..
@@ -98,13 +98,13 @@ install:
   - cd ../../
 
   - pwd
-  - cd vinbero-interfaces/build
+  - cd vinbero-ifaces/build
   - make
   - sudo make install
   - cd ../../
 
   - pwd
-  - cd libvinbero_common/build
+  - cd libvinbero_com/build
   - make
   - sudo make install
   - cd ../../
