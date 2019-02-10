@@ -63,11 +63,11 @@ Options:
     "vinbero_mt": {
         "paths": ["/usr/local/lib/vinbero_mt.so", "/usr/lib/vinbero/vinbero_mt.so"],
         "config": {"vinbero_mt.workerCount": 4},
-        "next": ["vinbero_tcp_mt_epoll"]
+        "next": ["vinbero_strm_mt_epoll"]
     },
-    "vinbero_tcp_mt_epoll": {
-        "paths": ["/usr/local/lib/vinbero_tcp_mt_epoll.so", "/usr/lib/vinbero/vinbero_tcp_mt_epoll.so"],
-        "config": {"vinbero_tcp_mt_epoll.clientTimeoutSeconds": 3},
+    "vinbero_strm_mt_epoll": {
+        "paths": ["/usr/local/lib/vinbero_strm_mt_epoll.so", "/usr/lib/vinbero/vinbero_strm_mt_epoll.so"],
+        "config": {"vinbero_strm_mt_epoll.clientTimeoutSeconds": 3},
         "next": ["vinbero_mt_epoll_http"]
     },
     "vinbero_mt_epoll_http": {
@@ -130,11 +130,11 @@ vinbero_mt
 ```
 
 #### Interfaces
-Interface names are snake case and should start with vinbero_interface and **interface part** must be **uppercase with underscore**.
+Interface names are snake case and should start with vinbero_iface and **interface part** must be **uppercase with underscore**.
 
 ##### Example
 ```C
-vinbero_interface_HTTP
+vinbero_iface_HTTP
 ```
 
 #### Structs
@@ -149,8 +149,8 @@ struct vinbero_mt_epoll_http_ParserData;
 Function names are camel case and start with struct names if it act like methods, or start with module names or interface names.
 ##### Example
 ```C
-int vinbero_tcp_mt_epoll_loadChildClModules(struct vinbero_common_ClModule* clModule);
-int vinbero_interface_HTTP_onRequestStart(struct vinbero_common_ClModule* clModule);
+int vinbero_strm_mt_epoll_loadChildClModules(struct vinbero_com_ClModule* clModule);
+int vinbero_iface_HTTP_onRequestStart(struct vinbero_com_ClModule* clModule);
 ```
 
 #### Macros
@@ -165,8 +165,8 @@ Struct variable names are same as function names. but local variables don't star
 
 #### Reserved namespaces
 - vinbero_core
-- vinbero_common
-- vinbero_interface
+- vinbero_com
+- vinbero_iface
 - vinbero_global
 - vinbero_static
 - vinbero_local
