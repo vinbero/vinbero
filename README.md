@@ -63,11 +63,11 @@ Options:
     "vinbero_mt": {
         "paths": ["/usr/local/lib/vinbero_mt.so", "/usr/lib/vinbero/vinbero_mt.so"],
         "config": {"vinbero_mt.workerCount": 4},
-        "next": ["vinbero_tcp_mt_epoll"]
+        "next": ["vinbero_strm_mt_epoll"]
     },
-    "vinbero_tcp_mt_epoll": {
-        "paths": ["/usr/local/lib/vinbero_tcp_mt_epoll.so", "/usr/lib/vinbero/vinbero_tcp_mt_epoll.so"],
-        "config": {"vinbero_tcp_mt_epoll.clientTimeoutSeconds": 3},
+    "vinbero_strm_mt_epoll": {
+        "paths": ["/usr/local/lib/vinbero_strm_mt_epoll.so", "/usr/lib/vinbero/vinbero_strm_mt_epoll.so"],
+        "config": {"vinbero_strm_mt_epoll.clientTimeoutSeconds": 3},
         "next": ["vinbero_mt_epoll_http"]
     },
     "vinbero_mt_epoll_http": {
@@ -149,7 +149,7 @@ struct vinbero_mt_epoll_http_ParserData;
 Function names are camel case and start with struct names if it act like methods, or start with module names or interface names.
 ##### Example
 ```C
-int vinbero_tcp_mt_epoll_loadChildClModules(struct vinbero_common_ClModule* clModule);
+int vinbero_strm_mt_epoll_loadChildClModules(struct vinbero_common_ClModule* clModule);
 int vinbero_interface_HTTP_onRequestStart(struct vinbero_common_ClModule* clModule);
 ```
 
