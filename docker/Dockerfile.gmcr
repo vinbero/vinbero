@@ -17,15 +17,16 @@ RUN mkdir -p /usr/src
   }
 }}#
 #{{
-  set repos {libgenc libgaio libfastdl libvinbero_com vinbero-ifaces vinbero}
+  set gonapps_repos {libgenc libgaio libfastdl}
+  set vinbero_repos {libvinbero_com vinbero-ifaces vinbero}
   if [expr {$branch ne {master}}] {
-     foreach {repo} $repos {
-       _println "RUN git clone -b dev [_getdef github]/vinbero/$repo /usr/src/$repo"
-     }
-  } else {
-     foreach {repo} $repos {
-       _println "RUN git clone [_getdef github]/vinbero/$repo /usr/src/$repo"
-     }
+    set branch dev
+  }
+  foreach {repo} $gonapps_repos {
+    _println "RUN git clone -b $branch [_getdef github]/gonapps-org/$repo /usr/src/$repo"
+  }
+  foreach {repo} $vinbero_repos {
+    _println "RUN git clone -b $branch [_getdef github]/vinbero/$repo /usr/src/$repo"
   }
 }}#
 #{{
