@@ -50,7 +50,7 @@ install:
   - sudo make install
   - cd ../
 #{{
-  set repos {libgenc libgaio libfastdl vinbero-interfaces libvinbero_com}
+  set repos {libgenc libgaio libfastdl vinbero-ifaces libvinbero_com}
   foreach {repo} $repos {
     _println "  - pwd"
     _println "  - cd $repo/build"
