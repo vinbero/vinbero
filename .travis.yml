@@ -22,7 +22,6 @@ before_install:
   - autoreconf -i
   - ./configure --prefix=/usr
   - cd ../
-
   - pwd
   - git clone -b $TRAVIS_BRANCH https://github.com/vinbero/libgenc
   - cd libgenc
@@ -30,7 +29,6 @@ before_install:
   - cd build
   - cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr ..
   - cd ../../
-
   - pwd
   - git clone -b $TRAVIS_BRANCH https://github.com/vinbero/libgaio
   - cd libgaio
@@ -38,7 +36,6 @@ before_install:
   - cd build
   - cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr ..
   - cd ../../
-
   - pwd
   - git clone -b $TRAVIS_BRANCH https://github.com/vinbero/libfastdl
   - cd libfastdl
@@ -46,7 +43,6 @@ before_install:
   - cd build
   - cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr ..
   - cd ../../
-
   - pwd
   - git clone -b $TRAVIS_BRANCH https://github.com/vinbero/vinbero-ifaces
   - cd vinbero-ifaces
@@ -54,7 +50,6 @@ before_install:
   - cd build
   - cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr ..
   - cd ../../
-
   - pwd
   - git clone -b $TRAVIS_BRANCH https://github.com/vinbero/libvinbero_com
   - cd libvinbero_com
@@ -62,6 +57,7 @@ before_install:
   - cd build
   - cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr ..
   - cd ../../
+
 
 install:
   - sudo apt-get install -y uthash-dev
@@ -84,30 +80,27 @@ install:
   - make
   - sudo make install
   - cd ../../
-
   - pwd
   - cd libgaio/build
   - make
   - sudo make install
   - cd ../../
-
   - pwd
   - cd libfastdl/build
   - make
   - sudo make install
   - cd ../../
-
   - pwd
-  - cd vinbero-ifaces/build
+  - cd vinbero-interfaces/build
   - make
   - sudo make install
   - cd ../../
-
   - pwd
   - cd libvinbero_com/build
   - make
   - sudo make install
   - cd ../../
+
 
 before_script:
   - cmake -version
@@ -120,3 +113,4 @@ before_script:
 script: make && ctest -V
 after_success:
   - bash <(curl -s https://codecov.io/bash)
+
