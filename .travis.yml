@@ -58,7 +58,6 @@ before_install:
   - cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr ..
   - cd ../../
 
-
 install:
   - sudo apt-get install -y uthash-dev
 
@@ -74,7 +73,6 @@ install:
   - make check
   - sudo make install
   - cd ../
-
   - pwd
   - cd libgenc/build
   - make
@@ -91,7 +89,7 @@ install:
   - sudo make install
   - cd ../../
   - pwd
-  - cd vinbero-interfaces/build
+  - cd vinbero-ifaces/build
   - make
   - sudo make install
   - cd ../../
@@ -101,7 +99,6 @@ install:
   - sudo make install
   - cd ../../
 
-
 before_script:
   - cmake -version
   - make --version 
@@ -109,7 +106,6 @@ before_script:
   - mkdir build
   - cd build
   - cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr -DBUILD_WITH_COVERAGE=ON ..
-
 script: make && ctest -V
 after_success:
   - bash <(curl -s https://codecov.io/bash)
