@@ -23,8 +23,18 @@ before_install:
   - ./configure --prefix=/usr
   - cd ../
 #{{
-  set repos {libgenc libgaio libfastdl vinbero-ifaces libvinbero_com}
-  foreach {repo} $repos {
+  set gonapps_repos {libgenc libgaio libfastdl}
+  set vinbero_repos {vinbero-ifaces libvinbero_com}
+  foreach {repo} $gonapps_repos {
+    _println "  - pwd"
+    _println "  - git clone -b \$TRAVIS_BRANCH https://github.com/gonapps-org/$repo"
+    _println "  - cd $repo"
+    _println "  - mkdir build"
+    _println "  - cd build"
+    _println "  - cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr .."
+    _println "  - cd ../../"
+  }
+  foreach {repo} $vinbero_repos {
     _println "  - pwd"
     _println "  - git clone -b \$TRAVIS_BRANCH https://github.com/vinbero/$repo"
     _println "  - cd $repo"
@@ -33,6 +43,7 @@ before_install:
     _println "  - cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr .."
     _println "  - cd ../../"
   }
+
 }}#
 install:
   - sudo apt-get install -y uthash-dev

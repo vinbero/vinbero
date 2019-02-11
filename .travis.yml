@@ -23,21 +23,21 @@ before_install:
   - ./configure --prefix=/usr
   - cd ../
   - pwd
-  - git clone -b $TRAVIS_BRANCH https://github.com/vinbero/libgenc
+  - git clone -b $TRAVIS_BRANCH https://github.com/gonapps-org/libgenc
   - cd libgenc
   - mkdir build
   - cd build
   - cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr ..
   - cd ../../
   - pwd
-  - git clone -b $TRAVIS_BRANCH https://github.com/vinbero/libgaio
+  - git clone -b $TRAVIS_BRANCH https://github.com/gonapps-org/libgaio
   - cd libgaio
   - mkdir build
   - cd build
   - cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr ..
   - cd ../../
   - pwd
-  - git clone -b $TRAVIS_BRANCH https://github.com/vinbero/libfastdl
+  - git clone -b $TRAVIS_BRANCH https://github.com/gonapps-org/libfastdl
   - cd libfastdl
   - mkdir build
   - cd build
