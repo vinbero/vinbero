@@ -1,10 +1,10 @@
 FROM alpine:latest
 MAINTAINER Byeonggon Lee (gonny952@gmail.com)
 
-RUN apk update && apk add git cmake automake autoconf libtool make gcc musl-dev cmocka-dev jansson-dev uthash-dev
+RUN apk update && apk add git cmake automake autoconf libtool make gcc musl-dev cmocka-dev jansson-dev uthash-dev openssl openssl-dev
 RUN mkdir -p /usr/src
 
-RUN apk add tmux vim less grep curl openssl openssl-dev musl-dbg gdb valgrind tree
+RUN apk add tmux vim less grep curl musl-dbg gdb valgrind tree
 RUN apk add tcl
 COPY vimrc /etc/vim/vimrc
 RUN git clone https://github.com/gonapps-org/gmcr /usr/src/gmcr
@@ -14,10 +14,10 @@ RUN cd /usr/src/tcllib; yes | ./installer.tcl
 FROM alpine:latest
 MAINTAINER Byeonggon Lee (gonny952@gmail.com)
 
-RUN apk update && apk add git cmake automake autoconf libtool make gcc musl-dev cmocka-dev jansson-dev uthash-dev
+RUN apk update && apk add git cmake automake autoconf libtool make gcc musl-dev cmocka-dev jansson-dev uthash-dev openssl openssl-dev
 RUN mkdir -p /usr/src
 
-RUN apk add tmux vim less grep curl openssl openssl-dev musl-dbg gdb valgrind tree
+RUN apk add tmux vim less grep curl musl-dbg gdb valgrind tree
 RUN apk add tcl
 COPY vimrc /etc/vim/vimrc
 RUN git clone https://github.com/gonapps-org/gmcr /usr/src/gmcr
