@@ -1,13 +1,13 @@
 FROM alpine:latest
 MAINTAINER Byeonggon Lee (gonny952@gmail.com)
 
-RUN apk update && apk add git cmake automake autoconf libtool make gcc musl-dev cmocka-dev jansson-dev uthash-dev
+RUN apk update && apk add git cmake automake autoconf libtool make gcc musl-dev cmocka-dev jansson-dev uthash-dev openssl openssl-dev
 RUN mkdir -p /usr/src
 
 #{{
   _def github {https://github.com}
   if [expr {$branch ne {master}}] {
-    _println "RUN apk add tmux vim less grep curl openssl openssl-dev musl-dbg gdb valgrind tree"
+    _println "RUN apk add tmux vim less grep curl musl-dbg gdb valgrind tree"
     _println "RUN apk add tcl"
     _println "COPY vimrc /etc/vim/vimrc"
     _println "RUN git clone [_getdef github]/gonapps-org/gmcr /usr/src/gmcr"
