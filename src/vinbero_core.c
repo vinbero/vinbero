@@ -22,6 +22,19 @@
 #include "vinbero_core.h"
 #include "vinbero_Version.h"
 
+/*
+VINBERO_COM_MODULE_META_INIT(
+    "core",
+    VINBERO_VERSION_MAJOR,
+    VINBERO_VERSION_MINOR,
+    VINBERO_VERSION_PATCH,
+    "",
+    "BASIC"
+);
+
+#define VINBERO_CORE_META_GET(name) vinbero_com_Module_Metadata_##name()
+*/
+
 static pthread_key_t vinbero_core_tlKey;
 
 struct vinbero_core {
@@ -90,7 +103,6 @@ int vinbero_core_initLocalModule(struct vinbero_com_Module* module, struct vinbe
     GENC_TREE_NODE_SET_PARENT(module, NULL);
     module->id = "core";
     module->config = config;
-    vinbero_com_Module_init(module, "core", VINBERO_VERSION, true);
     module->localModule.pointer = malloc(1 * sizeof(struct vinbero_core));
     struct vinbero_core* localModule = module->localModule.pointer;
     vinbero_com_Config_getInt(module->config, module, "vinbero.setUid", (int*)&localModule->setUid, (int)geteuid());
@@ -99,7 +111,9 @@ int vinbero_core_initLocalModule(struct vinbero_com_Module* module, struct vinbe
 }
 
 static int vinbero_core_loadModule(struct vinbero_com_Module* module) {
+    int ret = VINBERO_COM_STATUS_SUCCESS;
     struct vinbero_com_Object* paths;
+
     VINBERO_COM_CONFIG_MGET_REQ(module->config, module, "paths", ARRAY, &paths);
     if(paths == NULL) {
         return VINBERO_COM_ERROR_INVALID_CONFIG;
@@ -107,7 +121,6 @@ static int vinbero_core_loadModule(struct vinbero_com_Module* module) {
     if(GENC_TREE_NODE_CHILD_COUNT(paths) < 1) {
         return VINBERO_COM_ERROR_INVALID_CONFIG;
     }
-    int ret = VINBERO_COM_STATUS_SUCCESS;
     GENC_TREE_NODE_FOR_EACH_CHILD(paths, index) {
         struct vinbero_com_Object* path = GENC_TREE_NODE_GET_CHILD(paths, index);
         if(!VINBERO_COM_OBJECT_IS_CONSTRING(path)) {
@@ -115,8 +128,14 @@ static int vinbero_core_loadModule(struct vinbero_com_Module* module) {
         }
         if(fastdl_open(&module->dlHandle, VINBERO_COM_OBJECT_CONSTRING(path), RTLD_LAZY | RTLD_GLOBAL) == 0) {
             module->path = VINBERO_COM_OBJECT_CONSTRING(path);
+/*
+TODO: check module compatibility
+            const char* inIfaces = NULL;
+            VINBERO_COM_MODULE_META_GET(module, "IN_IFACES", &inIfaces, &ret);
+*/
             return VINBERO_COM_STATUS_SUCCESS;
         }
+        VINBERO_COM_LOG_DEBUG("Failed to open %s for module %s", VINBERO_COM_OBJECT_CONSTRING(path), module->id);
         ret = VINBERO_COM_ERROR_DLOPEN;
     }
     return ret;
@@ -145,7 +164,7 @@ int vinbero_core_loadChildModules(struct vinbero_com_Module* module) {
             VINBERO_COM_LOG_ERROR("%s", fastdl_error()); // dlerror is not thread safe
             return ret;
         }
-        VINBERO_COM_LOG_DEBUG("Module %s is loaded from %s", childModule->id, childModule->path);
+        VINBERO_COM_LOG_INFO("Module %s is loaded from %s", childModule->id, childModule->path);
         if((ret = vinbero_core_loadChildModules(childModule)) < VINBERO_COM_STATUS_SUCCESS)
             return ret;
     }
@@ -158,22 +177,9 @@ int vinbero_core_initChildModules(struct vinbero_com_Module* module) {
     int ret;
     GENC_TREE_NODE_FOR_EACH_CHILD(module, index) {
         struct vinbero_com_Module* childModule = GENC_TREE_NODE_GET_CHILD(module, index);
-        childModule->childrenRequired = true;
         VINBERO_COM_CALL(MODULE, init, childModule, &ret, childModule);
         if(ret < VINBERO_COM_STATUS_SUCCESS)
             return ret;
-        if(childModule->childrenRequired == true && GENC_TREE_NODE_CHILD_COUNT(childModule) == 0) {
-            VINBERO_COM_LOG_ERROR("Module %s must have at least one child", childModule->name);
-            return VINBERO_COM_ERROR_INVALID_MODULE;
-        }
-        if(childModule->name == NULL) {
-            VINBERO_COM_LOG_ERROR("Module %s has no name", childModule->id);
-            return VINBERO_COM_ERROR_INVALID_MODULE;
-        }
-        if(childModule->version == NULL) {
-            VINBERO_COM_LOG_ERROR("Module %s has no version", childModule->id);
-            return VINBERO_COM_ERROR_INVALID_MODULE;
-        }
         if((ret = vinbero_core_initChildModules(childModule)) < 0)
             return ret;
     }

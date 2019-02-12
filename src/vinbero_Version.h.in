@@ -1,6 +1,9 @@
 #ifndef _VINBERO_VERSION_H
 #define _VINBERO_VERSION_H
 
-#define VINBERO_VERSION "@vinbero_version@"
+#define VINBERO_VERSION "@version@"
+#define VINBERO_VERSION_MAJOR @version_major@
+#define VINBERO_VERSION_MINOR @version_minor@
+#define VINBERO_VERSION_PATCH @version_patch@
 
 #endif

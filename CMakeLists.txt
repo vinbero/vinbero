@@ -11,12 +11,16 @@ endif()
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall")
 
+set(version "0.2.0")
+set(soversion "0.2")
+string(REPLACE "." ";" version_list ${version})
+list(GET version_list 0 version_major)
+list(GET version_list 1 version_minor)
+list(GET version_list 2 version_patch)
+
 configure_file("${PROJECT_SOURCE_DIR}/src/${PROJECT_NAME}_Version.h.in"
                "${PROJECT_BINARY_DIR}/${PROJECT_NAME}_Version.h" @ONLY)
 include_directories("${PROJECT_BINARY_DIR}")
-
-set(vinbero_version "0.2.0")
-set(vinbero_soversion "0.2")
 
 option(BUILD_WITH_COVERAGE "Build with coverage" OFF)
 if(${BUILD_WITH_COVERAGE})
