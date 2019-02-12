@@ -7,9 +7,11 @@ RUN mkdir -p /usr/src
 #{{
   _def github {https://github.com}
   if [expr {$branch ne {master}}] {
-    _println "RUN apk add tmux vim less grep curl musl-dbg gdb valgrind tree"
+    _println "RUN apk add tmux vim less grep curl musl-dbg gdb valgrind tree zsh"
     _println "RUN apk add tcl"
     _println "COPY vimrc /etc/vim/vimrc"
+    _println "COPY .zshrc /root/.zshrc"
+    git config --global pager.branch false
     _println "RUN git clone [_getdef github]/gonapps-org/gmcr /usr/src/gmcr"
     _println "RUN git clone --depth 1 [_getdef github]/tcltk/tcllib /usr/src/tcllib"
     _println "RUN cp /usr/src/gmcr/gmcr /usr/bin/gmcr"

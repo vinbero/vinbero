@@ -4,9 +4,10 @@ MAINTAINER Byeonggon Lee (gonny952@gmail.com)
 RUN apk update && apk add git cmake automake autoconf libtool make gcc musl-dev cmocka-dev jansson-dev uthash-dev openssl openssl-dev
 RUN mkdir -p /usr/src
 
-RUN apk add tmux vim less grep curl musl-dbg gdb valgrind tree
+RUN apk add tmux vim less grep curl musl-dbg gdb valgrind tree zsh
 RUN apk add tcl
 COPY vimrc /etc/vim/vimrc
+COPY .zshrc /root/.zshrc
 RUN git clone https://github.com/gonapps-org/gmcr /usr/src/gmcr
 RUN git clone --depth 1 https://github.com/tcltk/tcllib /usr/src/tcllib
 RUN cp /usr/src/gmcr/gmcr /usr/bin/gmcr
@@ -17,9 +18,10 @@ MAINTAINER Byeonggon Lee (gonny952@gmail.com)
 RUN apk update && apk add git cmake automake autoconf libtool make gcc musl-dev cmocka-dev jansson-dev uthash-dev openssl openssl-dev
 RUN mkdir -p /usr/src
 
-RUN apk add tmux vim less grep curl musl-dbg gdb valgrind tree
+RUN apk add tmux vim less grep curl musl-dbg gdb valgrind tree zsh
 RUN apk add tcl
 COPY vimrc /etc/vim/vimrc
+COPY .zshrc /root/.zshrc
 RUN git clone https://github.com/gonapps-org/gmcr /usr/src/gmcr
 RUN git clone --depth 1 https://github.com/tcltk/tcllib /usr/src/tcllib
 RUN cp /usr/src/gmcr/gmcr /usr/bin/gmcr
