@@ -25,9 +25,9 @@ RUN git clone --depth 1 https://github.com/tcltk/tcllib /usr/src/tcllib
 RUN cp /usr/src/gmcr/gmcr /usr/bin/gmcr
 RUN cd /usr/src/tcllib; yes | ./installer.tcl
 
-RUN git clone -b dev https://github.com/vinbero/libgenc /usr/src/libgenc
-RUN git clone -b dev https://github.com/vinbero/libgaio /usr/src/libgaio
-RUN git clone -b dev https://github.com/vinbero/libfastdl /usr/src/libfastdl
+RUN git clone -b dev https://github.com/gonapps-org/libgenc /usr/src/libgenc
+RUN git clone -b dev https://github.com/gonapps-org/libgaio /usr/src/libgaio
+RUN git clone -b dev https://github.com/gonapps-org/libfastdl /usr/src/libfastdl
 RUN git clone -b dev https://github.com/vinbero/libvinbero_com /usr/src/libvinbero_com
 RUN git clone -b dev https://github.com/vinbero/vinbero-ifaces /usr/src/vinbero-ifaces
 RUN git clone -b dev https://github.com/vinbero/vinbero /usr/src/vinbero
