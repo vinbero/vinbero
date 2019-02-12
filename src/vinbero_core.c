@@ -90,8 +90,8 @@ int vinbero_core_checkConfig(struct vinbero_com_Config* config, const char* modu
     if((ret = vinbero_com_Config_getChildModuleIds(config, moduleId, &childModuleIds)) < VINBERO_COM_STATUS_SUCCESS)
         return ret;
 
-    GENC_TREE_NODE_FOR_EACH_CHILD(childModuleIds, index) {
-        const struct vinbero_com_Object* childModuleId = GENC_TREE_NODE_GET_CHILD(childModuleIds, index);
+    GENC_TREE_NODE_FOR_EACH(childModuleIds, index) {
+        const struct vinbero_com_Object* childModuleId = GENC_TREE_NODE_RAW_GET(childModuleIds, index);
         if((ret = vinbero_core_checkConfig(config, VINBERO_COM_OBJECT_CONSTRING(childModuleId))) < VINBERO_COM_STATUS_SUCCESS)
             return ret;
     }
@@ -118,11 +118,11 @@ static int vinbero_core_loadModule(struct vinbero_com_Module* module) {
     if(paths == NULL) {
         return VINBERO_COM_ERROR_INVALID_CONFIG;
     }
-    if(GENC_TREE_NODE_CHILD_COUNT(paths) < 1) {
+    if(GENC_TREE_NODE_SIZE(paths) < 1) {
         return VINBERO_COM_ERROR_INVALID_CONFIG;
     }
-    GENC_TREE_NODE_FOR_EACH_CHILD(paths, index) {
-        struct vinbero_com_Object* path = GENC_TREE_NODE_GET_CHILD(paths, index);
+    GENC_TREE_NODE_FOR_EACH(paths, index) {
+        struct vinbero_com_Object* path = GENC_TREE_NODE_RAW_GET(paths, index);
         if(!VINBERO_COM_OBJECT_IS_CONSTRING(path)) {
             return VINBERO_COM_ERROR_INVALID_CONFIG;
         }
@@ -149,11 +149,11 @@ int vinbero_core_loadChildModules(struct vinbero_com_Module* module) {
         return ret;
     }
 
-    GENC_TREE_NODE_FOR_EACH_CHILD(childModuleIds, index) {
+    GENC_TREE_NODE_FOR_EACH(childModuleIds, index) {
         struct vinbero_com_Module* childModule = malloc(sizeof(struct vinbero_com_Module));
         GENC_TREE_NODE_INIT(childModule);
-        GENC_TREE_NODE_ADD_CHILD(module, childModule);
-        childModule->id = VINBERO_COM_OBJECT_CONSTRING(GENC_TREE_NODE_GET_CHILD(childModuleIds, index));
+        GENC_TREE_NODE_ADD(module, childModule);
+        childModule->id = VINBERO_COM_OBJECT_CONSTRING(GENC_TREE_NODE_RAW_GET(childModuleIds, index));
         childModule->config = module->config;
         ret = vinbero_core_loadModule(childModule);
         if(ret == VINBERO_COM_ERROR_INVALID_CONFIG) {
@@ -175,8 +175,8 @@ int vinbero_core_loadChildModules(struct vinbero_com_Module* module) {
 int vinbero_core_initChildModules(struct vinbero_com_Module* module) {
     VINBERO_COM_LOG_TRACE2();
     int ret;
-    GENC_TREE_NODE_FOR_EACH_CHILD(module, index) {
-        struct vinbero_com_Module* childModule = GENC_TREE_NODE_GET_CHILD(module, index);
+    GENC_TREE_NODE_FOR_EACH(module, index) {
+        struct vinbero_com_Module* childModule = GENC_TREE_NODE_RAW_GET(module, index);
         VINBERO_COM_CALL(MODULE, init, childModule, &ret, childModule);
         if(ret < VINBERO_COM_STATUS_SUCCESS)
             return ret;
@@ -189,8 +189,8 @@ int vinbero_core_initChildModules(struct vinbero_com_Module* module) {
 int vinbero_core_rInitChildModules(struct vinbero_com_Module* module) {
     VINBERO_COM_LOG_TRACE2();
     int ret;
-    GENC_TREE_NODE_FOR_EACH_CHILD(module, index) {
-        struct vinbero_com_Module* childModule = GENC_TREE_NODE_GET_CHILD(module, index);
+    GENC_TREE_NODE_FOR_EACH(module, index) {
+        struct vinbero_com_Module* childModule = GENC_TREE_NODE_RAW_GET(module, index);
         if((ret = vinbero_core_rInitChildModules(childModule)) < 0)
             return ret;
 
@@ -204,8 +204,8 @@ int vinbero_core_rInitChildModules(struct vinbero_com_Module* module) {
 static int vinbero_core_destroyChildModules(struct vinbero_com_Module* module) {
     VINBERO_COM_LOG_TRACE2();
     int ret;
-    GENC_TREE_NODE_FOR_EACH_CHILD(module, index) {
-        struct vinbero_com_Module* childModule = GENC_TREE_NODE_GET_CHILD(module, index);
+    GENC_TREE_NODE_FOR_EACH(module, index) {
+        struct vinbero_com_Module* childModule = GENC_TREE_NODE_RAW_GET(module, index);
         VINBERO_COM_CALL(MODULE, destroy, childModule, &ret, childModule);
         if(ret < VINBERO_COM_STATUS_SUCCESS)
             return ret;
@@ -218,8 +218,8 @@ static int vinbero_core_destroyChildModules(struct vinbero_com_Module* module) {
 static int vinbero_core_rDestroyChildModules(struct vinbero_com_Module* module) {
     VINBERO_COM_LOG_TRACE2();
     int ret;
-    GENC_TREE_NODE_FOR_EACH_CHILD(module, index) {
-        struct vinbero_com_Module* childModule = GENC_TREE_NODE_GET_CHILD(module, index);
+    GENC_TREE_NODE_FOR_EACH(module, index) {
+        struct vinbero_com_Module* childModule = GENC_TREE_NODE_RAW_GET(module, index);
         if((ret = vinbero_core_rDestroyChildModules(childModule)) < 0)
             return ret;
         VINBERO_COM_CALL(MODULE, rDestroy, childModule, &ret, childModule);
@@ -259,8 +259,8 @@ int vinbero_core_start(struct vinbero_com_Module* module) {
         VINBERO_COM_LOG_TRACE2();
         pthread_key_create(&vinbero_core_tlKey, NULL);
         pthread_setspecific(vinbero_core_tlKey, jumpBuffer);
-        GENC_TREE_NODE_FOR_EACH_CHILD(module, index) {
-            struct vinbero_com_Module* childModule = GENC_TREE_NODE_GET_CHILD(module, index);
+        GENC_TREE_NODE_FOR_EACH(module, index) {
+            struct vinbero_com_Module* childModule = GENC_TREE_NODE_RAW_GET(module, index);
             VINBERO_COM_CALL(BASIC, service, childModule, &ret, childModule);
             if(ret < VINBERO_COM_STATUS_SUCCESS) {
                 VINBERO_COM_LOG_ERROR("vinbero_iface_BASIC_service() failed");
