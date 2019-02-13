@@ -1,31 +1,20 @@
+FROM golang:alpine as gitbatch
+RUN apk update && apk add git
+RUN go get -u github.com/isacikgoz/gitbatch
+
 FROM alpine:latest
 MAINTAINER Byeonggon Lee (gonny952@gmail.com)
+
+COPY --from=gitbatch $HOME/go/bin/gitbatch /usr/bin/gitbatch
 
 RUN apk update && apk add git cmake automake autoconf libtool make gcc musl-dev cmocka-dev jansson-dev uthash-dev openssl openssl-dev
 RUN mkdir -p /usr/src
 
 RUN apk add tmux vim less grep curl musl-dbg gdb valgrind tree zsh
-RUN apk add tcl
+RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
 COPY vimrc /etc/vim/vimrc
 COPY .zshrc /root/.zshrc
-RUN git clone https://github.com/gonapps-org/gmcr /usr/src/gmcr
-RUN git clone --depth 1 https://github.com/tcltk/tcllib /usr/src/tcllib
-RUN cp /usr/src/gmcr/gmcr /usr/bin/gmcr
-RUN cd /usr/src/tcllib; yes | ./installer.tcl
-FROM alpine:latest
-MAINTAINER Byeonggon Lee (gonny952@gmail.com)
-
-RUN apk update && apk add git cmake automake autoconf libtool make gcc musl-dev cmocka-dev jansson-dev uthash-dev openssl openssl-dev
-RUN mkdir -p /usr/src
-
-RUN apk add tmux vim less grep curl musl-dbg gdb valgrind tree zsh
-RUN apk add tcl
-COPY vimrc /etc/vim/vimrc
-COPY .zshrc /root/.zshrc
-RUN git clone https://github.com/gonapps-org/gmcr /usr/src/gmcr
-RUN git clone --depth 1 https://github.com/tcltk/tcllib /usr/src/tcllib
-RUN cp /usr/src/gmcr/gmcr /usr/bin/gmcr
-RUN cd /usr/src/tcllib; yes | ./installer.tcl
+RUN git config --global pager.branch false
 
 RUN git clone -b dev https://github.com/gonapps-org/libgenc /usr/src/libgenc
 RUN git clone -b dev https://github.com/gonapps-org/libgaio /usr/src/libgaio
