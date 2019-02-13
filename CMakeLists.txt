@@ -11,8 +11,8 @@ endif()
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall")
 
-set(version "0.2.0")
-set(soversion "0.2")
+set(version "0.3.0")
+set(soversion "0.3")
 string(REPLACE "." ";" version_list ${version})
 list(GET version_list 0 version_major)
 list(GET version_list 1 version_minor)
