@@ -190,7 +190,7 @@ To update AUTHORS file, you have to run cmake or make to update AUTHORS file bas
 1. To start developing from the environment where all official modules are installed, run a docker container like this:
 ```console
 docker run --cap-add=SYS_PTRACE --security-opt seccomp=unconfined -it -d --name vinbero vinbero/vinbero_mt_http_lua:dev
-docker exec -it vinbero /bin/sh
+docker exec -it vinbero /bin/zsh
 ```
 2. Inside the container clone a forked repository, start from a branch you want to improve e.g., dev, feature, release, hotfix, bugfix
 ```console
