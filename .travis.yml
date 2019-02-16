@@ -9,21 +9,21 @@ branches:
     - dev
 before_install:
   - pwd
-  - git clone -b $TRAVIS_BRANCH https://github.com/gonapps-org/libgenc
+  - git clone -b $TRAVIS_BRANCH --recurse-submodules -j8 https://github.com/gonapps-org/libgenc
   - cd libgenc
   - mkdir build
   - cd build
   - cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr ..
   - cd ../../
   - pwd
-  - git clone -b $TRAVIS_BRANCH https://github.com/gonapps-org/libgaio
+  - git clone -b $TRAVIS_BRANCH --recurse-submodules https://github.com/gonapps-org/libgaio
   - cd libgaio
   - mkdir build
   - cd build
   - cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr ..
   - cd ../../
   - pwd
-  - git clone -b $TRAVIS_BRANCH https://github.com/gonapps-org/libfastdl
+  - git clone -b $TRAVIS_BRANCH --recurse-submodules https://github.com/gonapps-org/libfastdl
   - cd libfastdl
   - mkdir build
   - cd build
@@ -37,7 +37,7 @@ before_install:
   - cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr ..
   - cd ../../
   - pwd
-  - git clone -b $TRAVIS_BRANCH https://github.com/vinbero/libvinbero_com
+  - git clone -b $TRAVIS_BRANCH --recurse-submodules https://github.com/vinbero/libvinbero_com
   - cd libvinbero_com
   - mkdir build
   - cd build
