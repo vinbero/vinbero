@@ -1,4 +1,4 @@
-dist: trusty
+dist: xenial
 sudo: required
 language: c
 compiler:
@@ -8,20 +8,6 @@ branches:
     - master
     - dev
 before_install:
-  - pwd
-  - git clone git://git.cryptomilk.org/projects/cmocka.git
-  - cd cmocka
-  - mkdir build
-  - cd build
-  - cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr ..
-  - cd ../../
-
-  - pwd
-  - git clone https://github.com/akheron/jansson
-  - cd jansson
-  - autoreconf -i
-  - ./configure --prefix=/usr
-  - cd ../
   - pwd
   - git clone -b $TRAVIS_BRANCH https://github.com/gonapps-org/libgenc
   - cd libgenc
@@ -59,20 +45,8 @@ before_install:
   - cd ../../
 
 install:
-  - sudo apt-get install -y uthash-dev
+  - sudo apt-get install -y uthash-dev libcmocka-dev libjansson-dev
 
-  - pwd
-  - cd cmocka/build
-  - make
-  - sudo make install
-  - cd ../../
-
-  - pwd
-  - cd jansson
-  - make
-  - make check
-  - sudo make install
-  - cd ../
   - pwd
   - cd libgenc/build
   - make

@@ -9,8 +9,6 @@ else()
     set(CMAKE_C_STANDARD 11)
 endif()
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall")
-
 set(version "0.3.0")
 set(soversion "0.3")
 string(REPLACE "." ";" version_list ${version})

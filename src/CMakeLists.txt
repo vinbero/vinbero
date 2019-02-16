@@ -2,10 +2,15 @@ set(CMAKE_INSTALL_RPATH "\$ORIGIN:/usr/local/lib")
 
 # Build and install libvinbero_core
 add_library(vinbero_core SHARED vinbero_core.c)
-list(APPEND vinbero_core_public_headers "vinbero_core.h")
-set_target_properties(vinbero_core PROPERTIES VERSION ${version}
-                                              SOVERSION ${soversion}
-                                              PUBLIC_HEADER "${vinbero_core_public_headers}")
+list(APPEND public_headers "vinbero_core.h")
+set_target_properties(
+    vinbero_core
+    PROPERTIES
+    VERSION ${version}
+    SOVERSION ${soversion}
+    PUBLIC_HEADER "${public_headers}"
+)
+target_compile_options(vinbero_core PRIVATE -Wall)
 find_library(fastdl libfastdl.so REQUIRED)
 find_library(gaio libgaio.so REQUIRED)
 target_link_libraries(vinbero_core ${fastdl} ${gaio} pthread dl)
