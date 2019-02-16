@@ -1,11 +1,14 @@
-FROM golang:alpine as gitbatch
+FROM golang:alpine as installer
 RUN apk update && apk add git
 RUN go get -u github.com/isacikgoz/gitbatch
+RUN wget 'https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-linux-amd64.zip' -O $HOME/ngrok.zip
+RUN unzip $HOME/ngrok.zip -d $HOME
 
 FROM alpine:latest
 MAINTAINER Byeonggon Lee (gonny952@gmail.com)
 
-COPY --from=gitbatch $HOME/go/bin/gitbatch /usr/bin/gitbatch
+COPY --from=installer $HOME/go/bin/gitbatch /usr/bin/gitbatch
+COPY --from=installer /ngrok /usr/bin/ngrok
 
 RUN apk update && apk add git cmake automake autoconf libtool make gcc musl-dev cmocka-dev jansson-dev uthash-dev openssl openssl-dev
 RUN mkdir -p /usr/src
