@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.5)
 include(cmake/gonapps-cmake-helper.cmake)
 project(vinbero C)
-gonapps_genVersion("0.3.0" "0.3")
+gonapps_setVersion("0.3.0" "0.3")
 gonapps_setBuildType()
 gonapps_genAuthors()
 add_subdirectory(src)

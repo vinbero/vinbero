@@ -9,7 +9,7 @@
 #include <vinbero_com/vinbero_com_Log.h>
 #include "vinbero_Options.h"
 #include "vinbero_Help.h"
-#include "vinbero_Version.h"
+#include "config.h"
 
 int vinbero_Options_process(int argc, char* argv[], struct vinbero_com_Config* config) {
     int ret;

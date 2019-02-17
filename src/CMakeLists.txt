@@ -1,7 +1,12 @@
+find_package(fastdl REQUIRED)
+find_package(gaio REQUIRED)
+find_package(vinbero_com REQUIRED)
+
 add_library(vinbero_core SHARED)
 target_sources(vinbero_core PRIVATE vinbero_core.c)
 target_compile_options(vinbero_core PRIVATE -Wall)
 list(APPEND public_headers "vinbero_core.h")
+
 set_target_properties(
     vinbero_core
     PROPERTIES
@@ -10,14 +15,25 @@ set_target_properties(
     SOVERSION ${soversion}
     PUBLIC_HEADER "${public_headers}"
 )
-find_package(fastdl REQUIRED)
-find_package(gaio REQUIRED)
+
+target_include_directories(
+    vinbero_core
+    PUBLIC
+    ${PROJECT_BINARY_DIR}
+)
+
 target_link_libraries(
     vinbero_core
     fastdl::fastdl
     gaio::gaio
     pthread
     dl
+)
+
+configure_file(
+    "${PROJECT_SOURCE_DIR}/src/config.h.in"
+    "${PROJECT_BINARY_DIR}/config.h"
+    @ONLY
 )
 
 install(
@@ -34,12 +50,13 @@ set_target_properties(
     C_STANDARD 11
     INSTALL_RPATH "\$ORIGIN:/usr/local/lib"
 )
-find_package(vinbero_com REQUIRED)
+
 target_link_libraries(
     vinbero
     vinbero_core
     vinbero_com::vinbero_com
 )
+
 install(
     TARGETS vinbero 
     RUNTIME DESTINATION bin
