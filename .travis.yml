@@ -1,4 +1,4 @@
-dist: trusty
+dist: xenial
 sudo: required
 language: c
 compiler:
@@ -9,35 +9,21 @@ branches:
     - dev
 before_install:
   - pwd
-  - git clone git://git.cryptomilk.org/projects/cmocka.git
-  - cd cmocka
-  - mkdir build
-  - cd build
-  - cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr ..
-  - cd ../../
-
-  - pwd
-  - git clone https://github.com/akheron/jansson
-  - cd jansson
-  - autoreconf -i
-  - ./configure --prefix=/usr
-  - cd ../
-  - pwd
-  - git clone -b $TRAVIS_BRANCH https://github.com/gonapps-org/libgenc
+  - git clone -b $TRAVIS_BRANCH --recurse-submodules -j8 https://github.com/gonapps-org/libgenc
   - cd libgenc
   - mkdir build
   - cd build
   - cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr ..
   - cd ../../
   - pwd
-  - git clone -b $TRAVIS_BRANCH https://github.com/gonapps-org/libgaio
+  - git clone -b $TRAVIS_BRANCH --recurse-submodules https://github.com/gonapps-org/libgaio
   - cd libgaio
   - mkdir build
   - cd build
   - cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr ..
   - cd ../../
   - pwd
-  - git clone -b $TRAVIS_BRANCH https://github.com/gonapps-org/libfastdl
+  - git clone -b $TRAVIS_BRANCH --recurse-submodules https://github.com/gonapps-org/libfastdl
   - cd libfastdl
   - mkdir build
   - cd build
@@ -51,7 +37,7 @@ before_install:
   - cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr ..
   - cd ../../
   - pwd
-  - git clone -b $TRAVIS_BRANCH https://github.com/vinbero/libvinbero_com
+  - git clone -b $TRAVIS_BRANCH --recurse-submodules https://github.com/vinbero/libvinbero_com
   - cd libvinbero_com
   - mkdir build
   - cd build
@@ -59,20 +45,8 @@ before_install:
   - cd ../../
 
 install:
-  - sudo apt-get install -y uthash-dev
+  - sudo apt-get install -y uthash-dev libcmocka-dev libjansson-dev
 
-  - pwd
-  - cd cmocka/build
-  - make
-  - sudo make install
-  - cd ../../
-
-  - pwd
-  - cd jansson
-  - make
-  - make check
-  - sudo make install
-  - cd ../
   - pwd
   - cd libgenc/build
   - make

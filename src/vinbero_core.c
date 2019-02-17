@@ -20,8 +20,7 @@
 #include <vinbero_com/vinbero_com_Status.h>
 #include <vinbero_com/vinbero_com_Object.h>
 #include "vinbero_core.h"
-#include "vinbero_Version.h"
-
+#include "config.h"
 
 VINBERO_COM_MODULE_META_NAME("vinbero_core")
 VINBERO_COM_MODULE_META_LICENSE("MPL-2.0")
