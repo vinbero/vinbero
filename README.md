@@ -46,7 +46,7 @@ Options:
   -h --help                Print this help message.
 ```
 
-<a href="https://asciinema.org/a/188477" target="_blank"><img src="https://asciinema.org/a/188477.png" width="100%"/></a>
+<a href="https://asciinema.org/a/228194" target="_blank"><img src="https://asciinema.org/a/228194.png" width="100%"/></a>
 
 ### Config file example
 ```JSON
