@@ -1,7 +1,7 @@
 FROM alpine:latest
 MAINTAINER Byeonggon Lee (gonny952@gmail.com)
 
-RUN apk update && apk add git cmake automake autoconf libtool make gcc musl-dev cmocka-dev jansson-dev uthash-dev openssl openssl-dev
+RUN apk update && apk add git cmake automake autoconf libtool make gcc musl-dev cmocka-dev jansson-dev openssl openssl-dev
 RUN mkdir -p /usr/src
 
 
