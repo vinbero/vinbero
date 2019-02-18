@@ -148,6 +148,7 @@ static bool vinbero_core_ifacesCompatible(const char* outIfaces, const char* inI
     const char* iface;
 
     char* outIfaces2 = strdup(outIfaces);
+    char* outIfaces3 = outIfaces2;
     struct vinbero_core_Ifaces outIfaceAlist;
     GENC_ALIST_INIT(&outIfaceAlist);
     while((iface = strsep(&outIfaces2, ",")) != NULL) {
@@ -156,6 +157,7 @@ static bool vinbero_core_ifacesCompatible(const char* outIfaces, const char* inI
     }
 
     char* inIfaces2 = strdup(inIfaces);
+    char* inIfaces3 = inIfaces2;
     struct vinbero_core_Ifaces inIfaceAlist;
     GENC_ALIST_INIT(&inIfaceAlist);
     while((iface = strsep(&inIfaces2, ",")) != NULL) {
@@ -166,24 +168,24 @@ static bool vinbero_core_ifacesCompatible(const char* outIfaces, const char* inI
     if(GENC_ALIST_SIZE(&outIfaceAlist) != GENC_ALIST_SIZE(&inIfaceAlist)) {
         GENC_ALIST_FREE(&outIfaceAlist);
         GENC_ALIST_FREE(&inIfaceAlist);
-        free(outIfaces2);
-        free(inIfaces2);
+        free(outIfaces3);
+        free(inIfaces3);
         return false;
     }
     GENC_ALIST_FOREACH(&outIfaceAlist, index) {
         if(strncmp(GENC_ALIST_RAW_GET(&outIfaceAlist, index), GENC_ALIST_RAW_GET(&inIfaceAlist, index), strlen(GENC_ALIST_RAW_GET(&outIfaceAlist, index))) != 0) {
             GENC_ALIST_FREE(&outIfaceAlist);
             GENC_ALIST_FREE(&inIfaceAlist);
-            free(outIfaces2);
-            free(inIfaces2);
+            free(outIfaces3);
+            free(inIfaces3);
             return false;
         }
     }
 
     GENC_ALIST_FREE(&outIfaceAlist);
     GENC_ALIST_FREE(&inIfaceAlist);
-    free(outIfaces2);
-    free(inIfaces2);
+    free(outIfaces3);
+    free(inIfaces3);
     return true;
 }
 
@@ -372,5 +374,6 @@ int vinbero_core_start(struct vinbero_com_Module* module) {
     pthread_key_delete(vinbero_core_tlKey);
     vinbero_core_destroyChildModules(module);
     vinbero_core_rDestroyChildModules(module);
+    free(module->localModule.pointer);
     return VINBERO_COM_STATUS_SUCCESS;
 }
