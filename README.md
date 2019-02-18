@@ -25,7 +25,7 @@ curl localhost:8080
 ```
 <a href="https://asciinema.org/a/228194" target="_blank"><img src="https://asciinema.org/a/228194.png" width="100%"/></a>
 ```console
-docker run -it -d --name vinbero -p 8080:80 vinbero/vinbero-blog
+docker run -it -d --name vinbero -p 8080:80 -e PASSWORD=<YOUR PASSWORD> vinbero/vinbero-blog
 #default id: 'admin', default password: 'password'
 ngrok http 8080
 ```
