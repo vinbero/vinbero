@@ -23,12 +23,13 @@ Vinbero is a modular server written in C, and its main goal is flexibility. Its 
 docker run -it -d --name vinbero -p 8080:80 vinbero/vinbero_mt_http_lua
 curl localhost:8080
 ```
+<a href="https://asciinema.org/a/228194" target="_blank"><img src="https://asciinema.org/a/228194.png" width="100%"/></a>
 ```console
 docker run -it -d --name vinbero -p 8080:80 vinbero/vinbero-blog
 #default id: 'admin', default password: 'password'
 ngrok http 8080
 ```
-
+[![Youtube link](https://img.youtube.com/vi/43bqzvIO3mk/0.jpg)](https://www.youtube.com/watch?v=43bqzvIO3mk) 
 ## Warning
 **Currently this software is under heavy development, so there will be bugs or the architecture can change.
 Writing new modules is not encouraged yet.**
@@ -45,8 +46,6 @@ Options:
   -v --version             Print version info.
   -h --help                Print this help message.
 ```
-
-<a href="https://asciinema.org/a/228194" target="_blank"><img src="https://asciinema.org/a/228194.png" width="100%"/></a>
 
 ### Config file example
 ```JSON
