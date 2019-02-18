@@ -134,8 +134,6 @@ static int vinbero_core_loadModule(struct vinbero_com_Module* module) {
     return ret;
 }
 
-
-
 struct vinbero_core_Ifaces {
     GENC_ALIST(const char);
 };
