@@ -11,7 +11,7 @@ MAINTAINER Byeonggon Lee (gonny952@gmail.com)
 COPY --from=installer /gitbatch /usr/bin/gitbatch
 COPY --from=installer /ngrok /usr/bin/ngrok
 
-RUN apk update && apk add git cmake automake autoconf libtool make gcc musl-dev cmocka-dev jansson-dev openssl openssl-dev
+RUN apk update && apk add git cmake automake autoconf libtool make gcc musl-dev cmocka-dev jansson-dev openssl openssl-dev procps
 RUN mkdir -p /usr/src
 
 RUN apk add tmux vim less grep curl musl-dbg gdb valgrind tree zsh
