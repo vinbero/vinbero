@@ -24,6 +24,7 @@ target_include_directories(
 
 target_link_libraries(
     vinbero_core
+    vinbero_com::vinbero_com
     fastdl::fastdl
     gaio::gaio
     pthread
@@ -54,7 +55,6 @@ set_target_properties(
 target_link_libraries(
     vinbero
     vinbero_core
-    vinbero_com::vinbero_com
 )
 
 install(
