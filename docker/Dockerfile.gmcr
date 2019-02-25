@@ -1,0 +1,53 @@
+#{{c
+  github = 'https://github.com'
+  branch = args.branch
+  if branch ~= 'master' then
+    branch = 'dev'
+  end
+}}#
+#{{c
+  if branch ~= 'master' then
+    print([[
+FROM golang:alpine as installer
+RUN apk update && apk add git
+RUN wget https://github.com/isacikgoz/gitbatch/releases/download/v0.4.1/gitbatch_0.4.1_linux_amd64.tar.gz -O /gitbatch.tar.gz
+RUN tar -xvzf /gitbatch.tar.gz -C /
+RUN wget 'https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-linux-amd64.zip' -O /ngrok.zip
+RUN unzip /ngrok.zip -d /
+    ]])
+  end
+}}#
+FROM alpine:latest
+MAINTAINER Byeonggon Lee (gonny952@gmail.com)
+
+RUN apk update && apk add git cmake automake autoconf libtool make gcc musl-dev cmocka-dev jansson-dev openssl openssl-dev
+RUN mkdir -p /usr/src
+#{{c
+  if branch ~= 'master' then
+    print('COPY --from=installer /gitbatch /usr/bin/gitbatch')
+    print('COPY --from=installer /ngrok /usr/bin/ngrok')
+    print('RUN echo "http://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories; apk update')
+    print('RUN apk add tmux vim less grep curl musl-dbg gdb valgrind tree zsh procps flex-dev g++ boost-dev boost-program_options lua5.3-dev nlohmann-json-dev')
+    print('RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"')
+    print('COPY vimrc /etc/vim/vimrc')
+    print('COPY .zshrc /root/.zshrc')
+    print('RUN git config --global pager.branch false')
+    print('RUN git clone ' .. github ..'/gonapps-org/gmcr /usr/src/gmcr')
+    print('RUN cd /usr/src/gmcr; make; PREFIX=/usr make install')
+  end
+}}#
+#{{c
+  local gonapps_repos = {'libgenc', 'libgaio', 'libfastdl'}
+  local vinbero_repos = {'libvinbero_com', 'vinbero-ifaces', 'vinbero'}
+  for _, repo in pairs(gonapps_repos) do
+    print('RUN git clone -j8 --recurse-submodules -b ' .. branch .. ' ' .. github .. '/gonapps-org/' .. repo .. ' /usr/src/' .. repo)
+  end
+  for _, repo in pairs(vinbero_repos) do
+    print('RUN git clone -j8 --recurse-submodules -b ' .. branch .. ' ' .. github .. '/vinbero/' .. repo .. ' /usr/src/' .. repo)
+  end
+}}#
+#{{c
+  for _, repo in pairs({'libgenc', 'libgaio', 'libfastdl', 'libvinbero_com', 'vinbero-ifaces', 'vinbero'}) do
+    print('RUN mkdir /usr/src/' .. repo .. '/build; cd /usr/src/' .. repo .. '/build; cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr -DCMAKE_BUILD_TYPE=Debug ..; make; make test; make install')
+  end
+}}#
