@@ -49,6 +49,8 @@ set_target_properties(
     vinbero
     PROPERTIES
     C_STANDARD 11
+    VERSION ${version}
+    SOVERSION ${soversion}
     INSTALL_RPATH "\$ORIGIN:/usr/local/lib"
 )
 
