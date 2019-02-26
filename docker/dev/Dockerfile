@@ -20,8 +20,9 @@ RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh
 COPY vimrc /etc/vim/vimrc
 COPY .zshrc /root/.zshrc
 RUN git config --global pager.branch false
-RUN git clone https://github.com/gonapps-org/gmcr /usr/src/gmcr
-RUN cd /usr/src/gmcr; make; PREFIX=/usr make install
+RUN git clone -j8 --recurse-submodules https://github.com/gonapps-org/gmcr /usr/src/gmcr
+RUN mkdir /usr/src/gmcr/build
+RUN cd /usr/src/gmcr/build; cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr ..; make; make install
 
 RUN git clone -j8 --recurse-submodules -b dev https://github.com/gonapps-org/libgenc /usr/src/libgenc
 RUN git clone -j8 --recurse-submodules -b dev https://github.com/gonapps-org/libgaio /usr/src/libgaio

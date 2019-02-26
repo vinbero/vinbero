@@ -32,8 +32,9 @@ RUN mkdir -p /usr/src
     print('COPY vimrc /etc/vim/vimrc')
     print('COPY .zshrc /root/.zshrc')
     print('RUN git config --global pager.branch false')
-    print('RUN git clone ' .. github ..'/gonapps-org/gmcr /usr/src/gmcr')
-    print('RUN cd /usr/src/gmcr; make; PREFIX=/usr make install')
+    print('RUN git clone -j8 --recurse-submodules ' .. github ..'/gonapps-org/gmcr /usr/src/gmcr')
+    print('RUN mkdir /usr/src/gmcr/build')
+    print('RUN cd /usr/src/gmcr/build; cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr ..; make; make install')
   end
 }}#
 #{{c
