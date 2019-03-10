@@ -4,3 +4,6 @@
 [submodule "iface/vinbero_iface_BASIC"]
 	path = iface/vinbero_iface_BASIC
 	url = https://github.com/vinbero/vinbero_iface_BASIC
+[submodule "iface/vinbero_iface_MODULE"]
+	path = iface/vinbero_iface_MODULE
+	url = https://github.com/vinbero/vinbero_iface_MODULE
