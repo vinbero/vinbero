@@ -20,6 +20,7 @@ target_include_directories(
     vinbero_core
     PUBLIC
     ${PROJECT_BINARY_DIR}
+    "${PROJECT_BINARY_DIR}/iface/"
 )
 
 target_link_libraries(

@@ -1,3 +1,6 @@
 [submodule "cmake"]
 	path = cmake
 	url = https://github.com/gonapps-org/gonapps-cmake-helper
+[submodule "iface/vinbero_iface_BASIC"]
+	path = iface/vinbero_iface_BASIC
+	url = https://github.com/vinbero/vinbero_iface_BASIC

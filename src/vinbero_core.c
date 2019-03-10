@@ -12,7 +12,7 @@
 #include <libgenc/genc_Tree.h>
 #include <libgenc/genc_Alist.h>
 #include <vinbero/vinbero_iface_MODULE.h>
-#include <vinbero/vinbero_iface_BASIC.h>
+#include <vinbero_iface_BASIC/vinbero_iface_BASIC.h>
 #include <vinbero_com/vinbero_com_Log.h>
 #include <vinbero_com/vinbero_com_Call.h>
 #include <vinbero_com/vinbero_com_Config.h>
