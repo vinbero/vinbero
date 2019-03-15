@@ -27,7 +27,7 @@ RUN mkdir -p /usr/src
     print('COPY --from=installer /gitbatch /usr/bin/gitbatch')
     print('COPY --from=installer /ngrok /usr/bin/ngrok')
     print('RUN echo "http://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories; apk update')
-    print('RUN apk add tmux vim less grep curl musl-dbg gdb valgrind tree zsh procps flex-dev g++ boost-dev boost-program_options lua5.3-dev nlohmann-json-dev')
+    print('RUN apk add tmux vim less grep curl musl-dbg gdb valgrind tree zsh procps flex-dev g++ boost-dev boost-program_options lua5.3-dev nlohmann-json-dev uncrustify')
     print('RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"')
     print('COPY vimrc /etc/vim/vimrc')
     print('COPY .zshrc /root/.zshrc')
