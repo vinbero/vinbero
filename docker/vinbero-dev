@@ -15,16 +15,23 @@ vinbero-dev-help() {
 }
 
 vinbero-dev-build() {
-    echo "this is build command"
+    vinbero-dev-recurse "mkdir -p build && cd build && cmake .. && make && make install"
+}
+
+vinbero-dev-recurse() {
     for repo in $VINBERO_REPOS
     do
-        (mkdir -p "/usr/src/$repo/build" && cd "/usr/src/$repo/build" && cmake .. && make && make install)
+        bash -c "cd /usr/src/$repo && $*"
     done
 }
 
 vinbero-dev-main() {
-    local cmd=$1; shift
-    cmd=${cmd:-"help"}
+    local cmd=$1;
+    if [ ! -z "$cmd" ]; then
+        shift;
+    else
+        cmd="help"
+    fi
     cmd="vinbero-dev-${cmd}"
     $cmd "$@"
 }
