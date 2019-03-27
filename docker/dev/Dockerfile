@@ -15,10 +15,12 @@ RUN mkdir -p /usr/src
 COPY --from=installer /gitbatch /usr/bin/gitbatch
 COPY --from=installer /ngrok /usr/bin/ngrok
 RUN echo "http://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories; apk update
-RUN apk add tmux vim less grep curl musl-dbg gdb valgrind tree zsh procps flex-dev g++ boost-dev boost-program_options lua5.3-dev nlohmann-json-dev
+RUN apk add tmux vim less grep curl musl-dbg gdb valgrind tree zsh procps flex-dev g++ boost-dev boost-program_options lua5.3-dev nlohmann-json-dev uncrustify
 RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
 COPY vimrc /etc/vim/vimrc
 COPY .zshrc /root/.zshrc
+COPY vinbero-dev /usr/bin/vinbero-dev
+RUN chmod +x /usr/bin/vinbero-dev
 RUN git config --global pager.branch false
 RUN git clone -j8 --recurse-submodules https://github.com/gonapps-org/gmcr /usr/src/gmcr
 RUN mkdir /usr/src/gmcr/build

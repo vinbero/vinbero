@@ -31,6 +31,8 @@ RUN mkdir -p /usr/src
     print('RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"')
     print('COPY vimrc /etc/vim/vimrc')
     print('COPY .zshrc /root/.zshrc')
+    print('COPY vinbero-dev /usr/bin/vinbero-dev')
+    print('RUN chmod +x /usr/bin/vinbero-dev')
     print('RUN git config --global pager.branch false')
     print('RUN git clone -j8 --recurse-submodules ' .. github ..'/gonapps-org/gmcr /usr/src/gmcr')
     print('RUN mkdir /usr/src/gmcr/build')

@@ -1,0 +1,32 @@
+#!/bin/bash
+
+set -o errexit -o pipefail -o noclobber
+
+! getopt --test > /dev/null 
+if [[ ${PIPESTATUS[0]} -ne 4 ]]; then
+    echo "This environment doesn't support getopt"
+    exit 1
+fi
+
+VINBERO_REPOS=${VINBERO_REPOS:-"vinbero vinbero_tcp vinbero_mt vinbero_strm_mt_epoll vinbero_mt_epoll_tls vinbero_mt_epoll_http vinbero_mt_http_lua"}
+
+vinbero-dev-help() {
+    echo "this is help"
+}
+
+vinbero-dev-build() {
+    echo "this is build command"
+    for repo in $VINBERO_REPOS
+    do
+        (mkdir -p "/usr/src/$repo/build" && cd "/usr/src/$repo/build" && cmake .. && make && make install)
+    done
+}
+
+vinbero-dev-main() {
+    local cmd=$1; shift
+    cmd=${cmd:-"help"}
+    cmd="vinbero-dev-${cmd}"
+    $cmd "$@"
+}
+
+vinbero-dev-main "$@"
