@@ -14,6 +14,7 @@ RUN wget https://github.com/isacikgoz/gitbatch/releases/download/v0.4.1/gitbatch
 RUN tar -xvzf /gitbatch.tar.gz -C /
 RUN wget 'https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-linux-amd64.zip' -O /ngrok.zip
 RUN unzip /ngrok.zip -d /
+RUN go get -u github.com/git-chglog/git-chglog/cmd/git-chglog
     ]])
   end
 }}#
