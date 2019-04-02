@@ -5,6 +5,7 @@ RUN wget https://github.com/isacikgoz/gitbatch/releases/download/v0.4.1/gitbatch
 RUN tar -xvzf /gitbatch.tar.gz -C /
 RUN wget 'https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-linux-amd64.zip' -O /ngrok.zip
 RUN unzip /ngrok.zip -d /
+RUN go get -u github.com/git-chglog/git-chglog/cmd/git-chglog
     
 
 FROM alpine:latest
@@ -14,6 +15,7 @@ RUN apk update && apk add git cmake automake autoconf libtool make gcc musl-dev 
 RUN mkdir -p /usr/src
 COPY --from=installer /gitbatch /usr/bin/gitbatch
 COPY --from=installer /ngrok /usr/bin/ngrok
+COPY --from=installer /go/bin/git-chglog /usr/bin/git-chglog
 RUN echo "http://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories; apk update
 RUN apk add tmux vim less grep curl musl-dbg gdb valgrind tree zsh procps flex-dev g++ boost-dev boost-program_options lua5.3-dev nlohmann-json-dev uncrustify
 RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
