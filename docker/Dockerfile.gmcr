@@ -21,24 +21,26 @@ RUN go get -u github.com/git-chglog/git-chglog/cmd/git-chglog
 FROM alpine:latest
 MAINTAINER Byeonggon Lee (gonny952@gmail.com)
 
-RUN apk update && apk add git cmake automake autoconf libtool make gcc musl-dev cmocka-dev jansson-dev openssl openssl-dev
+RUN apk update && apk add git cmake automake autoconf libtool make gcc musl-dev cmocka-dev jansson-dev openssl openssl-dev clang
 RUN mkdir -p /usr/src
 #{{c
   if branch ~= 'master' then
-    print('COPY --from=installer /gitbatch /usr/bin/gitbatch')
-    print('COPY --from=installer /ngrok /usr/bin/ngrok')
-    print('COPY --from=installer /go/bin/git-chglog /usr/bin/git-chglog')
-    print('RUN echo "http://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories; apk update')
-    print('RUN apk add tmux vim less grep curl musl-dbg gdb valgrind tree zsh procps flex-dev g++ boost-dev boost-program_options lua5.3-dev nlohmann-json-dev uncrustify')
-    print('RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"')
-    print('COPY vimrc /etc/vim/vimrc')
-    print('COPY .zshrc /root/.zshrc')
-    print('COPY vinbero-dev /usr/bin/vinbero-dev')
-    print('RUN chmod +x /usr/bin/vinbero-dev')
-    print('RUN git config --global pager.branch false')
-    print('RUN git clone -j8 --recurse-submodules ' .. github ..'/gonapps-org/gmcr /usr/src/gmcr')
-    print('RUN mkdir /usr/src/gmcr/build')
-    print('RUN cd /usr/src/gmcr/build; cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr ..; make; make install')
+    print([[
+COPY --from=installer /gitbatch /usr/bin/gitbatch
+COPY --from=installer /ngrok /usr/bin/ngrok
+COPY --from=installer /go/bin/git-chglog /usr/bin/git-chglog
+RUN echo "http://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories; apk update
+RUN apk add tmux vim less grep curl musl-dbg gdb valgrind tree zsh procps flex-dev g++ boost-dev boost-program_options lua5.3-dev nlohmann-json-dev uncrustify
+RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
+COPY vimrc /etc/vim/vimrc
+COPY .zshrc /root/.zshrc
+COPY vinbero-dev /usr/bin/vinbero-dev
+RUN chmod +x /usr/bin/vinbero-dev
+RUN git config --global pager.branch false
+RUN git clone -j8 --recurse-submodules ' .. github ..'/gonapps-org/gmcr /usr/src/gmcr
+RUN mkdir /usr/src/gmcr/build
+RUN cd /usr/src/gmcr/build; cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr ..; make; make install
+    ]])
   end
 }}#
 #{{c
