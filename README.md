@@ -116,7 +116,7 @@ Logging flags and logging options are integer bitmasks:
 
 ## History
 It is initially started as a hobby project by Byeonggon Lee at Jul, 2016.
-There have been many architectural changes for two years.
+There have been many architectural changes.
 
 ## License
 MPL-2.0
