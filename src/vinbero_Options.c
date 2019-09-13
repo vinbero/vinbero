@@ -15,8 +15,8 @@ int vinbero_Options_process(int argc, char* argv[], struct vinbero_com_Config* c
     int ret;
     if(argv == NULL || config == NULL)
         return VINBERO_COM_ERROR_NULL;
-    int loggingFlag = VINBERO_COM_LOG_FLAG_ALL & ~VINBERO_COM_LOG_FLAG_TRACE;
-    int loggingOption = VINBERO_COM_LOG_OPTION_COLOR;
+    unsigned long int loggingFlag = VINBERO_COM_LOG_FLAG_ALL & ~VINBERO_COM_LOG_FLAG_TRACE;
+    unsigned long int loggingOption = VINBERO_COM_LOG_OPTION_COLOR;
 
     const char* configString = NULL;
     const char* configFile = NULL;
@@ -40,13 +40,13 @@ int vinbero_Options_process(int argc, char* argv[], struct vinbero_com_Config* c
             configFile = optarg;
             break;
         case 'f':
-            loggingFlag = strtol(optarg, NULL, 10);
-            if(loggingFlag == LONG_MIN || loggingFlag == LONG_MAX)
+            loggingFlag = strtoul(optarg, NULL, 10);
+            if(loggingFlag == ULONG_MAX)
                 return VINBERO_COM_ERROR_INVALID_OPTION; 
             break;
         case 'o':
-            loggingOption = strtol(optarg, NULL, 10);
-            if(loggingOption == LONG_MIN || loggingOption == LONG_MAX)
+            loggingOption = strtoul(optarg, NULL, 10);
+            if(loggingOption == ULONG_MAX)
                 return VINBERO_COM_ERROR_INVALID_OPTION; 
             break;
         case 'v':

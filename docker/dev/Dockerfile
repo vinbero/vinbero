@@ -11,7 +11,7 @@ RUN go get -u github.com/git-chglog/git-chglog/cmd/git-chglog
 FROM alpine:latest
 MAINTAINER Byeonggon Lee (gonny952@gmail.com)
 
-RUN apk update && apk add git cmake automake autoconf libtool make gcc musl-dev cmocka-dev jansson-dev openssl openssl-dev yaml-dev
+RUN apk update && apk add git cmake automake autoconf libtool make gcc musl-dev cmocka-dev jansson-dev openssl openssl-dev clang yaml-dev
 RUN mkdir -p /usr/src
 COPY --from=installer /gitbatch /usr/bin/gitbatch
 COPY --from=installer /ngrok /usr/bin/ngrok
@@ -24,9 +24,10 @@ COPY .zshrc /root/.zshrc
 COPY vinbero-dev /usr/bin/vinbero-dev
 RUN chmod +x /usr/bin/vinbero-dev
 RUN git config --global pager.branch false
-RUN git clone -j8 --recurse-submodules https://github.com/gonapps-org/gmcr /usr/src/gmcr
+RUN git clone -j8 --recurse-submodules ' .. github ..'/gonapps-org/gmcr /usr/src/gmcr
 RUN mkdir /usr/src/gmcr/build
 RUN cd /usr/src/gmcr/build; cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr ..; make; make install
+    
 
 RUN git clone -j8 --recurse-submodules -b dev https://github.com/gonapps-org/libgenc /usr/src/libgenc
 RUN git clone -j8 --recurse-submodules -b dev https://github.com/gonapps-org/libgaio /usr/src/libgaio
