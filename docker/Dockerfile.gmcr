@@ -4,6 +4,15 @@
   if branch ~= 'master' then
     branch = 'dev'
   end
+  gonapps_repos = {'libgenc', 'libgaio', 'libfastdl'}
+  vinbero_repos = {'libvinbero_com', 'vinbero-ifaces', 'vinbero'}
+  all_repos = {}
+  for _, repo in pairs(gonapps_repos) do
+    table.insert(all_repos, repo)
+  end
+  for _, repo in pairs(vinbero_repos) do
+    table.insert(all_repos, repo)
+  end
 }}#
 #{{c
   if branch ~= 'master' then
@@ -44,8 +53,6 @@ RUN cd /usr/src/gmcr/build; cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr ..; make; mak
   end
 }}#
 #{{c
-  local gonapps_repos = {'libgenc', 'libgaio', 'libfastdl'}
-  local vinbero_repos = {'libvinbero_com', 'vinbero-ifaces', 'vinbero'}
   for _, repo in pairs(gonapps_repos) do
     print('RUN git clone -j8 --recurse-submodules -b ' .. branch .. ' ' .. github .. '/gonapps-org/' .. repo .. ' /usr/src/' .. repo)
   end
@@ -54,7 +61,13 @@ RUN cd /usr/src/gmcr/build; cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr ..; make; mak
   end
 }}#
 #{{c
-  for _, repo in pairs({'libgenc', 'libgaio', 'libfastdl', 'libvinbero_com', 'vinbero-ifaces', 'vinbero'}) do
-    print('RUN mkdir /usr/src/' .. repo .. '/build; cd /usr/src/' .. repo .. '/build; cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr -DCMAKE_BUILD_TYPE=Debug ..; make; make test; make install')
+  if branch ~= 'master' then
+    for _, repo in pairs(all_repos) do
+      print('RUN mkdir /usr/src/' .. repo .. '/build; cd /usr/src/' .. repo .. '/build; cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr -DCMAKE_BUILD_TYPE=Debug ..; make; make test; make install')
+    end
+  else
+    for _, repo in pairs(all_repos) do
+      print('RUN mkdir /usr/src/' .. repo .. '/build; cd /usr/src/' .. repo .. '/build; cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr -DCMAKE_BUILD_TYPE=Release ..; make; make test; make install')
+    end
   end
 }}#
