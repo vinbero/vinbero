@@ -8,7 +8,7 @@ if [[ ${PIPESTATUS[0]} -ne 4 ]]; then
     exit 1
 fi
 
-VINBERO_REPOS=${VINBERO_REPOS:-"vinbero vinbero_tcp vinbero_mt vinbero_strm_mt_epoll vinbero_mt_epoll_tls vinbero_mt_epoll_http vinbero_mt_http_lua"}
+VINBERO_REPOS=${VINBERO_REPOS:-"vinbero libvinbero_com vinbero_tcp vinbero_mt vinbero_strm_mt_epoll vinbero_mt_epoll_tls vinbero_mt_epoll_http vinbero_mt_http_lua"}
 
 vinbero-dev-help() {
     echo "this is help"
