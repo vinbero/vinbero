@@ -134,17 +134,34 @@ static int vinbero_core_loadModule(struct vinbero_com_Module* module) {
     return ret;
 }
 
-struct vinbero_core_Ifaces {
+struct vinbero_core_IfaceGroup {
     GENC_ALIST(const char);
+};
+
+struct vinbero_core_IfaceGroupAlist {
+    GENC_ALIST(struct vinbero_core_IfaceGroup);
 };
 
 static bool vinbero_core_isIfaceBigger(const char* iface, const char* iface2) {
     return strncmp(iface, iface2, strlen(iface)) > 0;
 }
 
-static bool vinbero_core_ifacesCompatible(const char* outIfaces, const char* inIfaces) {
-    /* TODO: Support semicolon to separate iface groups */
+static bool vinbero_core_ifaceGroupCompatible() {
+}
 
+static bool vinbero_core_getFirstCompatibleIfaceGroup() {
+}
+
+static bool vinbero_core_ifacesCompatible(const char* outIfacesOriginal, const char* inIfacesOriginal) {
+    /* TODO: Support semicolon to separate iface groups */
+    char* inIfaces = strdup(inIfacesOriginal);
+    char* outIfaces = strdup(outIfacesOriginal);
+    struct vinbero_core_IfaceGroupAlist outIfaceGroups;
+    const char* ifaceGroup;
+    GENC_ALIST_INIT(&outIfaceGroups);
+    while((ifaceGroup = strsep(&outIfaces, ";")) != NULL) {
+    }
+    /*
     const char* iface;
 
     char* outIfaces2 = strdup(outIfaces);
@@ -186,6 +203,7 @@ static bool vinbero_core_ifacesCompatible(const char* outIfaces, const char* inI
     GENC_ALIST_FREE(&inIfaceAlist);
     free(outIfaces3);
     free(inIfaces3);
+    */
     return true;
 }
 
