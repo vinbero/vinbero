@@ -146,65 +146,54 @@ static bool vinbero_core_isIfaceBigger(const char* iface, const char* iface2) {
     return strncmp(iface, iface2, strlen(iface)) > 0;
 }
 
-static bool vinbero_core_ifaceGroupCompatible() {
-}
-
-static bool vinbero_core_getFirstCompatibleIfaceGroup() {
-}
-
-static bool vinbero_core_ifacesCompatible(const char* outIfacesOriginal, const char* inIfacesOriginal) {
-    /* TODO: Support semicolon to separate iface groups */
-    char* inIfaces = strdup(inIfacesOriginal);
-    char* outIfaces = strdup(outIfacesOriginal);
-    struct vinbero_core_IfaceGroupAlist outIfaceGroups;
-    const char* ifaceGroup;
-    GENC_ALIST_INIT(&outIfaceGroups);
-    while((ifaceGroup = strsep(&outIfaces, ";")) != NULL) {
-    }
-    /*
+static bool vinbero_core_checkIfaceGroups(const char* outIfaceGroupOriginal, const char* inIfaceGroupOriginal) {
+    bool compatible = false;
     const char* iface;
 
-    char* outIfaces2 = strdup(outIfaces);
-    char* outIfaces3 = outIfaces2;
-    struct vinbero_core_Ifaces outIfaceAlist;
-    GENC_ALIST_INIT(&outIfaceAlist);
-    while((iface = strsep(&outIfaces2, ",")) != NULL) {
-        GENC_ALIST_PUSH(&outIfaceAlist, iface);
-        GENC_ALIST_SORT(&outIfaceAlist, vinbero_core_isIfaceBigger);
-    }
+    struct vinbero_core_IfaceGroup outIfaceGroup;
+    GENC_ALIST_INIT(&outIfaceGroup);
+    char* outIfaceGroupString = strdup(outIfaceGroupOriginal);
+    while((iface = strsep(&outIfaceGroupString, ",")) != NULL)
+        GENC_ALIST_PUSH(&outIfaceGroup, iface);
+    GENC_ALIST_SORT(&outIfaceGroup, vinbero_core_isIfaceBigger);
 
-    char* inIfaces2 = strdup(inIfaces);
-    char* inIfaces3 = inIfaces2;
-    struct vinbero_core_Ifaces inIfaceAlist;
-    GENC_ALIST_INIT(&inIfaceAlist);
-    while((iface = strsep(&inIfaces2, ",")) != NULL) {
-        GENC_ALIST_PUSH(&inIfaceAlist, iface);
-        GENC_ALIST_SORT(&inIfaceAlist, vinbero_core_isIfaceBigger);
-    }
+    struct vinbero_core_IfaceGroup inIfaceGroup;
+    char* inIfaceGroupString = strdup(inIfaceGroupOriginal);
+    while((iface = strsep(&inIfaceGroupString, ",")) != NULL)
+        GENC_ALIST_PUSH(&outIfaceGroup, iface);
+    GENC_ALIST_SORT(&inIfaceGroup, vinbero_core_isIfaceBigger);
 
-    if(GENC_ALIST_SIZE(&outIfaceAlist) != GENC_ALIST_SIZE(&inIfaceAlist)) {
-        GENC_ALIST_FREE(&outIfaceAlist);
-        GENC_ALIST_FREE(&inIfaceAlist);
-        free(outIfaces3);
-        free(inIfaces3);
-        return false;
-    }
-    GENC_ALIST_FOREACH(&outIfaceAlist, index) {
-        if(strncmp(GENC_ALIST_RAW_GET(&outIfaceAlist, index), GENC_ALIST_RAW_GET(&inIfaceAlist, index), strlen(GENC_ALIST_RAW_GET(&outIfaceAlist, index))) != 0) {
-            GENC_ALIST_FREE(&outIfaceAlist);
-            GENC_ALIST_FREE(&inIfaceAlist);
-            free(outIfaces3);
-            free(inIfaces3);
-            return false;
+    if(GENC_ALIST_SIZE(&outIfaceGroup) == GENC_ALIST_SIZE(&inIfaceGroup)) {
+        GENC_ALIST_FOREACH(&outIfaceGroup, index) {
+            if(
+                strncmp(
+                    GENC_ALIST_RAW_GET(&outIfaceGroup, index),
+                    GENC_ALIST_RAW_GET(&inIfaceGroup, index),
+                    strlen(GENC_ALIST_RAW_GET(&outIfaceGroup, index))
+                ) == 0
+            ) {
+                compatible = true;
+                break;
+            }
         }
     }
 
-    GENC_ALIST_FREE(&outIfaceAlist);
-    GENC_ALIST_FREE(&inIfaceAlist);
-    free(outIfaces3);
-    free(inIfaces3);
-    */
-    return true;
+    GENC_ALIST_FREE(&outIfaceGroup);
+    GENC_ALIST_FREE(&inIfaceGroup);
+    free(outIfaceGroupString);
+    free(inIfaceGroupString);
+    return compatible;
+}
+
+static bool vinbero_core_checkIfaces(const char* outIfaceGroup, const char* inIfacesOriginal) {
+    bool compatible = false;
+    char* inIfaces = strdup(inIfacesOriginal);
+    const char* inIfaceGroup;
+    while(compatible == false && (inIfaceGroup = strsep(&inIfaces, ";")) != NULL)
+        compatible = vinbero_core_checkIfaceGroups(outIfaceGroup, inIfaceGroup);
+    free(inIfaces);
+
+    return compatible;
 }
 
 int vinbero_core_loadChildModules(struct vinbero_com_Module* module) {
@@ -248,8 +237,7 @@ int vinbero_core_loadChildModules(struct vinbero_com_Module* module) {
         }
 
         VINBERO_COM_LOG_DEBUG("IN_IFACES OF MODULE %s IS %s", childModule->id, inIfaces);
-
-        if(vinbero_core_ifacesCompatible(outIfaces, inIfaces) == false) {
+        if(vinbero_core_checkIfaces(outIfaces, inIfaces) == false) {
             VINBERO_COM_LOG_ERROR("MODULE %s AND %s ARE INCOMPATIBLE", module->id, childModule->id);
             return VINBERO_COM_ERROR_INVALID_MODULE;
         }
