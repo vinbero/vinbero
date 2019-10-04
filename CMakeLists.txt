@@ -8,7 +8,7 @@ gonapps_setBuildType()
 
 add_custom_target(changelog WORKING_DIRECTORY ${PROJECT_SOURCE_DIR} COMMAND git-chglog -o ${PROJECT_SOURCE_DIR}/CHANGELOG.md)
 execute_process(COMMAND git rev-parse --abbrev-ref HEAD OUTPUT_VARIABLE branch)
-if(NOT "${branch}" STREQUAL "master")
+if(NOT "${branch}" STREQUAL "master\n")
     add_subdirectory(docker)
 endif()
 add_subdirectory(iface)
