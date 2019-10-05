@@ -3,7 +3,7 @@ include(cmake/gonapps-cmake-helper.cmake)
 project(vinbero C)
 set_property(GLOBAL PROPERTY ALLOW_DUPLICATE_CUSTOM_TARGETS TRUE)
 
-gonapps_setVersion("0.3.1" "0.3")
+gonapps_setVersion("0.4.0" "0.4")
 gonapps_setBuildType()
 
 add_custom_target(changelog WORKING_DIRECTORY ${PROJECT_SOURCE_DIR} COMMAND git-chglog -o ${PROJECT_SOURCE_DIR}/CHANGELOG.md)
