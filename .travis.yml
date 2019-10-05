@@ -43,6 +43,12 @@ before_install:
   - cd build
   - cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr ..
   - cd ../../
+  
+  - git clone -j8 --recurse-submodules https://github.com/gonapps-org/gmcr
+  - cd gmcr
+  - mkdir build
+  - cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr ..
+  - cd ../../
 
 install:
   - sudo apt-get install -y libcmocka-dev libjansson-dev
@@ -72,6 +78,11 @@ install:
   - make
   - sudo make install
   - cd ../../
+  
+  - cd gmcr/build
+  - make
+  - sudo make install
+  - cd ../../
 
 before_script:
   - cmake -version
@@ -83,4 +94,4 @@ before_script:
 script: make && ctest -V
 after_success:
   - bash <(curl -s https://codecov.io/bash)
-
+  
