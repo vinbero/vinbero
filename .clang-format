@@ -1,0 +1,46 @@
+---
+AccessModifierOffset: '0'
+AlignAfterOpenBracket: Align
+AlignConsecutiveMacros: 'false'
+AlignConsecutiveAssignments: 'false'
+AlignConsecutiveDeclarations: 'false'
+AlignEscapedNewlines: DontAlign
+AlignOperands: 'true'
+AlignTrailingComments: 'false'
+AllowAllParametersOfDeclarationOnNextLine: 'false'
+AllowShortBlocksOnASingleLine: 'false'
+AllowShortCaseLabelsOnASingleLine: 'false'
+AllowShortFunctionsOnASingleLine: None
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLoopsOnASingleLine: 'false'
+AlwaysBreakAfterReturnType: All
+AlwaysBreakBeforeMultilineStrings: 'false'
+BinPackArguments: 'false'
+BinPackParameters: 'false'
+BreakBeforeBinaryOperators: NonAssignment
+BreakBeforeBraces: Attach
+BreakBeforeTernaryOperators: 'false'
+ColumnLimit: '80'
+ContinuationIndentWidth: '2'
+IndentCaseLabels: 'false'
+IndentWidth: '4'
+KeepEmptyLinesAtTheStartOfBlocks: 'false'
+Language: Cpp
+MaxEmptyLinesToKeep: '1'
+PointerAlignment: Left
+ReflowComments: 'true'
+SortIncludes: 'true'
+SpaceAfterCStyleCast: 'false'
+SpaceAfterLogicalNot: 'false'
+SpaceBeforeAssignmentOperators: 'true'
+SpaceBeforeParens: Never
+SpaceInEmptyParentheses: 'false'
+SpacesBeforeTrailingComments: '1'
+SpacesInAngles: 'false'
+SpacesInCStyleCastParentheses: 'false'
+SpacesInParentheses: 'false'
+SpacesInSquareBrackets: 'false'
+TabWidth: '4'
+UseTab: Never
+
+...
