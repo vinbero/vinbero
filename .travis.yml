@@ -14,8 +14,6 @@ before_install:
   - mkdir build
   - cd build
   - cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr ..
-  - make
-  - sudo make install
   - cd ../../
   - pwd
   - git clone -b $TRAVIS_BRANCH --recurse-submodules -j8 https://github.com/gonapps-org/libgenc
@@ -55,6 +53,11 @@ before_install:
 
 install:
   - sudo apt-get install -y libcmocka-dev libjansson-dev liblua5.3-dev libboost-dev libboost-program-options-dev nlohmann-json-dev flex libfl-dev g++ make cmake
+  - pwd
+  - cd gmcr/build
+  - make
+  - sudo make install
+  - cd ../../
   - pwd
   - cd libgenc/build
   - make
