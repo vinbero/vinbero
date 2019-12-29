@@ -5,6 +5,7 @@ set_property(GLOBAL PROPERTY ALLOW_DUPLICATE_CUSTOM_TARGETS TRUE)
 
 gonapps_setVersion("0.3.1" "0.3")
 gonapps_setBuildType()
+gonapps_setClangFormat()
 
 add_custom_target(changelog WORKING_DIRECTORY ${PROJECT_SOURCE_DIR} COMMAND git-chglog -o ${PROJECT_SOURCE_DIR}/CHANGELOG.md)
 execute_process(COMMAND git rev-parse --abbrev-ref HEAD OUTPUT_VARIABLE branch)
