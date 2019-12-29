@@ -91,7 +91,7 @@ before_script:
   - mkdir build
   - cd build
   - cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr -DBUILD_WITH_COVERAGE=ON ..
-script: make && ctest -V && [ 0 = $(git diff --numstat | wc -l) ]
+script: make && ctest -V && [ $(git diff --numstat | wc -l) = 0 ]
 after_success:
   - bash <(curl -s https://codecov.io/bash)
 
