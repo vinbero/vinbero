@@ -9,13 +9,6 @@ branches:
     - dev
 before_install:
   - pwd
-  - git clone --recurse-submodules https://github.com/gonapps-org/gmcr
-  - cd gmcr
-  - mkdir build
-  - cd build
-  - cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr ..
-  - cd ../../
-  - pwd
   - git clone -b $TRAVIS_BRANCH --recurse-submodules -j8 https://github.com/gonapps-org/libgenc
   - cd libgenc
   - mkdir build
@@ -53,6 +46,13 @@ before_install:
 
 install:
   - sudo apt-get install -y libcmocka-dev libjansson-dev liblua5.3-dev libboost-dev libboost-program-options-dev nlohmann-json-dev flex libfl-dev g++ make cmake
+  - pwd
+  - git clone --recurse-submodules https://github.com/gonapps-org/gmcr
+  - cd gmcr
+  - mkdir build
+  - cd build
+  - cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr ..
+  - cd ../../
   - pwd
   - cd gmcr/build
   - make
