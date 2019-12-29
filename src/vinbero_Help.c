@@ -1,8 +1,9 @@
+#include "vinbero_Help.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include "vinbero_Help.h"
 
-void vinbero_Help_print() {
+void
+vinbero_Help_print() {
     puts("Usage: vinbero [OPTION]...");
     puts("A Modular Server.");
     puts("Options:");
